@@ -33,6 +33,23 @@ export default {
       titleLine1: 'Foresight for the',
       titleLine2: 'energy transition',
     },
+    // Pixel layout (test): the video shows through a pixel mask that drifts
+    // slowly; the orange pixels are example alerts. x/y place each alert on
+    // desktop (fractions of the hero), xm/ym on phones.
+    pixel: {
+      eyebrow: 'Asset foresight for energy',
+      titleLine1: 'Foresight for the',
+      titleLine2: 'energy transition',
+      text: 'Predicterra turns satellite, weather and sensor data into asset-level foresight, so operators act before the physical world does.',
+      alertsLabel: 'Example alerts',
+      alertLabel: 'Alert',
+      alerts: [
+        { icon: 'water_drop', asset: 'Substation SE-14', risk: 'Flood risk at the control building', when: 'Act within 72 h', x: 0.6, y: 0.46, xm: 0.72, ym: 0.56 },
+        { icon: 'local_fire_department', asset: 'Line L-207, span 41', risk: 'Vegetation 1.2 m from the conductor', when: 'Trim this week', x: 0.36, y: 0.74, xm: 0.22, ym: 0.68 },
+        { icon: 'wind_power', asset: 'Wind farm WF-03, turbine 12', risk: 'Icing risk on the blades tonight', when: 'Act within 12 h', x: 0.84, y: 0.36, xm: 0, ym: 0 },
+        { icon: 'solar_power', asset: 'Solar plant PV-08, block C', risk: 'Soiling loss above 6%', when: 'Schedule cleaning', x: 0.74, y: 0.7, xm: 0, ym: 0 },
+      ],
+    },
   },
 
 

@@ -1,0 +1,359 @@
+---
+/**
+ * Hero, pixel layout (test). The video plays behind a coarse pixel mask that
+ * drifts slowly (light cells cover it, dark cells reveal it). Light cells next
+ * to the video carry a small count of their dark neighbours. Orange pixels are
+ * example alerts on installations; the pointer becomes a grid-snapped
+ * crosshair with coordinates. Logic in `scripts/hero-pixel.ts`.
+ * Shown only when Menu > Hero layout (test) = Pixel.
+ */
+import Logos from './Logos.astro';
+import Icon from '../../components/Icon.astro';
+import { getCopy, withBase, type Locale } from '../../i18n/config';
+import type { IconName } from '../../data/icons';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { hero } = getCopy(locale).home;
+const { video, pixel } = hero;
+---
+
+<section class="hpx" aria-labelledby="hpx-title" data-hero-variant="pixel" data-hero-pixel>
+  <video
+    class="hpx__video"
+    muted
+    loop
+    playsinline
+    preload="none"
+    poster={withBase(video.poster)}
+    disablepictureinpicture
+    aria-hidden="true"
+    data-hero-video
+  >
+    <source src={withBase(video.large)} type="video/mp4" media="(min-width: 60em)" />
+    <source src={withBase(video.small)} type="video/mp4" />
+  </video>
+  <div class="hpx__dim" aria-hidden="true"></div>
+  <canvas class="hpx__mask" aria-hidden="true" data-pixel-canvas></canvas>
+
+  <!-- Kept light by the mask (data-pixel-keep) -->
+  <div class="hpx__intro" data-pixel-keep>
+    <p class="hpx__eyebrow t-small">{pixel.eyebrow}</p>
+    <!-- Only one hero is displayed at a time; the hidden ones are out of the
+         accessibility tree, so this heading never competes with the other h1. -->
+    <p id="hpx-title" class="hpx__title" role="heading" aria-level="1">
+      <span>{pixel.titleLine1}</span>
+      <span>{pixel.titleLine2}</span>
+    </p>
+    <Logos locale={locale} class="hpx__logos" />
+  </div>
+
+  <p class="hpx__note" data-pixel-keep>{pixel.text}</p>
+
+  <ul class="hpx__alerts" aria-label={pixel.alertsLabel}>
+    {
+      pixel.alerts.map((a, i) => {
+        const id = `hpx-alert-${i + 1}`;
+        const index = String(i + 1).padStart(2, '0');
+        return (
+          <li
+            class="alert"
+            data-pixel-alert
+            data-x={a.x}
+            data-y={a.y}
+            data-xm={a.xm}
+            data-ym={a.ym}
+          >
+            <button type="button" class="alert__dot" aria-expanded="false" aria-controls={id}>
+              <span class="visually-hidden">
+                {pixel.alertLabel} {index}: {a.asset}
+              </span>
+            </button>
+            <div class="alert__card" id={id} role="note">
+              <Icon name={a.icon as IconName} boxed size="2.25rem" />
+              <div class="alert__body">
+                <p class="alert__meta t-caption">
+                  <span class="t-num">
+                    {pixel.alertLabel} {index}
+                  </span>
+                  <span aria-hidden="true">·</span>
+                  <span>{a.when}</span>
+                </p>
+                <p class="alert__asset">{a.asset}</p>
+                <p class="alert__risk t-small">{a.risk}</p>
+              </div>
+            </div>
+          </li>
+        );
+      })
+    }
+  </ul>
+</section>
+
+<style>
+  .hpx {
+    --cell: 30px; /* set by the script to match the mask grid */
+    --edge: max(var(--gutter), calc((100vw - var(--max-w)) / 2 + var(--gutter)));
+    position: relative;
+    height: 100svh;
+    min-height: 38rem;
+    overflow: clip;
+    background: var(--canvas);
+    color: var(--ink);
+  }
+
+  .hpx__video,
+  .hpx__dim,
+  .hpx__mask {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hpx__video {
+    object-fit: cover;
+    filter: saturate(0.55);
+  }
+
+  /* Video cells read as near-black with the footage underneath. */
+  .hpx__dim {
+    background: rgb(24 24 24 / 0.72);
+  }
+
+  /* Without the script there is no mask: keep a plain light hero. */
+  .hpx:not(.hpx--live) .hpx__video,
+  .hpx:not(.hpx--live) .hpx__dim,
+  .hpx:not(.hpx--live) .hpx__alerts {
+    display: none;
+  }
+
+  /* Custom crosshair replaces the cursor (mouse only, drawn on the mask). */
+  @media (hover: hover) and (pointer: fine) {
+    .hpx.hpx--live,
+    .hpx.hpx--live * {
+      cursor: none;
+    }
+  }
+
+  /* ---------- Copy ---------- */
+  .hpx__intro {
+    position: absolute;
+    z-index: 3;
+    left: var(--edge);
+    top: calc(var(--header-h) + clamp(2rem, 1rem + 5vh, 5rem));
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: min(40rem, calc(100% - 2 * var(--gutter)));
+  }
+
+  .hpx__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--muted);
+  }
+
+  .hpx__eyebrow::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--accent);
+  }
+
+  .hpx__title {
+    display: grid;
+    margin-top: 1.25rem;
+    font-size: clamp(2.5rem, 1rem + 4vw, 5.5rem);
+    line-height: 0.98;
+    letter-spacing: var(--track-display);
+  }
+
+  .hpx__intro :global(.hpx__logos) {
+    --logo-scale: 0.78;
+    margin-top: clamp(1.75rem, 1rem + 2.5vh, 3rem);
+  }
+
+  .hpx__intro :global(.logos__list) {
+    justify-content: flex-start;
+    gap: 1rem clamp(1.5rem, 0.75rem + 2vw, 2.75rem);
+  }
+
+  .hpx__note {
+    position: absolute;
+    z-index: 3;
+    right: var(--edge);
+    bottom: clamp(1.5rem, 1rem + 3vh, 3.5rem);
+    max-width: 21rem;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    letter-spacing: var(--track-small);
+    color: var(--ink-2);
+  }
+
+  /* ---------- Alerts ---------- */
+  .hpx__alerts {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  .alert {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--cell);
+    height: var(--cell);
+    transform: translate(var(--ax, -999px), var(--ay, -999px));
+  }
+
+  .alert[hidden] {
+    display: none;
+  }
+
+  .alert__dot {
+    position: absolute;
+    inset: 0;
+    pointer-events: auto;
+    background: var(--accent);
+  }
+
+  /* Expanding square ring: the pixel is "transmitting". */
+  .alert__dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--accent);
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .alert__dot::after {
+      animation: alert-ping 2.4s var(--ease-out) infinite;
+      animation-delay: calc(var(--i, 0) * 600ms);
+    }
+  }
+
+  @keyframes alert-ping {
+    0% {
+      opacity: 0.9;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(2.6);
+    }
+  }
+
+  .alert__dot[aria-expanded='true'] {
+    outline: 1px solid #ffffff;
+    outline-offset: 3px;
+  }
+
+  .alert__dot:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+  }
+
+  .alert__card {
+    position: absolute;
+    top: 0;
+    left: calc(100% + var(--cell));
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.75rem;
+    width: 17rem;
+    padding: 0.75rem;
+    background: #f1f1f1;
+    color: var(--grey-700);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-6px);
+    transition:
+      opacity 180ms var(--ease-out),
+      transform 220ms var(--ease-out),
+      visibility 0s linear 220ms;
+  }
+
+  .alert[data-side='left'] .alert__card {
+    left: auto;
+    right: calc(100% + var(--cell));
+    transform: translateX(6px);
+  }
+
+  .alert[data-v='up'] .alert__card {
+    top: auto;
+    bottom: 0;
+  }
+
+  .alert.is-open .alert__card {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity 180ms var(--ease-out),
+      transform 220ms var(--ease-out),
+      visibility 0s;
+  }
+
+  .alert__body {
+    display: grid;
+    gap: 0.125rem;
+    align-content: start;
+  }
+
+  .alert__meta {
+    display: flex;
+    gap: 0.375rem;
+    color: var(--grey-500);
+  }
+
+  .alert__asset {
+    font-size: 0.9375rem;
+    line-height: 1.25;
+    letter-spacing: var(--track-title);
+  }
+
+  .alert__risk {
+    color: var(--grey-600);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .alert__card {
+      transform: none !important;
+    }
+  }
+
+  /* ---------- Small screens ---------- */
+  @media (max-width: 47.99rem) {
+    .hpx__intro :global(.hpx__logos) {
+      --logo-scale: 0.66;
+    }
+    .hpx__intro :global(.logos__list) {
+      display: grid;
+      grid-template-columns: repeat(3, max-content);
+    }
+    .hpx__note {
+      left: var(--gutter);
+      right: var(--gutter);
+      max-width: none;
+      font-size: 0.875rem;
+    }
+    .alert__card {
+      width: 14.5rem;
+    }
+  }
+</style>
+
+<script>
+  import { mountHeroPixel } from '../../scripts/hero-pixel';
+  import { mountHeroVideos } from '../../scripts/hero-video';
+  const root = document.querySelector<HTMLElement>('[data-hero-pixel]');
+  if (root) mountHeroPixel(root);
+  mountHeroVideos();
+</script>

@@ -57,7 +57,7 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
         var scene = localStorage.getItem('predicterra:scene');
         if (scene === 'overview') document.documentElement.dataset.scene = 'overview';
         var hero = localStorage.getItem('predicterra:hero');
-        if (hero === 'split' || hero === 'cutout') document.documentElement.dataset.hero = hero;
+        if (hero === 'split' || hero === 'cutout' || hero === 'pixel') document.documentElement.dataset.hero = hero;
       } catch (e) {}
     </script>
 

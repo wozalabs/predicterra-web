@@ -55,6 +55,7 @@ export default {
       centred: 'Centred',
       split: 'Split',
       cutout: 'Cutout',
+      pixel: 'Pixel',
     },
     email: 'hello@predicterra.com',
   },

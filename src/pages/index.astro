@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../sections/home/Hero.astro';
 import HeroCutout from '../sections/home/HeroCutout.astro';
+import HeroPixel from '../sections/home/HeroPixel.astro';
 import Claim from '../sections/home/Claim.astro';
 import SectorTrail from '../sections/home/SectorTrail.astro';
 import SectorScene from '../sections/home/SectorScene.astro';
@@ -26,6 +27,7 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   <Hero locale={locale} />
   <!-- Test only: cutout hero, shown when selected in the menu (Hero layout). -->
   <HeroCutout locale={locale} />
+  <HeroPixel locale={locale} />
   <Claim locale={locale} />
   <SectorTrail locale={locale} />
   <!-- Test only: previous 3D variant, shown when selected in the menu (3D view). -->

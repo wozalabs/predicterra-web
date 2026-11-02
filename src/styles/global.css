@@ -398,12 +398,15 @@ html[data-scene='overview'] [data-sectors='trail'] {
 }
 
 /* ---------- Hero layout test switch (menu) ---------- */
-[data-hero-variant='cutout'] {
+[data-hero-variant='cutout'],
+[data-hero-variant='pixel'] {
   display: none;
 }
-html[data-hero='cutout'] [data-hero-variant='cutout'] {
+html[data-hero='cutout'] [data-hero-variant='cutout'],
+html[data-hero='pixel'] [data-hero-variant='pixel'] {
   display: block;
 }
-html[data-hero='cutout'] [data-hero-variant='default'] {
+html[data-hero='cutout'] [data-hero-variant='default'],
+html[data-hero='pixel'] [data-hero-variant='default'] {
   display: none;
 }
