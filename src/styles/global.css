@@ -474,8 +474,9 @@ html.js-render-wait [data-render-step] {
   visibility: hidden;
 }
 
-/* Titles render in: letters appear progressively, left to right, with a short
-   orange leading edge, and settle to their own colour. */
+/* Titles are typed in (scripts/reveal.ts): letters appear one at a time at a
+   constant rate, no easing and no fade, behind a thin orange caret that
+   blinks twice at the end and goes away. */
 .render .rw {
   white-space: nowrap;
 }
@@ -484,28 +485,33 @@ html.js-render-wait [data-render-step] {
   opacity: 0;
 }
 
-.render--go .rc {
-  animation: render-char 600ms var(--ease-out) var(--d, 0ms) both;
+.render-caret {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: max(2px, 0.06em);
+  background: var(--render-flash, var(--accent));
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* Each letter fades in orange, holds for a beat, then snaps to its own colour
-   (no muddy orange-to-black blend). Letters go strictly left to right. */
-@keyframes render-char {
+.render-caret--blink {
+  animation: render-caret-blink 800ms steps(1, end) forwards;
+}
+
+@keyframes render-caret-blink {
   0% {
+    opacity: 1;
+  }
+  25% {
     opacity: 0;
-    color: var(--render-flash, var(--accent));
   }
-  22% {
+  50% {
     opacity: 1;
-    color: var(--render-flash, var(--accent));
   }
-  38% {
-    opacity: 1;
-    color: var(--render-flash, var(--accent));
-    animation-timing-function: steps(1, start);
-  }
+  75%,
   100% {
-    opacity: 1;
+    opacity: 0;
   }
 }
 

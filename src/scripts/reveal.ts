@@ -3,12 +3,12 @@
 // [data-reveal]          fades and rises a few pixels the first time it enters
 //                        the viewport. Inside [data-reveal-group] the children
 //                        are staggered.
-// [data-render]          titles and labels "render" in once they are well in
-//                        view: the original letters appear one after another,
-//                        left to right, each briefly in orange before settling
-//                        to its normal colour (a short orange leading edge runs
-//                        through the line). When it is done the original markup
-//                        is put back untouched.
+// [data-render]          titles and labels are typed in once they are well in
+//                        view, like a terminal: the original letters appear one
+//                        at a time, left to right, at a constant rate, behind a
+//                        thin orange caret that blinks twice at the end and goes
+//                        away. Text keeps its own colour throughout. When it is
+//                        done the original markup is put back untouched.
 // [data-render-step]     same effect, replayed every time its [data-step]
 //                        becomes active (3D section titles).
 //
@@ -19,9 +19,10 @@
 
 const REVEAL_STAGGER_MS = 70;
 const RENDER_START_MS = 100;
-const CHAR_STEP_MS = 26;
-const MAX_SWEEP_MS = 800;
-const CHAR_MS = 600;
+const CHAR_STEP_MS = 24;
+const MAX_SWEEP_MS = 750;
+/** Caret blinks at the end of the line before disappearing. */
+const CARET_TAIL_MS = 800;
 
 type RenderEl = HTMLElement & { __original?: string; __busy?: boolean };
 
@@ -116,7 +117,6 @@ function prepare(el: RenderEl) {
   const count = nodes.reduce((n, t) => n + (t.textContent ?? '').replace(/\s+/g, '').length, 0);
   const step = Math.min(CHAR_STEP_MS, MAX_SWEEP_MS / Math.max(count, 1));
 
-  let index = 0;
   for (const node of nodes) {
     const text = node.textContent ?? '';
     if (!text.trim()) continue;
@@ -136,18 +136,15 @@ function prepare(el: RenderEl) {
         const span = document.createElement('span');
         span.className = 'rc';
         span.textContent = ch;
-        const delay = RENDER_START_MS + index * step;
-        span.style.setProperty('--d', `${Math.round(delay)}ms`);
         word.append(span);
-        index++;
       }
       frag.append(word);
     }
     node.replaceWith(frag);
   }
 
+  el.style.setProperty('--rstep', `${Math.round(step)}ms`);
   el.dataset.renderReady = '';
-  el.dataset.renderTotal = String(RENDER_START_MS + index * step + CHAR_MS);
   el.classList.add('render');
   el.__original = original;
 }
@@ -155,14 +152,46 @@ function prepare(el: RenderEl) {
 function play(el: RenderEl) {
   if (el.__busy || el.dataset.renderReady === undefined) return;
   el.__busy = true;
-  // The keyframes end without a colour, so each character returns to its own
-  // colour (black, white on video, theme-scrubbed in Solutions).
+
+  // Letters and caret are driven from one clock, so the caret always sits
+  // exactly after the newest letter (no frame where it is missing or doubled).
+  const chars = Array.from(el.querySelectorAll<HTMLElement>('.rc'));
+  const step = parseFloat(el.style.getPropertyValue('--rstep')) || CHAR_STEP_MS;
+  const caret = document.createElement('span');
+  caret.className = 'render-caret';
+  caret.setAttribute('aria-hidden', 'true');
+  const restorePosition = getComputedStyle(el).position === 'static';
+  if (restorePosition) el.style.position = 'relative';
+  el.append(caret);
   el.classList.add('render--go');
-  const total = Number(el.dataset.renderTotal || 0) + 60;
-  window.setTimeout(() => {
+
+  const finish = () => {
     if (el.__original !== undefined) el.innerHTML = el.__original;
     el.classList.remove('render', 'render--go');
+    el.style.removeProperty('--rstep');
+    if (restorePosition) el.style.removeProperty('position');
     delete el.dataset.renderReady;
     el.__busy = false;
-  }, total);
+  };
+
+  const t0 = performance.now() + RENDER_START_MS;
+  let shown = 0;
+  const frame = (now: number) => {
+    const n = Math.max(0, Math.min(chars.length, Math.floor((now - t0) / step) + 1));
+    for (; shown < n; shown++) chars[shown].style.opacity = '1';
+    if (n > 0) {
+      const base = el.getBoundingClientRect();
+      const r = chars[n - 1].getBoundingClientRect();
+      caret.style.height = `${r.height * 0.74}px`;
+      caret.style.transform = `translate(${r.right - base.left + 1}px, ${r.top - base.top + r.height * 0.16}px)`;
+      caret.style.opacity = '1';
+    }
+    if (n < chars.length) {
+      requestAnimationFrame(frame);
+    } else {
+      caret.classList.add('render-caret--blink');
+      window.setTimeout(finish, CARET_TAIL_MS);
+    }
+  };
+  requestAnimationFrame(frame);
 }
