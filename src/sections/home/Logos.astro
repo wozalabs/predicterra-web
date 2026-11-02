@@ -1,0 +1,65 @@
+---
+import { getCopy, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+  class?: string;
+}
+const { locale = 'en', class: className } = Astro.props;
+const { logos } = getCopy(locale).home;
+---
+
+<div class:list={['logos', className]} role="region" aria-label={logos.title}>
+  <ul class="logos__list">
+    {
+      logos.items.map((item) => (
+        <li class="logos__item">
+          <img
+            src={item.src}
+            alt={item.name}
+            width={Math.round((item.w / item.h0) * item.h)}
+            height={item.h}
+            style={`--h:${item.h}px`}
+            loading="eager"
+            decoding="async"
+          />
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .logos {
+    /* Scale all logos together (the split hero uses a smaller value). */
+    --logo-scale: 1;
+  }
+
+  .logos__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem clamp(2rem, 1rem + 3vw, 4.5rem);
+  }
+
+  .logos__item {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Monochrome, whatever the original logo colours. */
+  .logos__item img {
+    width: auto;
+    height: calc(var(--h) * var(--logo-scale));
+    max-width: 100%;
+    filter: brightness(0);
+    opacity: 0.55;
+  }
+
+  @media (max-width: 40rem) {
+    .logos__list {
+      gap: 1rem 1.75rem;
+    }
+  }
+</style>

@@ -1,0 +1,134 @@
+---
+import NotchRule from '../../components/NotchRule.astro';
+import TextLink from '../../components/TextLink.astro';
+import Icon from '../../components/Icon.astro';
+import { getCopy, localizePath, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { cases } = getCopy(locale).home;
+---
+
+<section class="cases" id="success-stories" aria-labelledby="cases-title">
+  <div class="container cases__inner">
+    <NotchRule at={70} />
+    <h2 id="cases-title" class="t-h2 cases__title">{cases.title}</h2>
+
+    <div class="cases__grid">
+      <div class="cases__explore">
+        <TextLink
+          href={localizePath(cases.exploreHref, locale)}
+          label={cases.exploreLabel}
+          kicker={cases.exploreKicker}
+        />
+      </div>
+
+      <ul class="cases__list">
+        {
+          cases.items.map((c) => (
+            <li class="case">
+              <a
+                class="case__link"
+                href={c.external ? c.href : localizePath(c.href, locale)}
+                {...(c.external ? { target: '_blank', rel: 'noopener' } : {})}
+              >
+                <!-- Placeholder image: light grey until case photography is ready -->
+                <div class="case__media" aria-hidden="true"></div>
+                <div class="case__body">
+                  <h3 class="case__title">{c.title}</h3>
+                  <span class="case__arrow" aria-hidden="true">
+                    <Icon name="arrow_forward" />
+                  </span>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cases {
+    position: relative;
+    z-index: var(--z-cover);
+    background: var(--canvas);
+  }
+
+  .cases__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100svh;
+    padding-block: calc(var(--header-h) + 1rem) clamp(3rem, 2rem + 3vw, 5rem);
+  }
+
+  .cases__title {
+    margin-top: clamp(1rem, 0.75rem + 1vw, 2rem);
+  }
+
+  .cases__grid {
+    display: grid;
+    gap: 2rem;
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .cases__grid {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+      gap: var(--gutter);
+    }
+  }
+
+  .cases__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: 2.5rem var(--gutter);
+  }
+
+  .case__link {
+    display: grid;
+    gap: 1.25rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .case__media {
+    aspect-ratio: 4 / 3;
+    background: #e4e4e4;
+    /* Notched bottom edge, Hut 8 card pattern */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
+    transition: background-color 240ms ease;
+  }
+
+  .case__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 1.5rem;
+  }
+
+  .case__title {
+    max-width: 24ch;
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    letter-spacing: var(--track-title);
+  }
+
+  .case__arrow {
+    display: inline-flex;
+    font-size: 1.25rem;
+    transition: transform 200ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .case__link:hover .case__media {
+      background: #dadada;
+    }
+    .case__link:hover .case__arrow {
+      transform: translateX(4px);
+    }
+  }
+</style>

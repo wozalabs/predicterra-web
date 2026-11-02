@@ -1,0 +1,28 @@
+---
+import { logoAccentPaths, logoInkPaths } from '../data/logo';
+
+interface Props {
+  class?: string;
+  title?: string;
+}
+const { class: className, title = 'Predicterra' } = Astro.props;
+---
+
+<svg
+  class:list={['logo', className]}
+  viewBox="0 0 135 24"
+  role="img"
+  aria-label={title}
+  xmlns="http://www.w3.org/2000/svg"
+>
+  {logoAccentPaths.map((d) => <path d={d} fill="#FF3700" />)}
+  {logoInkPaths.map((d) => <path d={d} fill="currentColor" />)}
+</svg>
+
+<style>
+  .logo {
+    width: auto;
+    height: 1.5rem;
+    color: var(--ink);
+  }
+</style>

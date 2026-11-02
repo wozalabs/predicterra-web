@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../sections/home/Hero.astro';
+import HeroCutout from '../sections/home/HeroCutout.astro';
+import Claim from '../sections/home/Claim.astro';
+import SectorTrail from '../sections/home/SectorTrail.astro';
+import SectorScene from '../sections/home/SectorScene.astro';
+import Solutions from '../sections/home/Solutions.astro';
+import Benefits from '../sections/home/Benefits.astro';
+import Cases from '../sections/home/Cases.astro';
+import Cta from '../sections/home/Cta.astro';
+import { getCopy } from '../i18n/config';
+import { softwareJsonLd } from '../data/seo';
+
+const locale = 'en';
+const { home } = getCopy(locale);
+const site = Astro.site ?? new URL('https://www.predicterra.com');
+---
+
+<BaseLayout
+  title={home.seo.title}
+  description={home.seo.description}
+  locale={locale}
+  jsonLd={[softwareJsonLd(site, home.seo.description)]}
+>
+  <Hero locale={locale} />
+  <!-- Test only: cutout hero, shown when selected in the menu (Hero layout). -->
+  <HeroCutout locale={locale} />
+  <Claim locale={locale} />
+  <SectorTrail locale={locale} />
+  <!-- Test only: previous 3D variant, shown when selected in the menu (3D view). -->
+  <SectorScene locale={locale} />
+  <Solutions locale={locale} />
+  <Benefits locale={locale} />
+  <Cases locale={locale} />
+  <Cta locale={locale} />
+</BaseLayout>

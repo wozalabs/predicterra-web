@@ -1,0 +1,87 @@
+---
+import Button from '../../components/Button.astro';
+import TextLink from '../../components/TextLink.astro';
+import { getCopy, localizePath, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { cta } = getCopy(locale).home;
+---
+
+<!-- Full-width dark band. -->
+<section class="cta theme-dark" id="contact" aria-labelledby="cta-title" data-header-dark>
+  <div class="cta__field" aria-hidden="true"></div>
+  <div class="container cta__content">
+    <p class="label">{cta.label}</p>
+    <h2 id="cta-title" class="t-h2 cta__title">
+      <span class="cta__line">{cta.titleLine1}</span>
+      <span class="cta__line">{cta.titleLine2} <span class="accent">{cta.titleAccent}</span></span>
+    </h2>
+    <p class="cta__text">{cta.text}</p>
+    <div class="cta__actions">
+      <Button href={localizePath(cta.primary.href, locale)} label={cta.primary.label} />
+      <TextLink href={cta.secondary.href} label={cta.secondary.label} external class="cta__link" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    z-index: var(--z-cover);
+    overflow: hidden;
+    background: var(--grey-700);
+    padding-block: clamp(4rem, 3rem + 4vw, 7rem);
+  }
+
+  /* Dot field on both edges, fading towards the centred copy */
+  .cta__field {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, #4a4a4a 1.1px, transparent 1.7px);
+    background-size: 12px 12px;
+    mask-image: linear-gradient(90deg, #000, transparent 30%, transparent 70%, #000);
+    -webkit-mask-image: linear-gradient(90deg, #000, transparent 30%, transparent 70%, #000);
+  }
+
+  .cta__content {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .cta__content .label {
+    color: var(--ink-2);
+  }
+
+  .cta__title {
+    display: grid;
+  }
+
+  .cta__line {
+    white-space: nowrap;
+  }
+
+  .cta__text {
+    max-width: 40ch;
+    color: var(--ink-2);
+  }
+
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem 1.75rem;
+    margin-top: 0.75rem;
+  }
+
+  :global(.cta__link) {
+    min-width: 10rem;
+    padding-bottom: 0.5rem;
+  }
+</style>

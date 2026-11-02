@@ -1,0 +1,66 @@
+---
+/**
+ * Full-width hairline that steps up with a 45° notch (Hut 8 divider pattern).
+ * `at` sets where the step happens, as a percentage of the width.
+ */
+interface Props {
+  at?: number;
+  /** 'up' steps the line up after the notch, 'down' steps it down. */
+  direction?: 'up' | 'down';
+  class?: string;
+}
+const { at = 70, direction = 'up', class: className } = Astro.props;
+---
+
+<div class:list={['notch', `notch--${direction}`, className]} style={`--at:${at}%`} aria-hidden="true">
+  <span class="notch__a"></span>
+  <svg class="notch__step" viewBox="0 0 28 20" preserveAspectRatio="none">
+    {
+      direction === 'up' ? (
+        <line x1="0" y1="19.5" x2="28" y2="0.5" vector-effect="non-scaling-stroke" />
+      ) : (
+        <line x1="0" y1="0.5" x2="28" y2="19.5" vector-effect="non-scaling-stroke" />
+      )
+    }
+  </svg>
+  <span class="notch__b"></span>
+</div>
+
+<style>
+  .notch {
+    display: flex;
+    height: 20px;
+    width: 100%;
+  }
+
+  .notch__a {
+    flex: 0 0 var(--at);
+    border-bottom: 1px solid var(--rule, var(--line-strong));
+  }
+
+  .notch--down .notch__a {
+    border-bottom: 0;
+    border-top: 1px solid var(--rule, var(--line-strong));
+  }
+
+  .notch__step {
+    flex: 0 0 28px;
+    height: 20px;
+    overflow: visible;
+  }
+
+  .notch__step line {
+    stroke: var(--rule, var(--line-strong));
+    stroke-width: 1;
+  }
+
+  .notch__b {
+    flex: 1;
+    border-top: 1px solid var(--rule, var(--line-strong));
+  }
+
+  .notch--down .notch__b {
+    border-top: 0;
+    border-bottom: 1px solid var(--rule, var(--line-strong));
+  }
+</style>

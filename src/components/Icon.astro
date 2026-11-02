@@ -1,0 +1,35 @@
+---
+import { icons, type IconName } from '../data/icons';
+
+interface Props {
+  name: IconName;
+  /** Render inside the brand orange square. */
+  boxed?: boolean;
+  size?: string;
+  class?: string;
+}
+const { name, boxed = false, size, class: className } = Astro.props;
+const d = icons[name];
+---
+
+{
+  boxed ? (
+    <span class:list={['ibox', className]} style={size ? `--ibox:${size}` : undefined} aria-hidden="true">
+      <svg viewBox="0 -960 960 960">
+        <path d={d} />
+      </svg>
+    </span>
+  ) : (
+    <svg class:list={['icon', className]} viewBox="0 -960 960 960" aria-hidden="true">
+      <path d={d} />
+    </svg>
+  )
+}
+
+<style>
+  .icon {
+    width: 1.25em;
+    height: 1.25em;
+    fill: currentColor;
+  }
+</style>

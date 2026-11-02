@@ -1,0 +1,476 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { getCopy, localizePath, type Locale } from '../i18n/config';
+import { routes } from '../data/routes';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { common } = getCopy(locale);
+const { header, menu } = common;
+---
+
+<header class="site-header" data-site-header>
+  <div class="site-header__inner">
+    <a class="site-header__home" href={localizePath(routes.home, locale)} aria-label={header.homeLabel}>
+      <Logo />
+    </a>
+
+    <div class="site-header__actions">
+      <a class="btn site-header__demo" href={localizePath(routes.demo, locale)}>{header.demo}</a>
+      <button
+        class="site-header__menu"
+        type="button"
+        aria-haspopup="dialog"
+        aria-controls="site-menu"
+        aria-expanded="false"
+        data-menu-open
+      >
+        <span class="site-header__menu-label">{header.menu}</span>
+        <span class="burger" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<dialog id="site-menu" class="menu" aria-label={menu.title} data-menu>
+  <div class="menu__panel">
+    <div class="menu__top">
+      <span class="t-small t-muted">{menu.title}</span>
+      <button class="menu__close" type="button" aria-label={header.closeMenu} data-menu-close>
+        <Icon name="close" />
+      </button>
+    </div>
+
+    <nav class="menu__nav" aria-label={menu.title}>
+      {
+        menu.groups.map((group) => (
+          <div class="menu__group">
+            <p class="menu__group-title t-small t-muted">{group.title}</p>
+            <ul>
+              {group.links.map((link) => (
+                <li>
+                  <a
+                    class="menu__link"
+                    href={'external' in link && link.external ? link.href : localizePath(link.href, locale)}
+                    {...('external' in link && link.external ? { target: '_blank', rel: 'noopener' } : {})}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </nav>
+
+    <div class="menu__test" role="group" aria-label={menu.scene.label}>
+      <span class="t-small t-muted">{menu.scene.label}</span>
+      <div class="seg">
+        <button type="button" class="seg__btn" data-scene-option="trail" aria-pressed="true">{menu.scene.trail}</button>
+        <button type="button" class="seg__btn" data-scene-option="overview" aria-pressed="false">{menu.scene.overview}</button>
+      </div>
+    </div>
+
+    <div class="menu__test" role="group" aria-label={menu.hero.label}>
+      <span class="t-small t-muted">{menu.hero.label}</span>
+      <div class="seg">
+        <button type="button" class="seg__btn" data-hero-option="centred" aria-pressed="true">{menu.hero.centred}</button>
+        <button type="button" class="seg__btn" data-hero-option="split" aria-pressed="false">{menu.hero.split}</button>
+        <button type="button" class="seg__btn" data-hero-option="cutout" aria-pressed="false">{menu.hero.cutout}</button>
+      </div>
+    </div>
+
+    <div class="menu__foot">
+      <p class="t-small t-muted">{menu.contactLabel}</p>
+      <a class="menu__mail" href={`mailto:${menu.email}`}>{menu.email}</a>
+      <a class="btn btn--lg menu__demo" href={localizePath(routes.demo, locale)}>
+        <span>{header.demo}</span>
+        <span class="btn__square" aria-hidden="true"></span>
+      </a>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /* --hd (0 light, 1 dark) is set below whenever a [data-header-dark] section sits under the header. */
+  .site-header {
+    --hd: 0;
+    --hpct: calc(var(--hd) * 100%);
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: var(--z-header);
+    height: var(--header-h);
+    color: color-mix(in oklab, #f1f1f1 var(--hpct), #1e1e1e);
+    /* No background or border: the header floats over the page. */
+    transition: color 240ms ease;
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    max-width: var(--max-w);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .site-header__home {
+    display: inline-flex;
+    padding-block: 0.75rem;
+  }
+
+  .site-header__home :global(.logo) {
+    color: inherit;
+    height: clamp(1.25rem, 1.05rem + 0.5vw, 1.625rem);
+  }
+
+  .site-header__actions {
+    display: flex;
+    align-items: stretch;
+    height: 2.5rem;
+  }
+
+  .site-header__menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0 0 0 1.25rem;
+    transition: transform 160ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .site-header__menu:active {
+    transform: scale(0.97);
+  }
+
+  .burger {
+    display: grid;
+    gap: 6px;
+    width: 1.375rem;
+  }
+
+  .burger span {
+    display: block;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 240ms var(--ease-out);
+  }
+
+  .burger span:last-child {
+    transform: translateX(30%) scaleX(0.6);
+    transform-origin: right;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-header__menu:hover .burger span:last-child {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .site-header__demo {
+      display: none;
+    }
+  }
+
+  /* ---------- Menu drawer ---------- */
+  .menu {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(34rem, 100vw);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--surface);
+    color: var(--ink);
+    transform: translateX(100%);
+    transition:
+      transform 420ms var(--ease-drawer),
+      overlay 420ms allow-discrete,
+      display 420ms allow-discrete;
+  }
+
+  .menu[open] {
+    transform: none;
+  }
+
+  @starting-style {
+    .menu[open] {
+      transform: translateX(100%);
+    }
+  }
+
+  .menu::backdrop {
+    background: rgb(30 30 30 / 0);
+    transition:
+      background-color 420ms ease,
+      overlay 420ms allow-discrete,
+      display 420ms allow-discrete;
+  }
+
+  .menu[open]::backdrop {
+    background: rgb(30 30 30 / 0.28);
+  }
+
+  @starting-style {
+    .menu[open]::backdrop {
+      background: rgb(30 30 30 / 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu {
+      transform: none;
+      opacity: 0;
+      transition:
+        opacity 200ms ease,
+        overlay 200ms allow-discrete,
+        display 200ms allow-discrete;
+    }
+    .menu[open] {
+      opacity: 1;
+    }
+    @starting-style {
+      .menu[open] {
+        opacity: 0;
+        transform: none;
+      }
+    }
+  }
+
+  .menu__panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 0 var(--gutter) var(--gutter);
+  }
+
+  .menu__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-h);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .menu__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    margin-right: -0.75rem;
+    font-size: 1.25rem;
+    transition: transform 160ms var(--ease-out);
+  }
+
+  .menu__close:active {
+    transform: scale(0.94);
+  }
+
+  .menu__nav {
+    display: grid;
+    gap: 1.75rem;
+    padding-block: 1.75rem;
+  }
+
+  .menu__group-title {
+    margin-bottom: 0.5rem;
+  }
+
+  .menu__link {
+    display: block;
+    padding-block: 0.3rem;
+    font-size: clamp(1.375rem, 1.15rem + 0.6vw, 1.75rem);
+    line-height: 1.15;
+    letter-spacing: var(--track-title);
+    transition: color 160ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .menu__link:hover {
+      color: var(--muted);
+    }
+  }
+
+  /* Temporary test switch between the two 3D variants */
+  .menu__test {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .seg {
+    display: inline-flex;
+    border: 1px solid var(--line);
+    background: var(--chip-bg);
+  }
+
+  .seg__btn {
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
+    font-size: var(--fs-small);
+    color: var(--muted);
+    transition:
+      background-color 160ms ease,
+      color 160ms ease;
+  }
+
+  .seg__btn[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--surface);
+  }
+
+  .seg__btn:active {
+    transform: scale(0.97);
+  }
+
+  .menu__foot {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .menu__mail {
+    font-size: 1.25rem;
+    letter-spacing: var(--track-title);
+    margin-bottom: 1rem;
+  }
+
+  .menu__demo {
+    justify-content: space-between;
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  const dialog = document.querySelector<HTMLDialogElement>('[data-menu]');
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-menu-close]');
+
+  // Translucent header once the page has scrolled past the very top, and dark
+  // header whenever a dark section (hero video, Solutions, CTA) is underneath it.
+  if (header) {
+    let ticking = false;
+    const darkSections = Array.from(document.querySelectorAll<HTMLElement>('[data-header-dark]'));
+    const update = () => {
+      header.toggleAttribute('data-scrolled', window.scrollY > 8);
+      const line = header.offsetHeight / 2;
+      const dark = darkSections.some((el) => {
+        const r = el.getBoundingClientRect();
+        const isDark = el.dataset.headerDark === 'scrub' ? el.hasAttribute('data-is-dark') : true;
+        return isDark && r.height > 0 && r.top <= line && r.bottom > line;
+      });
+      header.style.setProperty('--hd', dark ? '1' : '0');
+      ticking = false;
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true },
+    );
+    window.addEventListener('header:refresh', update);
+    update();
+  }
+
+  if (dialog && openBtn) {
+    const setExpanded = (v: boolean) => openBtn.setAttribute('aria-expanded', String(v));
+
+    openBtn.addEventListener('click', () => {
+      dialog.showModal();
+      setExpanded(true);
+    });
+    closeBtn?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => {
+      setExpanded(false);
+      openBtn.focus();
+    });
+    // Click on the backdrop closes the drawer.
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    dialog.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => dialog.close()));
+  }
+
+  // After switching, land on the 3D section that is now visible.
+  try {
+    if (sessionStorage.getItem('predicterra:scene-jump')) {
+      sessionStorage.removeItem('predicterra:scene-jump');
+      history.scrollRestoration = 'manual';
+      const jump = () => {
+        const visible = Array.from(document.querySelectorAll<HTMLElement>('[data-sectors]')).find(
+          (el) => getComputedStyle(el).display !== 'none',
+        );
+        if (visible) window.scrollTo({ top: visible.getBoundingClientRect().top + window.scrollY, behavior: 'auto' });
+      };
+      if (document.readyState === 'complete') jump();
+      else window.addEventListener('load', jump, { once: true });
+    }
+  } catch {
+    /* ignore */
+  }
+
+  // Hero layout test switch: applies instantly, remembered for next visits.
+  const heroOptions = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-hero-option]'));
+  const syncHero = () => {
+    const now = document.documentElement.dataset.hero ?? 'centred';
+    heroOptions.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.heroOption === now)));
+  };
+  heroOptions.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const value = btn.dataset.heroOption!;
+      if (value === 'centred') delete document.documentElement.dataset.hero;
+      else document.documentElement.dataset.hero = value;
+      try {
+        localStorage.setItem('predicterra:hero', value);
+      } catch {
+        /* storage unavailable: applies to this page view only */
+      }
+      syncHero();
+      // Start/stop the right hero video and re-check the header colour.
+      window.dispatchEvent(new Event('hero:change'));
+      window.dispatchEvent(new Event('header:refresh'));
+    }),
+  );
+  syncHero();
+
+  // 3D variant test switch: remember the choice and reload on the 3D section.
+  const options = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-scene-option]'));
+  const current = document.documentElement.dataset.scene === 'overview' ? 'overview' : 'trail';
+  options.forEach((btn) => {
+    btn.setAttribute('aria-pressed', String(btn.dataset.sceneOption === current));
+    btn.addEventListener('click', () => {
+      const value = btn.dataset.sceneOption!;
+      if (value === current) return;
+      try {
+        localStorage.setItem('predicterra:scene', value);
+      } catch {
+        /* storage unavailable: switch for this page view only */
+      }
+      try {
+        sessionStorage.setItem('predicterra:scene-jump', '1');
+      } catch {
+        /* ignore */
+      }
+      location.reload();
+    });
+  });
+</script>

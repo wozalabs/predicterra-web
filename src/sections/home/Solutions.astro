@@ -1,0 +1,210 @@
+---
+import NotchRule from '../../components/NotchRule.astro';
+import { getCopy, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { solutions } = getCopy(locale).home;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<!--
+  Dark section. It slides over the pinned 3D stage and its colours are scrubbed
+  from light to dark with the scroll (see scripts/theme-scrub.ts), then back to
+  light as Benefits comes in. The sector list scrolls continuously (illustrative).
+-->
+<section
+  class="solutions theme-scrub"
+  id="solutions"
+  aria-labelledby="solutions-title"
+  data-theme-dark
+  data-header-dark="scrub"
+>
+  <div class="container solutions__inner">
+    <NotchRule at={70} />
+
+    <div class="solutions__grid">
+      <div class="solutions__head">
+        <h2 id="solutions-title" class="t-h2">{solutions.title}</h2>
+        <p class="solutions__caption">{solutions.caption}</p>
+        <p class="solutions__count">
+          <span class="solutions__count-n t-num">{solutions.sectors.length}</span>
+          <span class="t-small">{solutions.countLabel}</span>
+        </p>
+      </div>
+
+      <div class="reel" data-reel>
+        <div class="reel__inner" data-reel-inner>
+          {
+            [0, 1].map((copy) => (
+              <ul class="reel__list" aria-hidden={copy === 1 ? 'true' : undefined}>
+                {solutions.sectors.map((name, i) => (
+                  <li class="reel__row" data-reel-row>
+                    <span class="reel__i t-small t-num">{pad(i + 1)}</span>
+                    <span class="reel__name">{name}</span>
+                    <span class="reel__mark" aria-hidden="true" />
+                  </li>
+                ))}
+              </ul>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .solutions {
+    position: relative;
+    z-index: var(--z-cover);
+    margin-top: -100svh;
+    box-shadow: 0 -24px 48px -24px rgb(30 30 30 / 0.14);
+  }
+
+  .solutions__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+    min-height: 100svh;
+    padding-top: calc(var(--header-h) + 1.5rem);
+    padding-bottom: clamp(2rem, 1.5rem + 2vw, 4rem);
+  }
+
+  .solutions__grid {
+    display: grid;
+    gap: 2rem var(--gutter);
+    align-items: center;
+  }
+
+  @media (min-width: 64rem) {
+    .solutions__grid {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    }
+  }
+
+  .solutions__head {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+  }
+
+  .solutions__caption {
+    max-width: 28ch;
+    color: var(--ink-2);
+  }
+
+  .solutions__count {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    color: var(--muted);
+  }
+
+  .solutions__count-n {
+    font-size: clamp(2.5rem, 2rem + 1.5vw, 3.5rem);
+    line-height: 1;
+    letter-spacing: var(--track-display);
+    color: var(--ink);
+  }
+
+  /* ---------- Reel ---------- */
+  .reel {
+    position: relative;
+    height: min(68svh, 42rem);
+    overflow: clip;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
+  }
+
+  /* Centre line the active row passes through */
+  .reel::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+
+  .reel__inner {
+    will-change: transform;
+  }
+
+  .reel__row {
+    --o: 0.3;
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: clamp(0.5rem, 0.35rem + 0.5vw, 0.875rem);
+    border-bottom: 1px solid var(--line);
+    opacity: var(--o);
+  }
+
+  .reel__i {
+    color: var(--muted);
+  }
+
+  .reel__name {
+    font-size: clamp(1.375rem, 1rem + 1.5vw, 2.75rem);
+    line-height: 1.1;
+    letter-spacing: var(--track-heading);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .reel__mark {
+    width: 0.625rem;
+    height: 0.625rem;
+    align-self: center;
+    background: var(--accent);
+    transform: scale(0);
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .reel__row[data-active] .reel__mark {
+    transform: scale(1);
+  }
+
+  /* Reduced motion: no reel, the full list in two columns. */
+  @media (prefers-reduced-motion: reduce) {
+    .reel {
+      height: auto;
+      mask-image: none;
+      -webkit-mask-image: none;
+    }
+    .reel::after {
+      display: none;
+    }
+    .reel__list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      column-gap: var(--gutter);
+    }
+    .reel__list[aria-hidden] {
+      display: none;
+    }
+    .reel__row {
+      --o: 1 !important;
+    }
+    .reel__name {
+      font-size: var(--fs-h4);
+    }
+  }
+</style>
+
+<script>
+  import { mountThemeScrub } from '../../scripts/theme-scrub';
+  import { mountReel } from '../../scripts/reel';
+  mountThemeScrub();
+  const reel = document.querySelector<HTMLElement>('[data-reel]');
+  if (reel) mountReel(reel);
+</script>

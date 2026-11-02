@@ -1,0 +1,115 @@
+---
+import NotchRule from '../../components/NotchRule.astro';
+import { getCopy, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { benefits } = getCopy(locale).home;
+---
+
+<!-- Key figures: title on the left, one ruled row per figure on the right (Hut 8 pattern). -->
+<section class="benefits theme-scrub" id="benefits" aria-labelledby="benefits-title">
+  <div class="container benefits__inner">
+    <NotchRule at={70} />
+
+    <div class="benefits__grid">
+      <h2 id="benefits-title" class="t-h2 benefits__title">{benefits.title}</h2>
+
+      <dl class="figures">
+        {
+          benefits.stats.map((s) => (
+            <div class="figure">
+              <dt class="figure__label">{s.label}</dt>
+              <dd class="figure__value t-num">{s.value}</dd>
+              <dd class="figure__caption t-small">{s.caption}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .benefits {
+    position: relative;
+    z-index: var(--z-cover);
+  }
+
+  .benefits__inner {
+    padding-block: calc(var(--header-h) + 1rem) clamp(3rem, 2rem + 3vw, 5rem);
+  }
+
+  .benefits__grid {
+    display: grid;
+    gap: 2rem var(--gutter);
+    padding-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
+  }
+
+  @media (min-width: 64rem) {
+    .benefits__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+  }
+
+  .benefits__title {
+    align-self: start;
+  }
+
+  .figure {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'label value'
+      '. caption';
+    gap: 0.75rem 1.5rem;
+    padding-block: clamp(1.25rem, 0.75rem + 1.5vw, 2.25rem);
+  }
+
+  .figure + .figure {
+    border-top: 1px solid var(--line);
+  }
+
+  .figure:first-child {
+    padding-top: 0;
+  }
+
+  .figure__label {
+    grid-area: label;
+    padding-top: 0.5rem;
+  }
+
+  .figure__value {
+    grid-area: value;
+    justify-self: end;
+    font-size: clamp(3rem, 1.5rem + 4.6vw, 7.5rem);
+    line-height: 0.88;
+    letter-spacing: var(--track-display);
+    white-space: nowrap;
+  }
+
+  .figure__caption {
+    grid-area: caption;
+    justify-self: end;
+    max-width: 30ch;
+    text-align: right;
+    color: var(--muted);
+  }
+
+  @media (max-width: 40rem) {
+    .figure {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'label'
+        'value'
+        'caption';
+    }
+    .figure__value,
+    .figure__caption {
+      justify-self: start;
+      text-align: left;
+    }
+  }
+</style>

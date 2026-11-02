@@ -1,0 +1,19 @@
+---
+interface Props {
+  href: string;
+  label: string;
+  kicker?: string;
+  external?: boolean;
+  class?: string;
+}
+const { href, label, kicker, external = false, class: className } = Astro.props;
+---
+
+<a
+  class:list={['tlink', className]}
+  href={href}
+  {...external ? { target: '_blank', rel: 'noopener' } : {}}
+>
+  {kicker && <span class="tlink__label">{kicker}</span>}
+  <span class="tlink__text">{label}</span>
+</a>

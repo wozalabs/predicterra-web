@@ -1,0 +1,19 @@
+---
+interface Props {
+  href: string;
+  label: string;
+  size?: 'md' | 'lg';
+  external?: boolean;
+  class?: string;
+}
+const { href, label, size = 'md', external = false, class: className } = Astro.props;
+---
+
+<a
+  class:list={['btn', size === 'lg' && 'btn--lg', className]}
+  href={href}
+  {...external ? { target: '_blank', rel: 'noopener' } : {}}
+>
+  <span>{label}</span>
+  <span class="btn__square" aria-hidden="true"></span>
+</a>

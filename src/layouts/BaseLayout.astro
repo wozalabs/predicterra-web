@@ -1,0 +1,96 @@
+---
+import '../styles/global.css';
+import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { getCopy, defaultLocale, type Locale } from '../i18n/config';
+import { organizationJsonLd, websiteJsonLd } from '../data/seo';
+
+interface Props {
+  title: string;
+  description: string;
+  locale?: Locale;
+  /** Absolute or root-relative path to a 1200×630 image. */
+  ogImage?: string;
+  /** Extra JSON-LD objects for this page. */
+  jsonLd?: Record<string, unknown>[];
+  noindex?: boolean;
+  /** Critical images to preload (e.g. the hero poster). */
+  preloadImages?: string[];
+}
+
+const {
+  title,
+  description,
+  locale = defaultLocale,
+  ogImage = '/og/predicterra-og.png',
+  jsonLd = [],
+  noindex = false,
+  preloadImages = [],
+} = Astro.props;
+
+const { common } = getCopy(locale);
+const site = Astro.site ?? new URL('https://www.predicterra.com');
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImageUrl = new URL(ogImage, site).href;
+const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...jsonLd];
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin />
+    {preloadImages.map((src) => <link rel="preload" href={src} as="image" fetchpriority="high" />)}
+
+    <!-- Test switches (menu): 3D section variant and hero layout. Runs before paint. -->
+    <script is:inline>
+      try {
+        var scene = localStorage.getItem('predicterra:scene');
+        if (scene === 'overview') document.documentElement.dataset.scene = 'overview';
+        var hero = localStorage.getItem('predicterra:hero');
+        if (hero === 'split' || hero === 'cutout') document.documentElement.dataset.hero = hero;
+      } catch (e) {}
+    </script>
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#F0F0F0" />
+    <meta name="color-scheme" content="light" />
+
+    <!-- Hreflang: add one link per locale when more languages ship. -->
+    <link rel="alternate" hreflang="en" href={canonical} />
+    <link rel="alternate" hreflang="x-default" href={canonical} />
+
+    <!-- Open Graph / social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={common.brand} />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    {structured.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{common.skipToContent}</a>
+    <SiteHeader locale={locale} />
+    <main id="main">
+      <slot />
+    </main>
+    <SiteFooter locale={locale} />
+  </body>
+</html>

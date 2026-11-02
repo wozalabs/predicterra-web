@@ -1,0 +1,472 @@
+---
+/**
+ * Sector scene, variant B ("chip trace"): starts on Grid and travels diagonally
+ * to the bottom right along a circuit-like trace. Assets at risk are orange.
+ */
+import Icon from '../../components/Icon.astro';
+import { getCopy, type Locale } from '../../i18n/config';
+import type { IconName } from '../../data/icons';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { scene } = getCopy(locale).home;
+const stops = scene.sectors.length; // one stop per sector, no overview
+---
+
+<section
+  class="sectors"
+  id="sectors"
+  aria-labelledby="sectors-title"
+  data-sectors="trail"
+  style={`--stops:${stops}`}
+>
+  <div class="sectors__stage" data-stage>
+    <div class="sectors__canvas" data-canvas-host aria-hidden="true"></div>
+
+    <!-- Copy: one layer per sector. All text stays in the DOM for crawlers and screen readers. -->
+    <div class="sectors__copy container">
+      <div class="sectors__heading">
+        <h2 id="sectors-title" class="label">{scene.label}</h2>
+        <p class="visually-hidden">{scene.title}. {scene.intro}</p>
+      </div>
+      {
+        scene.sectors.map((s, i) => (
+          <article class="step" data-step={i} data-active={i === 0 ? '' : undefined} aria-labelledby={`sector-${s.id}-title`}>
+            <div class="step__head">
+              <Icon name={s.icon as IconName} boxed size="var(--step-size)" />
+              <span class="step__divider" aria-hidden="true" />
+              <h3 id={`sector-${s.id}-title`} class="step__title">
+                {s.title}
+              </h3>
+            </div>
+            <p class="step__text">{s.text}</p>
+          </article>
+        ))
+      }
+    </div>
+
+    <!-- Markers: square dots projected from the 3D anchors. -->
+    <div class="sectors__markers" data-markers>
+      {
+        scene.sectors.map((s) => (
+          <div class="marker" data-marker={s.id}>
+            <button
+              class="marker__btn"
+              type="button"
+              aria-expanded="false"
+              aria-controls={`alert-${s.id}`}
+              aria-label={`${scene.openAlert} ${s.alert.asset}`}
+            >
+              <span class="marker__ring" aria-hidden="true" />
+              <span class="marker__dot" aria-hidden="true" />
+            </button>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Alert cards, positioned next to their marker (desktop) or as a sheet (mobile). -->
+    <div class="sectors__alerts">
+      {
+        scene.sectors.map((s) => (
+          <div class="alert" id={`alert-${s.id}`} data-alert={s.id} role="group" aria-label={`${s.alert.hazard}, ${s.alert.asset}`}>
+            <div class="alert__top">
+              <span class="alert__badge">{scene.requiresAction}</span>
+              <span class="alert__sev t-caption">{s.alert.severity}</span>
+            </div>
+            <div class="alert__title">
+              <Icon name={s.alert.hazardIcon as IconName} boxed size="2rem" />
+              <p class="t-h4">{s.alert.hazard}</p>
+            </div>
+            <p class="alert__asset">
+              {s.alert.asset}
+              <span class="t-muted">{s.alert.context}</span>
+            </p>
+            <dl class="alert__data">
+              <div>
+                <dt class="t-caption t-muted">{s.alert.metricLabel}</dt>
+                <dd class="t-num">{s.alert.metric}</dd>
+              </div>
+              <div>
+                <dt class="t-caption t-muted">{scene.windowLabel}</dt>
+                <dd class="t-num">{s.alert.window}</dd>
+              </div>
+              <div>
+                <dt class="t-caption t-muted">{scene.confidenceLabel}</dt>
+                <dd class="t-num">{s.alert.confidence}</dd>
+              </div>
+            </dl>
+            <div class="alert__action">
+              <p class="t-caption t-muted">{scene.actionLabel}</p>
+              <p class="t-small">{s.alert.action}</p>
+            </div>
+            <p class="alert__note t-caption t-muted">{scene.footnote}</p>
+          </div>
+        ))
+      }
+    </div>
+
+  </div>
+</section>
+
+<style>
+  /* ---------- Pinning ---------- */
+  .sectors {
+    position: relative;
+    z-index: var(--z-stage);
+    /* one viewport per stop, half a viewport to hold the last one,
+       plus one for the next section to slide over (see LAST_HOLD in controller.ts) */
+    height: calc((var(--stops) + 1.5) * 100svh);
+  }
+
+  .sectors__stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    /* clip, not hidden: focusing a marker must never scroll the stage */
+    overflow: clip;
+    background: var(--canvas);
+    transform-origin: 50% 0;
+  }
+
+  .sectors__canvas {
+    position: absolute;
+    inset: 0;
+    /* Static fallback before WebGL loads: the same dot grid as the 3D ground. */
+    background-image: radial-gradient(circle, #cfcfcf 1px, transparent 1.6px);
+    background-size: 22px 22px;
+  }
+
+  .sectors__canvas :global(canvas) {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+
+  .sectors__canvas[data-ready] :global(canvas) {
+    opacity: 1;
+  }
+
+  /* ---------- Copy layers ---------- */
+  .sectors__copy {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* Readability veil behind the copy column */
+  .sectors__stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgb(240 240 240 / 0.92) 0%, rgb(240 240 240 / 0.7) 24%, rgb(240 240 240 / 0) 42%);
+  }
+
+  .sectors__canvas {
+    z-index: -1;
+  }
+
+  .sectors__heading {
+    position: absolute;
+    top: calc(var(--header-h) + 1.25rem);
+    left: var(--gutter);
+  }
+
+  .sectors__heading .label {
+    font-size: var(--fs-small);
+  }
+
+  /* Each sector: title and description together, vertically centred on the left. */
+  .step {
+    position: absolute;
+    left: var(--gutter);
+    top: 50%;
+    width: min(30rem, 40vw);
+    display: grid;
+    gap: 1.25rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(calc(-50% + 12px));
+    transition:
+      opacity 360ms var(--ease-out),
+      transform 480ms var(--ease-out),
+      visibility 0s linear 480ms;
+  }
+
+  .step[data-active] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%);
+    transition:
+      opacity 420ms var(--ease-out) 80ms,
+      transform 560ms var(--ease-out) 80ms,
+      visibility 0s;
+  }
+
+  .step__head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .step__divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--line-strong);
+  }
+
+  /* Title and icon share one size so the icon square matches the type (56px max). */
+  .step {
+    --step-size: clamp(2.25rem, 1.5rem + 2.2vw, 3.5rem);
+  }
+
+  .step__title {
+    font-size: var(--step-size);
+    line-height: 1;
+    letter-spacing: var(--track-heading);
+  }
+
+  .step__text {
+    max-width: 30ch;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Markers ---------- */
+  .sectors__markers,
+  .sectors__alerts {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform;
+    transition: opacity 300ms ease;
+  }
+
+  /* In focus mode only the active asset keeps its marker. */
+  .marker:not([data-active]) {
+    opacity: 0;
+  }
+
+  .marker:not([data-active]) .marker__btn {
+    pointer-events: none;
+  }
+
+  .marker[hidden] {
+    display: none;
+  }
+
+  .marker__btn {
+    position: absolute;
+    left: -22px;
+    top: -22px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .marker__dot {
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--surface), 0 2px 10px rgb(30 30 30 / 0.18);
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .marker__btn:active .marker__dot {
+    transform: scale(0.9);
+  }
+
+  .marker__btn[aria-expanded='true'] .marker__dot {
+    transform: scale(1.15);
+  }
+
+  .marker__ring {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--accent);
+    opacity: 0;
+  }
+
+  .marker[data-active] .marker__ring {
+    animation: ring 2s var(--ease-out) infinite;
+  }
+
+  .marker__btn[aria-expanded='true'] .marker__ring {
+    animation: none;
+  }
+
+  @keyframes ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    70%,
+    100% {
+      transform: scale(3.2);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marker__ring {
+      animation: none !important;
+    }
+  }
+
+  /* ---------- Alert card ---------- */
+  .alert {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20.5rem;
+    display: grid;
+    gap: 0.875rem;
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow:
+      0 1px 2px rgb(30 30 30 / 0.06),
+      0 12px 32px -8px rgb(30 30 30 / 0.18);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform-origin: var(--origin, 0 0);
+    transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(0.96);
+    transition:
+      opacity 140ms ease,
+      transform 160ms var(--ease-out),
+      visibility 0s linear 160ms;
+  }
+
+  .alert[data-open] {
+    pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
+    transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1);
+    transition:
+      opacity 180ms ease,
+      transform 220ms var(--ease-out),
+      visibility 0s;
+  }
+
+  .alert__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .alert__badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.625rem;
+    padding: 0 0.5rem;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: var(--fs-caption);
+  }
+
+  .alert__title {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .alert__asset {
+    display: grid;
+    font-size: var(--fs-small);
+  }
+
+  .alert__data {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+  }
+
+  .alert__data > div {
+    padding: 0.625rem 0.5rem 0 0;
+  }
+
+  .alert__data > div + div {
+    padding-left: 0.625rem;
+    border-left: 1px solid var(--line);
+  }
+
+  .alert__data dd {
+    font-size: 1.0625rem;
+    letter-spacing: var(--track-title);
+  }
+
+  .alert__note {
+    margin-top: -0.25rem;
+  }
+
+  .alert__action {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    background: var(--chip-bg);
+    border: 1px solid var(--line);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .alert,
+    .alert[data-open] {
+      transform: translate3d(var(--x, 0), var(--y, 0), 0);
+    }
+  }
+
+  /* ---------- Small screens ---------- */
+  @media (max-width: 47.99rem) {
+    .sectors__stage::before {
+      background: linear-gradient(180deg, rgb(240 240 240 / 0.94) 0%, rgb(240 240 240 / 0.8) 26%, rgb(240 240 240 / 0) 42%);
+    }
+    .step {
+      top: calc(var(--header-h) + 3rem);
+      right: var(--gutter);
+      width: auto;
+      gap: 0.75rem;
+      transform: translateY(12px);
+    }
+    .step[data-active] {
+      transform: none;
+    }
+    .step__text {
+      max-width: 34ch;
+      font-size: var(--fs-small);
+    }
+    .alert {
+      left: var(--gutter);
+      right: var(--gutter);
+      top: auto;
+      bottom: var(--gutter);
+      width: auto;
+      transform-origin: 50% 100%;
+      transform: translateY(8px) scale(0.98);
+    }
+    .alert[data-open] {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  import { mountSectorScene } from '../../scripts/sector-scene/controller';
+
+  // Test switch: only the variant selected in the menu is displayed and mounted.
+  const root = document.querySelector<HTMLElement>('[data-sectors="trail"]');
+  if (root && getComputedStyle(root).display !== 'none') mountSectorScene(root, 'trail');
+</script>

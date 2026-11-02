@@ -1,0 +1,116 @@
+---
+import TextLink from '../../components/TextLink.astro';
+import { getCopy, localizePath, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { claim } = getCopy(locale).home;
+const words = claim.text.split(' ');
+const accentWords = claim.accent.split(' ');
+---
+
+<section class="claim" aria-labelledby="claim-label" data-claim>
+  <div class="container claim__grid">
+    <h2 id="claim-label" class="label claim__label">{claim.label}</h2>
+    <div class="claim__body">
+      <p class="t-statement claim__text" data-claim-text>
+        {words.map((w) => <span class="w">{w} </span>)}
+        <span class="accent">{accentWords.map((w) => <span class="w">{w} </span>)}</span>
+      </p>
+      <TextLink
+        class="claim__link"
+        href={localizePath(claim.link.href, locale)}
+        label={claim.link.label}
+        kicker={claim.link.kicker}
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .claim {
+    position: relative;
+    z-index: var(--z-cover);
+    /* Light, same canvas as the cutout notch above it, so the hero flows in. */
+    background: var(--canvas);
+    display: flex;
+    align-items: center;
+    min-height: min(100svh, 52rem);
+    padding-block: var(--section-y);
+  }
+
+  .claim__grid {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (min-width: 64rem) {
+    .claim__grid {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 10fr);
+      gap: var(--gutter);
+    }
+    .claim__label {
+      align-self: start;
+      padding-top: 0.6rem;
+    }
+  }
+
+  .claim__text {
+    max-width: 30ch;
+    font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.375rem); /* 38px on desktop */
+    line-height: 1.12;
+  }
+
+  /* Scroll-linked reading highlight. Only applied when JS runs and motion is allowed. */
+  :global(.claim--reveal) .w {
+    opacity: var(--o, 0.16);
+    transition: opacity 200ms linear;
+  }
+
+  :global(.claim__link) {
+    margin-top: clamp(2rem, 1.5rem + 1.5vw, 3rem);
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-claim]');
+  const text = root?.querySelector<HTMLElement>('[data-claim-text]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (root && text && !reduce.matches) {
+    const words = Array.from(text.querySelectorAll<HTMLElement>('.w'));
+    root.classList.add('claim--reveal');
+    let raf = 0;
+
+    const update = () => {
+      raf = 0;
+      const r = text.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // 0 when the paragraph top enters at 95% of the viewport; fully lit once its
+      // top reaches 62%, i.e. before the paragraph is centred on screen.
+      const start = vh * 0.95;
+      const end = vh * 0.62;
+      const p = Math.min(1, Math.max(0, (start - r.top) / (start - end)));
+      const lit = p * words.length;
+      words.forEach((w, i) => {
+        const o = Math.min(1, Math.max(0.16, lit - i + 0.16));
+        w.style.setProperty('--o', o.toFixed(3));
+      });
+    };
+
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        window.addEventListener('scroll', onScroll, { passive: true });
+        update();
+      } else {
+        window.removeEventListener('scroll', onScroll);
+      }
+    }).observe(root);
+  }
+</script>

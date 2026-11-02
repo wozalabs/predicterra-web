@@ -1,0 +1,328 @@
+---
+import Logos from './Logos.astro';
+import { getCopy, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { hero } = getCopy(locale).home;
+const { video } = hero;
+// Background grid: 8 columns × 3 rows (4 × 3 on small screens).
+const gridCells = Array.from({ length: 24 });
+---
+
+<section class="hero" aria-labelledby="hero-title" data-hero-variant="default">
+  <!--
+    Top: light. Two layouts, toggled from the menu (Hero layout, test):
+    centred (title above the logos) or split (title left, logos right).
+  -->
+  <div class="hero__top container">
+    <div class="hero__titles">
+      <p class="hero__eyebrow t-small">{hero.eyebrow}</p>
+      <h1 id="hero-title" class="hero__title">
+        <span>{hero.titleLine1}</span>
+        <span>{hero.titleLine2}</span>
+      </h1>
+    </div>
+    <!-- Partner logos, inside the first viewport -->
+    <Logos locale={locale} class="hero__logos" />
+  </div>
+
+  <!-- Bottom: video behind a square grid, with frosted and coloured blocks -->
+  <div class="band" data-header-dark>
+    <video
+      class="band__video"
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster={video.poster}
+      disablepictureinpicture
+      aria-hidden="true"
+      data-hero-video
+    >
+      <source src={video.large} type="video/mp4" media="(min-width: 60em)" />
+      <source src={video.small} type="video/mp4" />
+    </video>
+
+    <div class="band__grid" aria-hidden="true">
+      {gridCells.map(() => <span />)}
+    </div>
+
+    <ul class="band__cells">
+      {
+        hero.cells.map((cell, i) => (
+          <li
+            class:list={['cell', `cell--${cell.kind}`, 'tone' in cell && `cell--${cell.tone}`]}
+            style={`--c:${cell.c};--r:${cell.r};--cm:${cell.cm};--rm:${cell.rm};--i:${i}`}
+            data-mobile-hidden={cell.cm === 0 ? '' : undefined}
+            aria-hidden={cell.kind === 'blur' ? 'true' : undefined}
+          >
+            {'title' in cell && (
+              <>
+                <span class="cell__plus" aria-hidden="true" />
+                <span class="cell__index t-caption t-num">{cell.index}</span>
+                <span class="cell__title">{cell.title}</span>
+              </>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .hero {
+    --cols: 8;
+    --rows: 3;
+    /* Square cells across the full width, shortened on low viewports so the
+       title and the whole grid fit in one screen. */
+    --cell-h: min(calc(100vw / var(--cols)), calc((100svh - var(--header-h) - 23rem) / var(--rows)));
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    background: var(--canvas);
+  }
+
+  /* ---------- Top ---------- */
+  /* Centred layout (default) */
+  .hero__top {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(2.25rem, 1rem + 4vh, 4rem); /* title → logos */
+    padding-top: calc(var(--header-h) + clamp(1rem, 0.5rem + 2vh, 2rem));
+    padding-bottom: clamp(2.25rem, 1rem + 4vh, 4rem); /* logos → video */
+    text-align: center;
+  }
+
+  .hero__titles {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  /* Split layout: title leads on the left, logos are quieter on the right. */
+  :global(html[data-hero='split']) .hero__top {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: end;
+    gap: var(--gutter);
+    text-align: left;
+  }
+
+  :global(html[data-hero='split']) .hero__titles {
+    align-items: flex-start;
+  }
+
+  :global(html[data-hero='split']) .hero__title {
+    font-size: clamp(2.5rem, 1rem + 4.2vw, 5.75rem);
+    line-height: 0.96;
+  }
+
+  :global(html[data-hero='split']) .hero__top :global(.hero__logos) {
+    --logo-scale: 0.82;
+    justify-self: end;
+    padding-bottom: 0.4rem; /* sit on the title's last baseline */
+  }
+
+  /* Logos as a tidy 3 + 2 grid, aligned to the right edge */
+  :global(html[data-hero='split']) .hero__top :global(.logos__list) {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    justify-content: end;
+    align-items: center;
+    gap: 1.25rem 2.25rem;
+  }
+
+  @media (max-width: 47.99rem) {
+    :global(html[data-hero='split']) .hero__top {
+      grid-template-columns: minmax(0, 1fr);
+      align-items: start;
+    }
+    :global(html[data-hero='split']) .hero__top :global(.hero__logos) {
+      justify-self: start;
+    }
+    :global(html[data-hero='split']) .hero__top :global(.logos__list) {
+      justify-content: start;
+    }
+  }
+
+  .hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--muted);
+  }
+
+  .hero__eyebrow::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--accent);
+  }
+
+  .hero__title {
+    display: grid;
+    font-size: clamp(2.25rem, 1.25rem + 3.2vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: var(--track-display);
+    color: var(--ink);
+  }
+
+  /* ---------- Bottom band ---------- */
+  .band {
+    position: relative;
+    height: calc(var(--cell-h) * var(--rows));
+    overflow: clip;
+    background: var(--grey-700);
+  }
+
+  .band__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.9) brightness(0.92);
+  }
+
+  .band__grid,
+  .band__cells {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-template-rows: repeat(var(--rows), 1fr);
+  }
+
+  /* Grid lines with a small square on every intersection */
+  .band__grid span {
+    position: relative;
+    border-left: 1px solid rgb(255 255 255 / 0.4);
+    border-top: 1px solid rgb(255 255 255 / 0.4);
+  }
+
+  .band__grid span::after {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: -3px;
+    width: 5px;
+    height: 5px;
+    background: #ffffff;
+  }
+
+  /* ---------- Blocks ---------- */
+  .cell {
+    position: relative;
+    grid-column: var(--c);
+    grid-row: var(--r);
+    margin: 1px 0 0 1px; /* sit inside the grid lines */
+  }
+
+  .cell--blur {
+    background: rgb(240 240 240 / 0.08);
+    backdrop-filter: blur(14px) saturate(120%);
+  }
+
+  .cell--info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.375rem;
+    padding: clamp(0.75rem, 0.5rem + 0.6vw, 1.25rem);
+  }
+
+  .cell--light {
+    background: rgb(241 241 241 / 0.94);
+    color: var(--grey-700);
+  }
+
+  .cell--accent {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .cell__index {
+    opacity: 0.75;
+  }
+
+  .cell__title {
+    max-width: 12ch;
+    font-size: clamp(0.9375rem, 0.8rem + 0.45vw, 1.25rem);
+    line-height: 1.15;
+    letter-spacing: var(--track-title);
+  }
+
+  /* Thin plus in the top-right corner (crosshair motif) */
+  .cell__plus {
+    position: absolute;
+    top: clamp(0.75rem, 0.5rem + 0.6vw, 1.25rem);
+    right: clamp(0.75rem, 0.5rem + 0.6vw, 1.25rem);
+    width: 16px;
+    height: 16px;
+    background:
+      linear-gradient(currentColor, currentColor) center / 1px 100% no-repeat,
+      linear-gradient(currentColor, currentColor) center / 100% 1px no-repeat;
+    opacity: 0.7;
+  }
+
+  /* Blocks settle in once, staggered (first visit only, no layout shift). */
+  @media (prefers-reduced-motion: no-preference) {
+    .cell {
+      animation: cell-in 600ms var(--ease-out) both;
+      animation-delay: calc(200ms + var(--i) * 60ms);
+    }
+  }
+
+  @keyframes cell-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .cell--blur {
+      backdrop-filter: none;
+      background: rgb(30 30 30 / 0.55);
+    }
+  }
+
+  /* ---------- Small screens: 4 × 3 ---------- */
+  @media (max-width: 47.99rem) {
+    .hero {
+      --cols: 4;
+      --cell-h: calc(100vw / 4);
+    }
+    .band__grid span:nth-child(n + 13) {
+      display: none;
+    }
+    .cell {
+      grid-column: var(--cm);
+      grid-row: var(--rm);
+    }
+    .cell[data-mobile-hidden] {
+      display: none;
+    }
+    .cell__title {
+      font-size: 0.875rem;
+    }
+    .cell__plus {
+      width: 12px;
+      height: 12px;
+    }
+  }
+</style>
+
+<script>
+  import { mountHeroVideos } from '../../scripts/hero-video';
+  mountHeroVideos();
+</script>

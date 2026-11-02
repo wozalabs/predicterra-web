@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+---
+
+<BaseLayout title="Page not found | Predicterra" description="This page does not exist yet." noindex>
+  <section class="nf container">
+    <p class="label">404</p>
+    <h1 class="t-h2">This page is not built yet.</h1>
+    <p class="t-lead t-muted">The new Predicterra site is growing section by section.</p>
+    <Button href="/" label="Back to home" />
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    display: grid;
+    justify-items: start;
+    gap: 1.5rem;
+    min-height: 80svh;
+    align-content: center;
+    padding-top: var(--header-h);
+  }
+</style>
