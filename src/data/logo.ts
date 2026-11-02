@@ -1,6 +1,7 @@
 // Predicterra logotype (updated proportions). viewBox 0 0 1056 170.
 // The orange corner mark keeps #FF3700; the wordmark uses currentColor.
-export const LOGO_VIEWBOX = '0 0 1056 170';
+// A little room around the artwork so antialiased edges are never clipped.
+export const LOGO_VIEWBOX = '-2 -2 1060 176';
 export const logoAccentPaths = [
   "M13.2414 0H0V35.3103H13.2414V0Z",
   "M-5.78799e-07 7.82013e-05L0 13.2415L35.3103 13.2415L35.3103 7.66578e-05L-5.78799e-07 7.82013e-05Z"

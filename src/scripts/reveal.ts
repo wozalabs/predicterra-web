@@ -17,11 +17,11 @@
 // JavaScript. Reduced motion: fade only, no render effect.
 
 const REVEAL_STAGGER_MS = 70;
-const RENDER_START_MS = 160;
-const CHAR_STEP_MS = 30;
-const MAX_SWEEP_MS = 900;
-const CHAR_JITTER_MS = 260;
-const CHAR_MS = 880;
+const RENDER_START_MS = 100;
+const CHAR_STEP_MS = 22;
+const MAX_SWEEP_MS = 700;
+const CHAR_JITTER_MS = 200;
+const CHAR_MS = 700;
 const BLOCK_CHANCE = 0.12;
 
 type RenderEl = HTMLElement & { __original?: string; __busy?: boolean };

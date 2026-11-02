@@ -210,15 +210,18 @@ ol {
   --btn-fg: var(--on-accent);
   --btn-sq: #ffffff;
   --btn-arrow: var(--grey-700);
-  --btn-inset: 0.3125rem;
+  /* Sizes on a 4 px grid: md 36 px, lg 40 px; the square is the height minus the inset. */
+  --btn-h: 2.25rem;
+  --btn-inset: 0.25rem;
   display: inline-flex;
   align-items: center;
-  gap: 1rem;
-  min-height: 2.75rem;
-  padding: var(--btn-inset) var(--btn-inset) var(--btn-inset) 1.125rem;
+  gap: 0.75rem;
+  height: var(--btn-h);
+  padding: var(--btn-inset) var(--btn-inset) var(--btn-inset) 0.875rem;
   background: var(--btn-bg);
   color: var(--btn-fg);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
+  line-height: 1;
   letter-spacing: var(--track-body);
   white-space: nowrap;
   transition:
@@ -231,16 +234,15 @@ ol {
   display: grid;
   place-items: center;
   flex: none;
-  align-self: stretch;
-  aspect-ratio: 1;
-  min-width: 2rem;
+  width: calc(var(--btn-h) - 2 * var(--btn-inset));
+  height: calc(var(--btn-h) - 2 * var(--btn-inset));
   background: var(--btn-sq);
   color: var(--btn-arrow);
 }
 
 .btn__icon {
-  width: 1rem;
-  height: 1rem;
+  width: 0.875rem;
+  height: 0.875rem;
   fill: currentColor;
   transition: transform 200ms var(--ease-out);
 }
@@ -260,13 +262,14 @@ ol {
 }
 
 .btn--lg {
-  min-height: 3.125rem;
-  padding-left: 1.375rem;
-  font-size: 1rem;
+  --btn-h: 2.5rem;
+  padding-left: 1rem;
+  font-size: 0.9375rem;
 }
 
-.btn--lg .btn__sq {
-  min-width: 2.5rem;
+.btn--lg .btn__icon {
+  width: 1rem;
+  height: 1rem;
 }
 
 /* Secondary: white on light surfaces, dark grey on dark ones. */
@@ -473,14 +476,19 @@ html.js-render-wait [data-render-step] {
 
 /* Claim: each word flashes orange as the reading highlight reaches it. */
 .w--flash {
-  animation: word-flash 700ms ease both;
+  animation: word-flash 600ms ease;
 }
 
+/* Explicit end colour (--w-ink, set in Claim.astro): some browsers keep the
+   flash colour when the last keyframe is left implicit. */
 @keyframes word-flash {
   0%,
   45% {
     color: var(--accent);
     animation-timing-function: steps(1, start);
+  }
+  100% {
+    color: var(--w-ink, var(--ink));
   }
 }
 
@@ -501,7 +509,7 @@ html.js-render-wait [data-render-step] {
 }
 
 .render--go .rc {
-  animation: render-char 880ms ease var(--d, 0ms) both;
+  animation: render-char 700ms ease var(--d, 0ms) both;
 }
 
 /* A few characters are a small orange pixel first, then the glyph. */
@@ -522,7 +530,7 @@ html.js-render-wait [data-render-step] {
   height: 0.26em;
   margin-left: -0.13em;
   background: var(--render-flash, var(--accent));
-  animation: render-pixel 880ms linear var(--d, 0ms) both;
+  animation: render-pixel 700ms linear var(--d, 0ms) both;
 }
 
 /* Orange holds, then snaps to the final colour (no muddy orange-to-black blend). */

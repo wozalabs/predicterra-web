@@ -65,10 +65,10 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
   sun.shadow.normalBias = 0.02;
   sun.shadow.radius = 3;
   const sc = sun.shadow.camera;
-  sc.left = -60;
-  sc.right = 60;
-  sc.top = 60;
-  sc.bottom = -60;
+  sc.left = -80;
+  sc.right = 80;
+  sc.top = 80;
+  sc.bottom = -80;
   sc.near = 1;
   sc.far = 300;
   scene.add(sun, sun.target);
@@ -160,16 +160,17 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
     const aspect = width / height;
     if (aspect >= 1.25) {
       // Wide card: one cluster on each side of the centred copy.
+      // Large and bleeding past the card edges (the card clips them).
       viewH = 30;
       viewW = viewH * aspect;
-      place(left.group, -viewW / 2 + 12, -7, 1);
-      place(right.group, viewW / 2 - 12, -6, 1);
+      place(left.group, -viewW / 2 + 9, -11, 1.75);
+      place(right.group, viewW / 2 - 8, -10, 1.75);
     } else {
       // Tall card: clusters in the top-left and bottom-right corners.
       viewW = 36;
       viewH = viewW / aspect;
-      place(left.group, -viewW * 0.2, viewH * 0.36, 0.72);
-      place(right.group, viewW * 0.2, -viewH * 0.47, 0.72);
+      place(left.group, -viewW * 0.16, viewH * 0.43, 1.1);
+      place(right.group, viewW * 0.22, -viewH * 0.52, 1.1);
     }
   }
 

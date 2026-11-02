@@ -57,6 +57,15 @@ const accentWords = claim.accent.split(' ');
     }
   }
 
+  /* End colour of the orange flash on each word (see .w--flash). */
+  .claim__text .w {
+    --w-ink: var(--ink);
+  }
+
+  .claim__text .accent .w {
+    --w-ink: var(--accent);
+  }
+
   .claim__text {
     max-width: 30ch;
     font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.375rem); /* 38px on desktop */
@@ -104,6 +113,7 @@ const accentWords = claim.accent.split(' ');
           w.classList.remove('w--flash');
           void w.offsetWidth;
           w.classList.add('w--flash');
+          w.addEventListener('animationend', () => w.classList.remove('w--flash'), { once: true });
         } else if (!on && w.dataset.lit !== undefined) {
           delete w.dataset.lit;
         }

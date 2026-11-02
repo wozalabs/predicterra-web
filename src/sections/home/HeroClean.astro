@@ -124,16 +124,18 @@ const { video, clean } = hero;
     display: flex;
     align-items: center;
     height: var(--logos-h);
-    border-top: 1px solid rgb(255 255 255 / 0.16);
   }
 
+  /* Left-aligned, never past the middle of the screen */
   .hcl__logos :global(.hcl__logos-row) {
-    --logo-scale: 0.8;
-    width: 100%;
+    --logo-scale: 0.78;
+    width: min(100%, 50vw);
   }
 
   .hcl__logos :global(.logos__list) {
+    flex-wrap: nowrap;
     justify-content: space-between;
+    gap: clamp(1.25rem, 0.5rem + 1.5vw, 2.25rem);
   }
 
   .hcl__logos :global(.logos__item img) {
@@ -146,13 +148,14 @@ const { video, clean } = hero;
       --logos-h: 7rem;
     }
     .hcl__logos :global(.hcl__logos-row) {
-      --logo-scale: 0.66;
+      --logo-scale: 0.62;
+      width: 100%;
     }
     .hcl__logos :global(.logos__list) {
       display: grid;
       grid-template-columns: repeat(3, max-content);
-      justify-content: space-between;
-      gap: 1rem 1.5rem;
+      justify-content: start;
+      gap: 1rem 1.75rem;
     }
   }
 

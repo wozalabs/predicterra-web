@@ -66,7 +66,7 @@ The first version of the 3D section (`SectorScene.astro`, opens on the whole net
 
 ## Buttons
 
-`.btn` (global.css, `components/Button.astro`): square, plain fill, label on the left and an inset square on the right (5 px from the edges) holding the arrow. The arrow moves 2 px on hover and focus; press scales to 0.97.
+`.btn` (global.css, `components/Button.astro`): square, plain fill, label on the left and an inset square on the right (4 px from the edges) holding the arrow. Two sizes on a 4 px grid: md 36 px (default, header) and lg 40 px (CTAs). The arrow moves 2 px on hover and focus; press scales to 0.97.
 
 - `variant="primary"` (default): orange with a white square and a black arrow.
 - `variant="secondary"`: white with a black square and a white arrow on light surfaces; inside `.theme-dark` it turns dark grey with a white square. Used instead of underline links for secondary actions (Claim, Success stories, CTA).
