@@ -1,4 +1,5 @@
 /** Structured data (schema.org JSON-LD) shared across pages. */
+import { withBase } from '../i18n/config';
 
 export function organizationJsonLd(site: URL) {
   return {
@@ -8,7 +9,7 @@ export function organizationJsonLd(site: URL) {
     name: 'Predicterra',
     legalName: 'Predicterra SL',
     url: site.href,
-    logo: new URL('/favicon.svg', site).href,
+    logo: new URL(withBase('/favicon.svg'), site).href,
     email: 'hello@predicterra.com',
     description:
       'Foresight infrastructure for energy. Predicterra turns satellite, weather and sensor data into asset-level foresight for energy operators.',

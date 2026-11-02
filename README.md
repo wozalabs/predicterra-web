@@ -75,6 +75,14 @@ The first version of the 3D section (`SectorScene.astro`, opens on the whole net
 - Tuning knobs: camera stops (`lift`, `views` / `stops`), hazard radii, `HOLD` and `LAST_HOLD` in `controller.ts` (the CSS height of `.sectors` must match `LAST_HOLD`).
 - Respects `prefers-reduced-motion` (no spring, no spinning, no pulses) and falls back to static markers without WebGL2.
 
+## Preview on GitHub Pages
+
+`.github/workflows/deploy.yml` builds and publishes the site on every push to `main`: https://wozalabs.github.io/predicterra-web/
+
+- One-time setup in the repo: **Settings > Pages > Build and deployment > Source = GitHub Actions**.
+- The preview lives under `/predicterra-web/`, so the workflow sets `SITE_BASE` and `SITE_URL`. Always build internal links and asset paths with `localizePath()` or `withBase()` (`src/i18n/config.ts`), never a bare `"/..."`, or they break on the preview.
+- The preview is `noindex` (`PUBLIC_NOINDEX`), so it never competes with www.predicterra.com in search. A normal `npm run build` is unaffected.
+
 ## Adding a page
 
 1. Create `src/pages/<route>.astro` using `BaseLayout`.

@@ -1,6 +1,6 @@
 ---
 import Logos from './Logos.astro';
-import { getCopy, type Locale } from '../../i18n/config';
+import { getCopy, withBase, type Locale } from '../../i18n/config';
 
 interface Props {
   locale?: Locale;
@@ -37,13 +37,13 @@ const gridCells = Array.from({ length: 24 });
       loop
       playsinline
       preload="metadata"
-      poster={video.poster}
+      poster={withBase(video.poster)}
       disablepictureinpicture
       aria-hidden="true"
       data-hero-video
     >
-      <source src={video.large} type="video/mp4" media="(min-width: 60em)" />
-      <source src={video.small} type="video/mp4" />
+      <source src={withBase(video.large)} type="video/mp4" media="(min-width: 60em)" />
+      <source src={withBase(video.small)} type="video/mp4" />
     </video>
 
     <div class="band__grid" aria-hidden="true">

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
+import { withBase } from '../i18n/config';
 ---
 
 <BaseLayout title="Page not found | Predicterra" description="This page does not exist yet." noindex>
@@ -8,7 +9,7 @@ import Button from '../components/Button.astro';
     <p class="label">404</p>
     <h1 class="t-h2">This page is not built yet.</h1>
     <p class="t-lead t-muted">The new Predicterra site is growing section by section.</p>
-    <Button href="/" label="Back to home" />
+    <Button href={withBase('/')} label="Back to home" />
   </section>
 </BaseLayout>
 

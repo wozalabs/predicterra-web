@@ -6,7 +6,7 @@
  * Shown only when Menu > Hero layout (test) = Cutout.
  */
 import Logos from './Logos.astro';
-import { getCopy, type Locale } from '../../i18n/config';
+import { getCopy, withBase, type Locale } from '../../i18n/config';
 
 interface Props {
   locale?: Locale;
@@ -23,13 +23,13 @@ const { video, cutout } = hero;
     loop
     playsinline
     preload="none"
-    poster={video.poster}
+    poster={withBase(video.poster)}
     disablepictureinpicture
     aria-hidden="true"
     data-hero-video
   >
-    <source src={video.large} type="video/mp4" media="(min-width: 60em)" />
-    <source src={video.small} type="video/mp4" />
+    <source src={withBase(video.large)} type="video/mp4" media="(min-width: 60em)" />
+    <source src={withBase(video.small)} type="video/mp4" />
   </video>
   <div class="hcut__scrim" aria-hidden="true"></div>
 

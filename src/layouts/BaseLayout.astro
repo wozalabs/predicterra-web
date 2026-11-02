@@ -3,7 +3,7 @@ import '../styles/global.css';
 import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
-import { getCopy, defaultLocale, type Locale } from '../i18n/config';
+import { getCopy, defaultLocale, withBase, type Locale } from '../i18n/config';
 import { organizationJsonLd, websiteJsonLd } from '../data/seo';
 
 interface Props {
@@ -32,7 +32,9 @@ const {
 const { common } = getCopy(locale);
 const site = Astro.site ?? new URL('https://www.predicterra.com');
 const canonical = new URL(Astro.url.pathname, site).href;
-const ogImageUrl = new URL(ogImage, site).href;
+const ogImageUrl = new URL(withBase(ogImage), site).href;
+// GitHub Pages preview builds are kept out of search results (see deploy workflow).
+const hideFromSearch = noindex || import.meta.env.PUBLIC_NOINDEX === 'true';
 const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...jsonLd];
 ---
 
@@ -44,10 +46,10 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {hideFromSearch && <meta name="robots" content="noindex, nofollow" />}
 
     <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin />
-    {preloadImages.map((src) => <link rel="preload" href={src} as="image" fetchpriority="high" />)}
+    {preloadImages.map((src) => <link rel="preload" href={withBase(src)} as="image" fetchpriority="high" />)}
 
     <!-- Test switches (menu): 3D section variant and hero layout. Runs before paint. -->
     <script is:inline>
@@ -59,8 +61,8 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
       } catch (e) {}
     </script>
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
     <meta name="theme-color" content="#F0F0F0" />
     <meta name="color-scheme" content="light" />
 

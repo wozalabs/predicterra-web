@@ -11,8 +11,21 @@ export function getCopy(locale: Locale = defaultLocale) {
   return dictionaries[locale] ?? dictionaries[defaultLocale];
 }
 
-/** Prefixes a route with the locale segment (none for the default locale). */
+const isExternal = (path: string) => /^(https?:|mailto:|tel:|#)/.test(path);
+
+/**
+ * Prefixes a root-relative path with the site base. The base is `/` in
+ * production and `/predicterra-web/` on the GitHub Pages preview.
+ */
+export function withBase(path: string) {
+  if (isExternal(path) || !path.startsWith('/')) return path;
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  return `${base}${path}` || '/';
+}
+
+/** Prefixes a route with the locale segment (none for the default locale) and the site base. */
 export function localizePath(path: string, locale: Locale = defaultLocale) {
-  if (locale === defaultLocale || /^(https?:|mailto:|tel:|#)/.test(path)) return path;
-  return `/${locale}${path === '/' ? '' : path}`;
+  if (isExternal(path)) return path;
+  if (locale === defaultLocale) return withBase(path);
+  return withBase(`/${locale}${path === '/' ? '' : path}`);
 }
