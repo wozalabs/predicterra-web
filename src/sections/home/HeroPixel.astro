@@ -40,7 +40,7 @@ const { video, pixel } = hero;
 
   <!-- Kept light by the mask (data-pixel-keep) -->
   <div class="hpx__intro" data-pixel-keep>
-    <p class="hpx__eyebrow t-small">{pixel.eyebrow}</p>
+    <p class="hpx__eyebrow t-small" data-render>{pixel.eyebrow}</p>
     <!-- Only one hero is displayed at a time; the hidden ones are out of the
          accessibility tree, so this heading never competes with the other h1. -->
     <p id="hpx-title" class="hpx__title" role="heading" aria-level="1" data-render>

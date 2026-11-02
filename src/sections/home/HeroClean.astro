@@ -4,6 +4,7 @@
  * Shown only when Menu > Hero layout (test) = Clean.
  */
 import Button from '../../components/Button.astro';
+import Logos from './Logos.astro';
 import { getCopy, localizePath, withBase, type Locale } from '../../i18n/config';
 
 interface Props {
@@ -38,7 +39,15 @@ const { video, clean } = hero;
       <span>{clean.titleLine1}</span>
       <span>{clean.titleLine2}</span>
     </p>
+    <p class="hcl__text">{clean.text}</p>
     <Button class="hcl__cta" href={localizePath(clean.cta.href, locale)} label={clean.cta.label} size="lg" />
+  </div>
+
+  <!-- Partner logos along the bottom edge, over the video -->
+  <div class="hcl__logos container">
+    <div class="hcl__logos-inner">
+      <Logos locale={locale} class="hcl__logos-row" />
+    </div>
   </div>
 </section>
 
@@ -63,22 +72,88 @@ const { video, clean } = hero;
     object-fit: cover;
   }
 
-  /* Just enough shade for the header and the title; the footage stays clear. */
+  /* Dimmed so the footage stays in the background; darker behind the copy. */
+  .hcl__video {
+    filter: saturate(0.8);
+  }
+
   .hcl__scrim {
     background:
-      linear-gradient(to bottom, rgb(16 16 16 / 0.35), rgb(16 16 16 / 0) 22%),
-      linear-gradient(to top, rgb(16 16 16 / 0.6), rgb(16 16 16 / 0) 50%);
+      linear-gradient(to bottom, rgb(16 16 16 / 0.35), rgb(16 16 16 / 0) 24%),
+      linear-gradient(to top, rgb(16 16 16 / 0.82), rgb(16 16 16 / 0) 62%),
+      rgb(16 16 16 / 0.38);
   }
 
   .hcl__content {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: clamp(2.5rem, 1rem + 6vh, 6rem);
+    bottom: calc(var(--logos-h) + clamp(2rem, 1rem + 4vh, 4.5rem));
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+  }
+
+  .hcl {
+    --logos-h: clamp(4.5rem, 3.5rem + 2vw, 5.75rem);
+  }
+
+  .hcl__text {
+    max-width: 34rem;
+    margin-top: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.45;
+    letter-spacing: var(--track-body);
+    color: rgb(255 255 255 / 0.78);
+  }
+
+  .hcl__content :global(.hcl__cta) {
+    margin-top: clamp(1.5rem, 1rem + 1.2vw, 2.25rem);
+  }
+
+  /* Logos row: a hairline, then the marks in white */
+  .hcl__logos {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0 auto;
+  }
+
+  .hcl__logos-inner {
+    display: flex;
+    align-items: center;
+    height: var(--logos-h);
+    border-top: 1px solid rgb(255 255 255 / 0.16);
+  }
+
+  .hcl__logos :global(.hcl__logos-row) {
+    --logo-scale: 0.8;
+    width: 100%;
+  }
+
+  .hcl__logos :global(.logos__list) {
+    justify-content: space-between;
+  }
+
+  .hcl__logos :global(.logos__item img) {
+    filter: brightness(0) invert(1);
+    opacity: 0.72;
+  }
+
+  @media (max-width: 47.99rem) {
+    .hcl {
+      --logos-h: 7rem;
+    }
+    .hcl__logos :global(.hcl__logos-row) {
+      --logo-scale: 0.66;
+    }
+    .hcl__logos :global(.logos__list) {
+      display: grid;
+      grid-template-columns: repeat(3, max-content);
+      justify-content: space-between;
+      gap: 1rem 1.5rem;
+    }
   }
 
   .hcl__title {

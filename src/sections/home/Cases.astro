@@ -1,6 +1,6 @@
 ---
 import NotchRule from '../../components/NotchRule.astro';
-import TextLink from '../../components/TextLink.astro';
+import Button from '../../components/Button.astro';
 import Icon from '../../components/Icon.astro';
 import { getCopy, localizePath, type Locale } from '../../i18n/config';
 
@@ -18,11 +18,7 @@ const { cases } = getCopy(locale).home;
 
     <div class="cases__grid">
       <div class="cases__explore" data-reveal>
-        <TextLink
-          href={localizePath(cases.exploreHref, locale)}
-          label={cases.exploreLabel}
-          kicker={cases.exploreKicker}
-        />
+        <Button variant="secondary" href={localizePath(cases.exploreHref, locale)} label={cases.exploreLabel} />
       </div>
 
       <ul class="cases__list" data-reveal-group>
@@ -37,7 +33,7 @@ const { cases } = getCopy(locale).home;
                 <!-- Placeholder image: light grey until case photography is ready -->
                 <div class="case__media" aria-hidden="true"></div>
                 <div class="case__body">
-                  <h3 class="case__title">{c.title}</h3>
+                  <h3 class="case__title" data-render>{c.title}</h3>
                   <span class="case__arrow" aria-hidden="true">
                     <Icon name="arrow_forward" />
                   </span>

@@ -28,7 +28,7 @@ const stops = scene.sectors.length; // one stop per sector, no overview
     <!-- Copy: one layer per sector. All text stays in the DOM for crawlers and screen readers. -->
     <div class="sectors__copy container">
       <div class="sectors__heading">
-        <h2 id="sectors-title" class="label">{scene.label}</h2>
+        <h2 id="sectors-title" class="label" data-render>{scene.label}</h2>
         <p class="visually-hidden">{scene.title}. {scene.intro}</p>
       </div>
       {
@@ -37,7 +37,7 @@ const stops = scene.sectors.length; // one stop per sector, no overview
             <div class="step__head">
               <Icon name={s.icon as IconName} boxed size="var(--step-size)" />
               <span class="step__divider" aria-hidden="true" />
-              <h3 id={`sector-${s.id}-title`} class="step__title">
+              <h3 id={`sector-${s.id}-title`} class="step__title" data-render-step>
                 {s.title}
               </h3>
             </div>

@@ -35,7 +35,7 @@ const stops = scene.sectors.length + 1; // overview + one stop per sector
             <div class="step__head">
               <Icon name={s.icon as IconName} boxed size="3.5rem" />
               <span class="step__divider" aria-hidden="true" />
-              <h3 id={`sector-ov-${s.id}-title`} class="t-h2 step__title">
+              <h3 id={`sector-ov-${s.id}-title`} class="t-h2 step__title" data-render-step>
                 {s.title}
               </h3>
             </div>

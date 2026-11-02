@@ -172,11 +172,6 @@ const { header, menu } = common;
     }
   }
 
-  .site-header[data-on-accent] :global(.site-header__demo) {
-    --btn-bg: var(--grey-700);
-    --btn-light: var(--accent);
-  }
-
   @media (max-width: 40rem) {
     :global(.site-header__demo) {
       display: none;
@@ -372,7 +367,6 @@ const { header, menu } = common;
   if (header) {
     let ticking = false;
     const darkSections = Array.from(document.querySelectorAll<HTMLElement>('[data-header-dark]'));
-    const accentSections = Array.from(document.querySelectorAll<HTMLElement>('[data-header-accent]'));
     const update = () => {
       header.toggleAttribute('data-scrolled', window.scrollY > 8);
       const line = header.offsetHeight / 2;
@@ -382,12 +376,6 @@ const { header, menu } = common;
         return isDark && r.height > 0 && r.top <= line && r.bottom > line;
       });
       header.style.setProperty('--hd', dark ? '1' : '0');
-      // Over an orange surface (CTA card) the orange button switches to dark.
-      const onAccent = accentSections.some((el) => {
-        const r = el.getBoundingClientRect();
-        return r.height > 0 && r.top <= line && r.bottom > line;
-      });
-      header.toggleAttribute('data-on-accent', onAccent);
       ticking = false;
     };
     window.addEventListener(

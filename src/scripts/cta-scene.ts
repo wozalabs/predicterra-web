@@ -1,28 +1,28 @@
 /**
  * CTA card background: two small clusters of energy assets (wind + solar on
- * one side, grid on the other), drawn with an ordered dither in three tones of
- * the brand orange on a transparent canvas, so the card colour shows through.
- * The pointer tilts the camera with a soft spring, like the 3D section.
+ * one side, grid on the other), with the same white material, lights and
+ * dithered-shadow ground as the 3D section. The pointer tilts the camera with
+ * a soft spring, like the 3D section.
  */
 import {
+  AmbientLight,
   Color,
   DirectionalLight,
   Group,
+  HemisphereLight,
   Mesh,
+  MeshLambertMaterial,
   OrthographicCamera,
+  PCFShadowMap,
   PlaneGeometry,
   Scene,
-  ShaderLib,
-  ShaderMaterial,
   SRGBColorSpace,
-  UniformsLib,
-  UniformsUtils,
   Vector3,
   WebGLRenderer,
-  type IUniform,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { cable, rotorGeometry, solarPlant, substation, tower, windTurbine, type Bucket } from './sector-scene/geometry';
+import { createGroundMaterial } from './sector-scene/materials';
 
 const DEG = Math.PI / 180;
 const BASE_AZ = 45;
@@ -30,77 +30,8 @@ const BASE_EL = 32;
 /** Pointer tilt range (degrees), close to the 3D section so the two feel related. */
 const TILT_AZ = 3.5;
 const TILT_EL = 2.5;
-
-const BAYER = /* glsl */ `
-float bayer4(vec2 p) {
-  vec2 q = mod(floor(p), 4.0);
-  float i = q.x + q.y * 4.0;
-  if (i < 0.5) return 0.0;   if (i < 1.5) return 8.0;   if (i < 2.5) return 2.0;   if (i < 3.5) return 10.0;
-  if (i < 4.5) return 12.0;  if (i < 5.5) return 4.0;   if (i < 6.5) return 14.0;  if (i < 7.5) return 6.0;
-  if (i < 8.5) return 3.0;   if (i < 9.5) return 11.0;  if (i < 10.5) return 1.0;  if (i < 11.5) return 9.0;
-  if (i < 12.5) return 15.0; if (i < 13.5) return 7.0;  if (i < 14.5) return 13.0; return 5.0;
-}`;
-
-/** Lambert shade quantised into dark / mid / light with a 4×4 Bayer dither. */
-function createAssetMaterial(pixel: number, light: Vector3) {
-  return new ShaderMaterial({
-    uniforms: {
-      uLight: { value: light.clone().normalize() },
-      uDark: { value: new Color('#c42b00') },
-      uMid: { value: new Color('#ff8f66') },
-      uHi: { value: new Color('#fff3ec') },
-      uPixel: { value: pixel },
-    },
-    vertexShader: /* glsl */ `
-      varying vec3 vN;
-      void main() {
-        vN = normalize(mat3(modelMatrix) * normal);
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-      }`,
-    fragmentShader: /* glsl */ `
-      uniform vec3 uLight;
-      uniform vec3 uDark;
-      uniform vec3 uMid;
-      uniform vec3 uHi;
-      uniform float uPixel;
-      varying vec3 vN;
-      ${BAYER}
-      void main() {
-        vec3 n = normalize(vN);
-        float s = clamp(0.16 + 0.74 * max(dot(n, uLight), 0.0) + 0.14 * n.y, 0.0, 1.0);
-        float t = (bayer4(gl_FragCoord.xy / uPixel) + 0.5) / 16.0;
-        vec3 c = s < 0.5 ? ((s / 0.5) > t ? uMid : uDark) : (((s - 0.5) / 0.5) > t ? uHi : uMid);
-        gl_FragColor = vec4(c, 1.0);
-        #include <colorspace_fragment>
-      }`,
-  });
-}
-
-/** Invisible ground that only draws its (dithered) shadows. */
-function createShadowMaterial(pixel: number) {
-  const uniforms: Record<string, IUniform> = UniformsUtils.merge([
-    UniformsLib.lights,
-    UniformsLib.fog,
-    { uShadow: { value: new Color('#d63000') }, uPixel: { value: pixel } },
-  ]);
-  const fragmentShader = ShaderLib.shadow.fragmentShader
-    .replace('uniform vec3 color;\nuniform float opacity;', `uniform vec3 uShadow;\nuniform float uPixel;\n${BAYER}`)
-    .replace(
-      'gl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );',
-      /* glsl */ `
-  float t = (bayer4(gl_FragCoord.xy / uPixel) + 0.5) / 16.0;
-  float sh = (1.0 - getShadowMask()) * 0.85;
-  if (sh <= t) discard;
-  gl_FragColor = vec4(uShadow, 1.0);`,
-    );
-  return new ShaderMaterial({
-    uniforms,
-    vertexShader: ShaderLib.shadow.vertexShader,
-    fragmentShader,
-    lights: true,
-    fog: true,
-  });
-}
+/** Card ground: a step darker than the page so the inset card reads as a card. */
+export const CTA_GROUND = '#EAEAEA';
 
 export interface CtaScene {
   resize(w: number, h: number): void;
@@ -110,24 +41,29 @@ export interface CtaScene {
 }
 
 export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion: boolean }): CtaScene {
-  const renderer = new WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'low-power' });
+  const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: 'low-power' });
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   renderer.setPixelRatio(dpr);
   renderer.outputColorSpace = SRGBColorSpace;
-  renderer.setClearColor(0x000000, 0);
+  renderer.setClearColor(new Color(CTA_GROUND), 1);
   renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = PCFShadowMap;
 
   const scene = new Scene();
-  const pixel = 2 * dpr; // 2 CSS px dither cells, like the rest of the brand
-  const lightDir = new Vector3(-0.55, 1, 0.35);
-  const assetMat = createAssetMaterial(pixel, lightDir);
-  const shadowMat = createShadowMaterial(pixel);
+  scene.background = new Color(CTA_GROUND);
+  const assetMat = new MeshLambertMaterial({ color: 0xffffff });
+  const groundMat = createGroundMaterial({ pixel: Math.max(1, Math.round(1.5 * dpr)) });
+  groundMat.uniforms.uBase.value = new Color(CTA_GROUND);
 
-  // Sun for the ground shadows (assets use their own shading).
-  const sun = new DirectionalLight(0xffffff, 1);
+  // Same light rig as the 3D section.
+  scene.add(new HemisphereLight(0xffffff, 0xc4c4c4, 2.0));
+  scene.add(new AmbientLight(0xffffff, 0.55));
+  const sun = new DirectionalLight(0xffffff, 1.6);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.bias = -0.0005;
+  sun.shadow.bias = -0.0004;
+  sun.shadow.normalBias = 0.02;
+  sun.shadow.radius = 3;
   const sc = sun.shadow.camera;
   sc.left = -60;
   sc.right = 60;
@@ -137,7 +73,7 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
   sc.far = 300;
   scene.add(sun, sun.target);
 
-  const ground = new Mesh(new PlaneGeometry(400, 400), shadowMat);
+  const ground = new Mesh(new PlaneGeometry(400, 400), groundMat);
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
   scene.add(ground);
@@ -152,6 +88,7 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
     const group = new Group();
     const mesh = new Mesh(geo, assetMat);
     mesh.castShadow = true;
+    mesh.receiveShadow = true;
     group.add(mesh);
     scene.add(group);
     return { group, geo };
@@ -172,6 +109,7 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
     pivot.rotation.y = t.facing;
     const r = new Mesh(rotorGeo, assetMat);
     r.castShadow = true;
+    r.receiveShadow = true;
     r.rotation.z = i * 0.9;
     pivot.add(r);
     left.group.add(pivot);
@@ -244,7 +182,7 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
     camera.position.copy(target).addScaledVector(dir, 200);
     camera.lookAt(target);
     camera.updateProjectionMatrix();
-    sun.position.copy(target).add(new Vector3(-50, 90, 30));
+    sun.position.copy(target).add(new Vector3(-55, 95, 25));
     sun.target.position.copy(target);
     sun.target.updateMatrixWorld();
   }
@@ -287,7 +225,7 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
     right.geo.dispose();
     rotorGeo.dispose();
     assetMat.dispose();
-    shadowMat.dispose();
+    groundMat.dispose();
     ground.geometry.dispose();
   }
 

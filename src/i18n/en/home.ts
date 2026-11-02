@@ -37,6 +37,7 @@ export default {
     clean: {
       titleLine1: 'Foresight for the',
       titleLine2: 'energy transition',
+      text: 'Asset-level foresight from satellite, weather and sensor data, so operators act before the physical world does.',
       cta: { label: 'Request a demo', href: routes.demo },
     },
     // Pixel layout (test): the video shows through a pixel mask that drifts

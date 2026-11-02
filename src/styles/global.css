@@ -1,12 +1,6 @@
 @import '@fontsource-variable/archivo/wght.css';
 @import './tokens.css';
 
-/* Button glow size (animatable) */
-@property --glow {
-  syntax: '<percentage>';
-  inherits: true;
-  initial-value: 100%;
-}
 
 
 /* ---------- Reset ---------- */
@@ -211,77 +205,44 @@ ol {
 
 /* Primary action. White on #FF3700, square corners. */
 .btn {
-  /* Orange square button lit from below by a warm, dithered glow (2px pixels in
-     ordered bands: 25%, 50%, then a solid core). --glow grows it on hover. */
+  /* Plain fill, label on the left, an inset square on the right with the arrow. */
   --btn-bg: var(--accent);
   --btn-fg: var(--on-accent);
-  --btn-light: #ffb05c;
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
+  --btn-sq: #ffffff;
+  --btn-arrow: var(--grey-700);
+  --btn-inset: 0.3125rem;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 2.5rem;
-  padding: 0 0.875rem 0 1rem;
-  background:
-    radial-gradient(
-      ellipse calc(var(--glow) * 0.14) calc(var(--glow) * 0.5) at 50% 140%,
-      var(--btn-light) 96%,
-      transparent 100%
-    ),
-    var(--btn-bg);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22);
+  gap: 1rem;
+  min-height: 2.75rem;
+  padding: var(--btn-inset) var(--btn-inset) var(--btn-inset) 1.125rem;
+  background: var(--btn-bg);
   color: var(--btn-fg);
   font-size: 0.9375rem;
   letter-spacing: var(--track-body);
   white-space: nowrap;
   transition:
     transform 160ms var(--ease-out),
-    --glow 360ms var(--ease-out);
+    background-color 200ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn::before,
-.btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: var(--btn-light);
-  mask-size:
-    4px 4px,
-    100% 100%;
-  mask-repeat: repeat, no-repeat;
-  mask-composite: intersect;
+.btn__sq {
+  display: grid;
+  place-items: center;
+  flex: none;
+  align-self: stretch;
+  aspect-ratio: 1;
+  min-width: 2rem;
+  background: var(--btn-sq);
+  color: var(--btn-arrow);
 }
 
-/* Outer band: one pixel in four */
-.btn::before {
-  mask-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='2' height='2'/%3E%3C/svg%3E"),
-    radial-gradient(
-      ellipse calc(var(--glow) * 0.38) calc(var(--glow) * 0.95) at 50% 140%,
-      #000 98%,
-      transparent 100%
-    );
-}
-
-/* Inner band: checkerboard */
-.btn::after {
-  mask-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='2' height='2'/%3E%3Crect x='2' y='2' width='2' height='2'/%3E%3C/svg%3E"),
-    radial-gradient(
-      ellipse calc(var(--glow) * 0.25) calc(var(--glow) * 0.72) at 50% 140%,
-      #000 98%,
-      transparent 100%
-    );
-}
-
-.btn > * {
-  position: relative;
+.btn__icon {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+  transition: transform 200ms var(--ease-out);
 }
 
 .btn:active {
@@ -289,39 +250,38 @@ ol {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .btn:hover {
-    --glow: 125%;
-  }
-}
-
-.btn:focus-visible {
-  --glow: 125%;
-}
-
-.btn--lg {
-  min-height: 2.875rem;
-  padding: 0 1rem 0 1.25rem;
-  font-size: 1rem;
-}
-
-/* Dark button (for orange surfaces): the glow is the brand orange. */
-.btn--dark {
-  --btn-bg: var(--grey-700);
-  --btn-light: var(--accent);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1);
-}
-
-.btn__icon {
-  width: 1.125em;
-  height: 1.125em;
-  fill: currentColor;
-  transition: transform 200ms var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
   .btn:hover .btn__icon {
     transform: translateX(2px);
   }
+}
+
+.btn:focus-visible .btn__icon {
+  transform: translateX(2px);
+}
+
+.btn--lg {
+  min-height: 3.125rem;
+  padding-left: 1.375rem;
+  font-size: 1rem;
+}
+
+.btn--lg .btn__sq {
+  min-width: 2.5rem;
+}
+
+/* Secondary: white on light surfaces, dark grey on dark ones. */
+.btn--secondary {
+  --btn-bg: #ffffff;
+  --btn-fg: var(--grey-700);
+  --btn-sq: var(--grey-700);
+  --btn-arrow: #ffffff;
+}
+
+.theme-dark .btn--secondary {
+  --btn-bg: var(--grey-600);
+  --btn-fg: #ffffff;
+  --btn-sq: #ffffff;
+  --btn-arrow: var(--grey-700);
 }
 
 /* Pill / chip (square in this brand): 1px outline + 10% grey fill */
@@ -503,6 +463,33 @@ html.js-reveal [data-reveal]:not(.is-in) {
   transform: translate3d(0, 14px, 0);
 }
 
+/* Until reveal.ts has split the titles (and the font is in), keep them hidden
+   so they never show in the fallback font first. Removed by the script, or by
+   the inline timer in BaseLayout as a safety net. */
+html.js-render-wait [data-render],
+html.js-render-wait [data-render-step] {
+  visibility: hidden;
+}
+
+/* Claim: each word flashes orange as the reading highlight reaches it. */
+.w--flash {
+  animation: word-flash 700ms ease both;
+}
+
+@keyframes word-flash {
+  0%,
+  45% {
+    color: var(--accent);
+    animation-timing-function: steps(1, start);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .w--flash {
+    animation: none;
+  }
+}
+
 /* Titles render in: characters arrive in a loose sweep, flash orange (a few
    as a solid pixel first) and settle to their own colour. */
 .render .rw {
@@ -514,7 +501,7 @@ html.js-reveal [data-reveal]:not(.is-in) {
 }
 
 .render--go .rc {
-  animation: render-char 720ms ease var(--d, 0ms) both;
+  animation: render-char 880ms ease var(--d, 0ms) both;
 }
 
 /* A few characters are a small orange pixel first, then the glyph. */
@@ -535,7 +522,7 @@ html.js-reveal [data-reveal]:not(.is-in) {
   height: 0.26em;
   margin-left: -0.13em;
   background: var(--render-flash, var(--accent));
-  animation: render-pixel 720ms linear var(--d, 0ms) both;
+  animation: render-pixel 880ms linear var(--d, 0ms) both;
 }
 
 /* Orange holds, then snaps to the final colour (no muddy orange-to-black blend). */
@@ -544,11 +531,11 @@ html.js-reveal [data-reveal]:not(.is-in) {
     opacity: 0;
     color: var(--render-flash, var(--accent));
   }
-  12% {
+  10% {
     opacity: 1;
     color: var(--render-flash, var(--accent));
   }
-  40% {
+  46% {
     opacity: 1;
     color: var(--render-flash, var(--accent));
     animation-timing-function: steps(1, start);

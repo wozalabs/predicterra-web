@@ -53,6 +53,11 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
 
     <!-- Test switches (menu): 3D section variant and hero layout. Runs before paint. -->
     <script is:inline>
+      // Titles stay hidden until reveal.ts has prepared them (safety timer included).
+      document.documentElement.classList.add('js-render-wait');
+      setTimeout(function () {
+        document.documentElement.classList.remove('js-render-wait');
+      }, 2500);
       try {
         var scene = localStorage.getItem('predicterra:scene');
         if (scene === 'overview') document.documentElement.dataset.scene = 'overview';

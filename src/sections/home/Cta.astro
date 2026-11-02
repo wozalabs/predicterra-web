@@ -1,6 +1,5 @@
 ---
 import Button from '../../components/Button.astro';
-import TextLink from '../../components/TextLink.astro';
 import { getCopy, localizePath, type Locale } from '../../i18n/config';
 
 interface Props {
@@ -11,24 +10,24 @@ const { cta } = getCopy(locale).home;
 ---
 
 <!--
-  Action card: orange, inset from the page edges. Dithered 3D assets sit on
-  both sides (scripts/cta-scene.ts, lazy) and tilt with the pointer.
+  Action card, inset from the page edges. The 3D section's white assets sit
+  on both sides (scripts/cta-scene.ts, lazy) and tilt with the pointer.
 -->
 <section class="cta" id="contact" aria-labelledby="cta-title">
-  <div class="cta__card" data-cta-card data-reveal data-header-accent>
+  <div class="cta__card" data-cta-card data-reveal>
     <canvas class="cta__scene" aria-hidden="true" data-cta-canvas></canvas>
     <div class="cta__veil" aria-hidden="true"></div>
 
     <div class="cta__content">
-      <p class="cta__label">{cta.label}</p>
+      <p class="label cta__label" data-render>{cta.label}</p>
       <h2 id="cta-title" class="t-h2 cta__title" data-render>
         <span class="cta__line">{cta.titleLine1}</span>
-        <span class="cta__line">{cta.titleLine2} <span class="cta__accent">{cta.titleAccent}</span></span>
+        <span class="cta__line">{cta.titleLine2} <span class="accent">{cta.titleAccent}</span></span>
       </h2>
       <p class="cta__text">{cta.text}</p>
       <div class="cta__actions">
-        <Button href={localizePath(cta.primary.href, locale)} label={cta.primary.label} variant="dark" size="lg" />
-        <TextLink href={cta.secondary.href} label={cta.secondary.label} external class="cta__link" />
+        <Button href={localizePath(cta.primary.href, locale)} label={cta.primary.label} size="lg" />
+        <Button href={cta.secondary.href} label={cta.secondary.label} variant="secondary" size="lg" external />
       </div>
     </div>
   </div>
@@ -52,8 +51,9 @@ const { cta } = getCopy(locale).home;
     max-width: var(--max-w);
     margin-inline: auto;
     padding: clamp(3rem, 2rem + 4vw, 5.5rem) var(--gutter);
-    background: var(--accent);
-    color: var(--grey-700);
+    /* Matches CTA_GROUND in scripts/cta-scene.ts (shown until WebGL is ready). */
+    background: #eaeaea;
+    color: var(--ink);
   }
 
   .cta__scene {
@@ -70,12 +70,12 @@ const { cta } = getCopy(locale).home;
     opacity: 1;
   }
 
-  /* Plain orange behind the copy, so the dithered assets never touch the text. */
+  /* Plain ground behind the copy, so the assets and their shadows never touch the text. */
   .cta__veil {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: radial-gradient(ellipse 34% 52% at 50% 50%, var(--accent) 55%, transparent 100%);
+    background: radial-gradient(ellipse 34% 52% at 50% 50%, #eaeaea 55%, rgb(234 234 234 / 0) 100%);
     pointer-events: none;
   }
 
@@ -87,24 +87,7 @@ const { cta } = getCopy(locale).home;
     text-align: center;
   }
 
-  /* Near-black on #FF3700 is about 4.6:1, white would only be 3.6:1. */
-  .cta__label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.625rem;
-    font-size: var(--fs-small);
-  }
-
-  .cta__label::before {
-    content: '';
-    width: 0.5rem;
-    height: 0.5rem;
-    background: var(--grey-700);
-  }
-
   .cta__title {
-    /* Render effect flashes white here (orange would vanish on orange). */
-    --render-flash: #ffffff;
     display: grid;
   }
 
@@ -112,13 +95,9 @@ const { cta } = getCopy(locale).home;
     white-space: nowrap;
   }
 
-  /* Large text, so white passes contrast on orange. */
-  .cta__accent {
-    color: #ffffff;
-  }
-
   .cta__text {
     max-width: 40ch;
+    color: var(--ink-2);
   }
 
   .cta__actions {
@@ -126,20 +105,8 @@ const { cta } = getCopy(locale).home;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 1rem 1.75rem;
-    margin-top: 0.75rem;
-  }
-
-  /* Text link on orange: dark rule, dark bar */
-  .cta__card :global(.cta__link) {
-    --line-strong: rgb(30 30 30 / 0.45);
-    --muted: var(--grey-700);
-    min-width: 10rem;
-    padding-bottom: 0.5rem;
-  }
-
-  .cta__card :global(.cta__link)::after {
-    background: var(--grey-700);
+    gap: 0.75rem;
+    margin-top: 1rem;
   }
 
   @media (max-width: 47.99rem) {
@@ -152,7 +119,7 @@ const { cta } = getCopy(locale).home;
       white-space: normal;
     }
     .cta__veil {
-      background: radial-gradient(ellipse 70% 34% at 50% 50%, var(--accent) 60%, transparent 100%);
+      background: radial-gradient(ellipse 70% 34% at 50% 50%, #eaeaea 60%, rgb(234 234 234 / 0) 100%);
     }
   }
 </style>

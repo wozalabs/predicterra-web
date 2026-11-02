@@ -34,7 +34,7 @@ const { video, cutout } = hero;
   <div class="hcut__scrim" aria-hidden="true"></div>
 
   <div class="hcut__content container">
-    <p class="hcut__eyebrow t-small">{cutout.eyebrow}</p>
+    <p class="hcut__eyebrow t-small" data-render>{cutout.eyebrow}</p>
     <span class="hcut__rule" aria-hidden="true"></span>
     <!-- Only one hero is displayed at a time; the hidden one is out of the
          accessibility tree, so this heading never competes with the other h1. -->
@@ -80,7 +80,7 @@ const { video, cutout } = hero;
     background:
       linear-gradient(to top, rgb(20 20 20 / 0.6), rgb(20 20 20 / 0) 55%),
       linear-gradient(to right, rgb(20 20 20 / 0.35), rgb(20 20 20 / 0) 60%),
-      rgb(20 20 20 / 0.28);
+      rgb(20 20 20 / 0.4);
   }
 
   /* ---------- Title ---------- */

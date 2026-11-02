@@ -1,5 +1,5 @@
 ---
-import { logoAccentPaths, logoInkPaths } from '../data/logo';
+import { LOGO_VIEWBOX, logoAccentPaths, logoInkPaths } from '../data/logo';
 
 interface Props {
   class?: string;
@@ -10,7 +10,7 @@ const { class: className, title = 'Predicterra' } = Astro.props;
 
 <svg
   class:list={['logo', className]}
-  viewBox="0 0 135 24"
+  viewBox={LOGO_VIEWBOX}
   role="img"
   aria-label={title}
   xmlns="http://www.w3.org/2000/svg"
@@ -22,7 +22,7 @@ const { class: className, title = 'Predicterra' } = Astro.props;
 <style>
   .logo {
     width: auto;
-    height: 1.5rem;
+    height: 1.375rem;
     color: var(--ink);
   }
 </style>
