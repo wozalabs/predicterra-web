@@ -474,9 +474,9 @@ html.js-render-wait [data-render-step] {
   visibility: hidden;
 }
 
-/* Titles are typed in (scripts/reveal.ts): letters appear one at a time at a
-   constant rate, no easing and no fade, behind a thin orange caret that
-   blinks twice at the end and goes away. */
+/* Titles render in: characters arrive in a loose sweep, hold in orange for a
+   beat (a few as a small pixel first) and snap to their own colour. Only
+   opacity and colour animate, so nothing moves. */
 .render .rw {
   white-space: nowrap;
 }
@@ -485,31 +485,74 @@ html.js-render-wait [data-render-step] {
   opacity: 0;
 }
 
-.render-caret {
+.render--go .rc {
+  animation: render-char 700ms ease var(--d, 0ms) both;
+}
+
+/* A few characters are a small orange pixel first, then the glyph. */
+.render .rc--block {
+  position: relative;
+}
+
+.render--go .rc--block {
+  animation-name: render-glyph;
+}
+
+.render--go .rc--block::before {
+  content: '';
   position: absolute;
-  left: 0;
-  top: 0;
-  width: max(2px, 0.06em);
+  left: 50%;
+  bottom: 0.22em;
+  width: 0.26em;
+  height: 0.26em;
+  margin-left: -0.13em;
   background: var(--render-flash, var(--accent));
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0; /* hidden until its own turn */
+  animation: render-pixel 700ms linear var(--d, 0ms) forwards;
 }
 
-.render-caret--blink {
-  animation: render-caret-blink 800ms steps(1, end) forwards;
-}
-
-@keyframes render-caret-blink {
+/* Orange holds, then snaps to the final colour (no muddy orange-to-black blend). */
+@keyframes render-char {
   0% {
-    opacity: 1;
-  }
-  25% {
     opacity: 0;
+    color: var(--render-flash, var(--accent));
   }
-  50% {
+  10% {
+    opacity: 1;
+    color: var(--render-flash, var(--accent));
+  }
+  46% {
+    opacity: 1;
+    color: var(--render-flash, var(--accent));
+    animation-timing-function: steps(1, start);
+  }
+  100% {
     opacity: 1;
   }
-  75%,
+}
+
+@keyframes render-glyph {
+  0%,
+  30% {
+    opacity: 1;
+    color: transparent;
+  }
+  31%,
+  52% {
+    color: var(--render-flash, var(--accent));
+    animation-timing-function: steps(1, start);
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes render-pixel {
+  0%,
+  30% {
+    opacity: 1;
+  }
+  31%,
   100% {
     opacity: 0;
   }
