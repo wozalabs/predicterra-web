@@ -474,30 +474,6 @@ html.js-render-wait [data-render-step] {
   visibility: hidden;
 }
 
-/* Claim: each word flashes orange as the reading highlight reaches it. */
-.w--flash {
-  animation: word-flash 600ms ease;
-}
-
-/* Explicit end colour (--w-ink, set in Claim.astro): some browsers keep the
-   flash colour when the last keyframe is left implicit. */
-@keyframes word-flash {
-  0%,
-  45% {
-    color: var(--accent);
-    animation-timing-function: steps(1, start);
-  }
-  100% {
-    color: var(--w-ink, var(--ink));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .w--flash {
-    animation: none;
-  }
-}
-
 /* Titles render in: characters arrive in a loose sweep, flash orange (a few
    as a solid pixel first) and settle to their own colour. */
 .render .rw {

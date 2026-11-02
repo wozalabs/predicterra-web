@@ -13,7 +13,7 @@ const accentWords = claim.accent.split(' ');
 
 <section class="claim" aria-labelledby="claim-label" data-claim>
   <div class="container claim__grid">
-    <h2 id="claim-label" class="label claim__label" data-render>{claim.label}</h2>
+    <h2 id="claim-label" class="label claim__label" data-reveal>{claim.label}</h2>
     <div class="claim__body">
       <p class="t-statement claim__text" data-claim-text>
         {words.map((w) => <span class="w">{w} </span>)}
@@ -57,15 +57,6 @@ const accentWords = claim.accent.split(' ');
     }
   }
 
-  /* End colour of the orange flash on each word (see .w--flash). */
-  .claim__text .w {
-    --w-ink: var(--ink);
-  }
-
-  .claim__text .accent .w {
-    --w-ink: var(--accent);
-  }
-
   .claim__text {
     max-width: 30ch;
     font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.375rem); /* 38px on desktop */
@@ -106,17 +97,6 @@ const accentWords = claim.accent.split(' ');
       words.forEach((w, i) => {
         const o = Math.min(1, Math.max(0.16, lit - i + 0.16));
         w.style.setProperty('--o', o.toFixed(3));
-        // As the highlight reaches a word it flashes orange for a moment.
-        const on = o > 0.9;
-        if (on && !w.dataset.lit) {
-          w.dataset.lit = '';
-          w.classList.remove('w--flash');
-          void w.offsetWidth;
-          w.classList.add('w--flash');
-          w.addEventListener('animationend', () => w.classList.remove('w--flash'), { once: true });
-        } else if (!on && w.dataset.lit !== undefined) {
-          delete w.dataset.lit;
-        }
       });
     };
 
