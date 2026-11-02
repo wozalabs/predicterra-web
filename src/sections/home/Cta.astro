@@ -10,19 +10,26 @@ const { locale = 'en' } = Astro.props;
 const { cta } = getCopy(locale).home;
 ---
 
-<!-- Full-width dark band. -->
-<section class="cta theme-dark" id="contact" aria-labelledby="cta-title" data-header-dark>
-  <div class="cta__field" aria-hidden="true"></div>
-  <div class="container cta__content">
-    <p class="label">{cta.label}</p>
-    <h2 id="cta-title" class="t-h2 cta__title">
-      <span class="cta__line">{cta.titleLine1}</span>
-      <span class="cta__line">{cta.titleLine2} <span class="accent">{cta.titleAccent}</span></span>
-    </h2>
-    <p class="cta__text">{cta.text}</p>
-    <div class="cta__actions">
-      <Button href={localizePath(cta.primary.href, locale)} label={cta.primary.label} />
-      <TextLink href={cta.secondary.href} label={cta.secondary.label} external class="cta__link" />
+<!--
+  Action card: orange, inset from the page edges. Dithered 3D assets sit on
+  both sides (scripts/cta-scene.ts, lazy) and tilt with the pointer.
+-->
+<section class="cta" id="contact" aria-labelledby="cta-title">
+  <div class="cta__card" data-cta-card data-reveal data-header-accent>
+    <canvas class="cta__scene" aria-hidden="true" data-cta-canvas></canvas>
+    <div class="cta__veil" aria-hidden="true"></div>
+
+    <div class="cta__content">
+      <p class="cta__label">{cta.label}</p>
+      <h2 id="cta-title" class="t-h2 cta__title" data-render>
+        <span class="cta__line">{cta.titleLine1}</span>
+        <span class="cta__line">{cta.titleLine2} <span class="cta__accent">{cta.titleAccent}</span></span>
+      </h2>
+      <p class="cta__text">{cta.text}</p>
+      <div class="cta__actions">
+        <Button href={localizePath(cta.primary.href, locale)} label={cta.primary.label} variant="dark" size="lg" />
+        <TextLink href={cta.secondary.href} label={cta.secondary.label} external class="cta__link" />
+      </div>
     </div>
   </div>
 </section>
@@ -31,34 +38,73 @@ const { cta } = getCopy(locale).home;
   .cta {
     position: relative;
     z-index: var(--z-cover);
-    overflow: hidden;
-    background: var(--grey-700);
-    padding-block: clamp(4rem, 3rem + 4vw, 7rem);
+    background: var(--canvas);
+    padding: clamp(2rem, 1rem + 3vw, 4rem) var(--gutter) clamp(1.5rem, 1rem + 2vw, 3rem);
   }
 
-  /* Dot field on both edges, fading towards the centred copy */
-  .cta__field {
+  .cta__card {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    display: grid;
+    place-items: center;
+    min-height: clamp(30rem, 58vh, 38rem);
+    max-width: var(--max-w);
+    margin-inline: auto;
+    padding: clamp(3rem, 2rem + 4vw, 5.5rem) var(--gutter);
+    background: var(--accent);
+    color: var(--grey-700);
+  }
+
+  .cta__scene {
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(circle, #4a4a4a 1.1px, transparent 1.7px);
-    background-size: 12px 12px;
-    mask-image: linear-gradient(90deg, #000, transparent 30%, transparent 70%, #000);
-    -webkit-mask-image: linear-gradient(90deg, #000, transparent 30%, transparent 70%, #000);
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 900ms var(--ease-out);
+  }
+
+  .cta__scene[data-ready] {
+    opacity: 1;
+  }
+
+  /* Plain orange behind the copy, so the dithered assets never touch the text. */
+  .cta__veil {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(ellipse 34% 52% at 50% 50%, var(--accent) 55%, transparent 100%);
+    pointer-events: none;
   }
 
   .cta__content {
-    position: relative;
     display: grid;
     justify-items: center;
     gap: 1rem;
+    max-width: 44rem;
     text-align: center;
   }
 
-  .cta__content .label {
-    color: var(--ink-2);
+  /* Near-black on #FF3700 is about 4.6:1, white would only be 3.6:1. */
+  .cta__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: var(--fs-small);
+  }
+
+  .cta__label::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--grey-700);
   }
 
   .cta__title {
+    /* Render effect flashes white here (orange would vanish on orange). */
+    --render-flash: #ffffff;
     display: grid;
   }
 
@@ -66,9 +112,13 @@ const { cta } = getCopy(locale).home;
     white-space: nowrap;
   }
 
+  /* Large text, so white passes contrast on orange. */
+  .cta__accent {
+    color: #ffffff;
+  }
+
   .cta__text {
     max-width: 40ch;
-    color: var(--ink-2);
   }
 
   .cta__actions {
@@ -80,8 +130,106 @@ const { cta } = getCopy(locale).home;
     margin-top: 0.75rem;
   }
 
-  :global(.cta__link) {
+  /* Text link on orange: dark rule, dark bar */
+  .cta__card :global(.cta__link) {
+    --line-strong: rgb(30 30 30 / 0.45);
+    --muted: var(--grey-700);
     min-width: 10rem;
     padding-bottom: 0.5rem;
   }
+
+  .cta__card :global(.cta__link)::after {
+    background: var(--grey-700);
+  }
+
+  @media (max-width: 47.99rem) {
+    /* Room above and below the copy for the two clusters */
+    .cta__card {
+      min-height: 44rem;
+      padding-block: 11rem 12rem;
+    }
+    .cta__line {
+      white-space: normal;
+    }
+    .cta__veil {
+      background: radial-gradient(ellipse 70% 34% at 50% 50%, var(--accent) 60%, transparent 100%);
+    }
+  }
 </style>
+
+<script>
+  import type { CtaScene } from '../../scripts/cta-scene';
+
+  const card = document.querySelector<HTMLElement>('[data-cta-card]');
+  const canvas = card?.querySelector<HTMLCanvasElement>('[data-cta-canvas]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (card && canvas) {
+    let scene: CtaScene | null = null;
+    let visible = false;
+    let raf = 0;
+    let last = 0;
+
+    const frame = (now: number) => {
+      raf = 0;
+      if (!scene || !visible) return;
+      const dt = last ? (now - last) / 1000 : 1 / 60;
+      last = now;
+      const moving = scene.tick(dt);
+      if (moving) raf = requestAnimationFrame(frame);
+    };
+    const start = () => {
+      if (!raf && visible && scene) {
+        last = 0;
+        raf = requestAnimationFrame(frame);
+      }
+    };
+
+    const boot = async () => {
+      try {
+        const { createCtaScene } = await import('../../scripts/cta-scene');
+        scene = createCtaScene(canvas, { reducedMotion: reduce });
+        const r = card.getBoundingClientRect();
+        scene.resize(r.width, r.height);
+        scene.tick(0);
+        canvas.dataset.ready = '';
+        new ResizeObserver(([e]) => {
+          scene?.resize(e.contentRect.width, e.contentRect.height);
+          scene?.tick(0);
+        }).observe(card);
+        start();
+      } catch {
+        /* No WebGL: the card stays plain orange. */
+      }
+    };
+
+    // Load three.js only when the card gets close.
+    const near = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          near.disconnect();
+          boot();
+        }
+      },
+      { rootMargin: '600px 0px' },
+    );
+    near.observe(card);
+
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) start();
+    }).observe(card);
+
+    // Pointer tilt (mouse only), relative to the card centre.
+    card.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse' || !scene) return;
+      const r = card.getBoundingClientRect();
+      scene.setPointer(((e.clientX - r.left) / r.width) * 2 - 1, ((e.clientY - r.top) / r.height) * 2 - 1);
+      start();
+    });
+    card.addEventListener('pointerleave', () => {
+      scene?.setPointer(0, 0);
+      start();
+    });
+  }
+</script>

@@ -15,14 +15,14 @@ const { benefits } = getCopy(locale).home;
     <NotchRule at={70} />
 
     <div class="benefits__grid">
-      <h2 id="benefits-title" class="t-h2 benefits__title">{benefits.title}</h2>
+      <h2 id="benefits-title" class="t-h2 benefits__title" data-render>{benefits.title}</h2>
 
-      <dl class="figures">
+      <dl class="figures" data-reveal-group>
         {
           benefits.stats.map((s) => (
-            <div class="figure">
+            <div class="figure" data-reveal>
               <dt class="figure__label">{s.label}</dt>
-              <dd class="figure__value t-num">{s.value}</dd>
+              <dd class="figure__value t-num" data-render>{s.value}</dd>
               <dd class="figure__caption t-small">{s.caption}</dd>
             </div>
           ))

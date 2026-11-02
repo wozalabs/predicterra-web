@@ -38,7 +38,7 @@ const { video, cutout } = hero;
     <span class="hcut__rule" aria-hidden="true"></span>
     <!-- Only one hero is displayed at a time; the hidden one is out of the
          accessibility tree, so this heading never competes with the other h1. -->
-    <p id="hcut-title" class="hcut__title" role="heading" aria-level="1">
+    <p id="hcut-title" class="hcut__title" role="heading" aria-level="1" data-render>
       <span>{cutout.titleLine1}</span>
       <span>{cutout.titleLine2}</span>
     </p>

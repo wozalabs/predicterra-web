@@ -1,19 +1,22 @@
 ---
+import { icons } from '../data/icons';
+
 interface Props {
   href: string;
   label: string;
   size?: 'md' | 'lg';
+  variant?: 'accent' | 'dark';
   external?: boolean;
   class?: string;
 }
-const { href, label, size = 'md', external = false, class: className } = Astro.props;
+const { href, label, size = 'md', variant = 'accent', external = false, class: className } = Astro.props;
 ---
 
 <a
-  class:list={['btn', size === 'lg' && 'btn--lg', className]}
+  class:list={['btn', size === 'lg' && 'btn--lg', variant === 'dark' && 'btn--dark', className]}
   href={href}
   {...external ? { target: '_blank', rel: 'noopener' } : {}}
 >
-  <span>{label}</span> 
-  <span class="btn__square" aria-hidden="true"></span>
+  <span>{label}</span>
+  <svg class="btn__icon" viewBox="0 -960 960 960" aria-hidden="true"><path d={icons.arrow_forward} /></svg>
 </a>

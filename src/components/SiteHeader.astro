@@ -1,6 +1,7 @@
 ---
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
+import Button from './Button.astro';
 import { getCopy, localizePath, type Locale } from '../i18n/config';
 import { routes } from '../data/routes';
 
@@ -19,7 +20,7 @@ const { header, menu } = common;
     </a>
 
     <div class="site-header__actions">
-      <a class="btn site-header__demo" href={localizePath(routes.demo, locale)}>{header.demo}</a>
+      <Button class="site-header__demo" href={localizePath(routes.demo, locale)} label={header.demo} />
       <button
         class="site-header__menu"
         type="button"
@@ -82,16 +83,14 @@ const { header, menu } = common;
         <button type="button" class="seg__btn" data-hero-option="split" aria-pressed="false">{menu.hero.split}</button>
         <button type="button" class="seg__btn" data-hero-option="cutout" aria-pressed="false">{menu.hero.cutout}</button>
         <button type="button" class="seg__btn" data-hero-option="pixel" aria-pressed="false">{menu.hero.pixel}</button>
+        <button type="button" class="seg__btn" data-hero-option="clean" aria-pressed="false">{menu.hero.clean}</button>
       </div>
     </div>
 
     <div class="menu__foot">
       <p class="t-small t-muted">{menu.contactLabel}</p>
       <a class="menu__mail" href={`mailto:${menu.email}`}>{menu.email}</a>
-      <a class="btn btn--lg menu__demo" href={localizePath(routes.demo, locale)}>
-        <span>{header.demo}</span>
-        <span class="btn__square" aria-hidden="true"></span>
-      </a>
+      <Button class="menu__demo" size="lg" href={localizePath(routes.demo, locale)} label={header.demo} />
     </div>
   </div>
 </dialog>
@@ -173,8 +172,13 @@ const { header, menu } = common;
     }
   }
 
+  .site-header[data-on-accent] :global(.site-header__demo) {
+    --btn-bg: var(--grey-700);
+    --btn-light: var(--accent);
+  }
+
   @media (max-width: 40rem) {
-    .site-header__demo {
+    :global(.site-header__demo) {
       display: none;
     }
   }
@@ -314,6 +318,7 @@ const { header, menu } = common;
 
   .seg {
     display: inline-flex;
+    flex-wrap: wrap;
     border: 1px solid var(--line);
     background: var(--chip-bg);
   }
@@ -351,7 +356,7 @@ const { header, menu } = common;
     margin-bottom: 1rem;
   }
 
-  .menu__demo {
+  :global(.menu__demo) {
     justify-content: space-between;
   }
 </style>
@@ -367,6 +372,7 @@ const { header, menu } = common;
   if (header) {
     let ticking = false;
     const darkSections = Array.from(document.querySelectorAll<HTMLElement>('[data-header-dark]'));
+    const accentSections = Array.from(document.querySelectorAll<HTMLElement>('[data-header-accent]'));
     const update = () => {
       header.toggleAttribute('data-scrolled', window.scrollY > 8);
       const line = header.offsetHeight / 2;
@@ -376,6 +382,12 @@ const { header, menu } = common;
         return isDark && r.height > 0 && r.top <= line && r.bottom > line;
       });
       header.style.setProperty('--hd', dark ? '1' : '0');
+      // Over an orange surface (CTA card) the orange button switches to dark.
+      const onAccent = accentSections.some((el) => {
+        const r = el.getBoundingClientRect();
+        return r.height > 0 && r.top <= line && r.bottom > line;
+      });
+      header.toggleAttribute('data-on-accent', onAccent);
       ticking = false;
     };
     window.addEventListener(

@@ -57,7 +57,7 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
         var scene = localStorage.getItem('predicterra:scene');
         if (scene === 'overview') document.documentElement.dataset.scene = 'overview';
         var hero = localStorage.getItem('predicterra:hero');
-        if (hero === 'split' || hero === 'cutout' || hero === 'pixel') document.documentElement.dataset.hero = hero;
+        if (['split', 'cutout', 'pixel', 'clean'].indexOf(hero) > -1) document.documentElement.dataset.hero = hero;
       } catch (e) {}
     </script>
 
@@ -94,5 +94,9 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
       <slot />
     </main>
     <SiteFooter locale={locale} />
+    <script>
+      import { mountReveal } from '../scripts/reveal';
+      mountReveal();
+    </script>
   </body>
 </html>

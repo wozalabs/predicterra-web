@@ -13,15 +13,15 @@ const { footer } = getCopy(locale).common;
 <footer class="footer">
   <div class="container">
     <div class="footer__top">
-      <div class="footer__brand">
+      <div class="footer__brand" data-reveal>
         <Logo class="footer__logo" />
         <p class="footer__tagline t-small t-muted">{footer.tagline}</p>
       </div>
 
-      <nav class="footer__cols" aria-label="Footer">
+      <nav class="footer__cols" aria-label="Footer" data-reveal-group>
         {
           footer.columns.map((col) => (
-            <div>
+            <div data-reveal>
               <p class="footer__title t-caption t-muted">{col.title}</p>
               <ul>
                 {col.links.map((link) => (
@@ -40,7 +40,7 @@ const { footer } = getCopy(locale).common;
           ))
         }
 
-        <div>
+        <div data-reveal>
           <p class="footer__title t-caption t-muted">{footer.contact.title}</p>
           <address class="footer__address">
             <a class="footer__link" href={`mailto:${footer.contact.email}`}>{footer.contact.email}</a>
@@ -89,41 +89,44 @@ const { footer } = getCopy(locale).common;
     z-index: var(--z-cover);
     background: var(--canvas);
     font-size: var(--fs-small);
-    padding-bottom: 1.25rem;
+    padding-bottom: 1.5rem;
   }
 
   .footer__top {
     display: grid;
-    gap: 2rem;
-    padding-block: 2rem;
+    gap: 3rem;
+    padding-block: clamp(3rem, 2rem + 3vw, 5.5rem) clamp(3rem, 2rem + 3vw, 5rem);
     border-top: 1px solid var(--line);
   }
 
   @media (min-width: 64rem) {
     .footer__top {
-      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-      gap: var(--gutter);
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      gap: calc(var(--gutter) * 2);
     }
   }
 
   .footer__brand {
     display: grid;
     align-content: start;
-    gap: 0.75rem;
+    gap: 1.25rem;
   }
 
   .footer__brand :global(.footer__logo) {
-    height: 1.125rem;
+    height: clamp(1.75rem, 1.25rem + 1.2vw, 2.5rem);
   }
 
   .footer__tagline {
-    max-width: 30ch;
+    max-width: 28ch;
+    font-size: var(--fs-body);
+    line-height: 1.4;
+    letter-spacing: var(--track-body);
   }
 
   .footer__cols {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.75rem var(--gutter);
+    gap: 2.5rem var(--gutter);
   }
 
   @media (min-width: 48rem) {
@@ -133,12 +136,12 @@ const { footer } = getCopy(locale).common;
   }
 
   .footer__title {
-    margin-bottom: 0.625rem;
+    margin-bottom: 1rem;
   }
 
   .footer__cols ul {
     display: grid;
-    gap: 0.25rem;
+    gap: 0.5rem;
   }
 
   .footer__link {
@@ -154,7 +157,7 @@ const { footer } = getCopy(locale).common;
 
   .footer__address {
     display: grid;
-    gap: 0.25rem;
+    gap: 0.5rem;
     font-style: normal;
   }
 
@@ -169,7 +172,7 @@ const { footer } = getCopy(locale).common;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem 1.5rem;
-    padding-top: 1rem;
+    padding-top: 1.5rem;
     border-top: 1px solid var(--line);
   }
 

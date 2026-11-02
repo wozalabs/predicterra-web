@@ -13,7 +13,7 @@ const accentWords = claim.accent.split(' ');
 
 <section class="claim" aria-labelledby="claim-label" data-claim>
   <div class="container claim__grid">
-    <h2 id="claim-label" class="label claim__label">{claim.label}</h2>
+    <h2 id="claim-label" class="label claim__label" data-reveal>{claim.label}</h2>
     <div class="claim__body">
       <p class="t-statement claim__text" data-claim-text>
         {words.map((w) => <span class="w">{w} </span>)}

@@ -33,6 +33,12 @@ export default {
       titleLine1: 'Foresight for the',
       titleLine2: 'energy transition',
     },
+    // Clean layout (test): only the video, the title and one action.
+    clean: {
+      titleLine1: 'Foresight for the',
+      titleLine2: 'energy transition',
+      cta: { label: 'Request a demo', href: routes.demo },
+    },
     // Pixel layout (test): the video shows through a pixel mask that drifts
     // slowly; the orange pixels are example alerts. x/y place each alert on
     // desktop (fractions of the hero), xm/ym on phones.

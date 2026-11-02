@@ -14,10 +14,10 @@ const { cases } = getCopy(locale).home;
 <section class="cases" id="success-stories" aria-labelledby="cases-title">
   <div class="container cases__inner">
     <NotchRule at={70} />
-    <h2 id="cases-title" class="t-h2 cases__title">{cases.title}</h2>
+    <h2 id="cases-title" class="t-h2 cases__title" data-render>{cases.title}</h2>
 
     <div class="cases__grid">
-      <div class="cases__explore">
+      <div class="cases__explore" data-reveal>
         <TextLink
           href={localizePath(cases.exploreHref, locale)}
           label={cases.exploreLabel}
@@ -25,10 +25,10 @@ const { cases } = getCopy(locale).home;
         />
       </div>
 
-      <ul class="cases__list">
+      <ul class="cases__list" data-reveal-group>
         {
           cases.items.map((c) => (
-            <li class="case">
+            <li class="case" data-reveal>
               <a
                 class="case__link"
                 href={c.external ? c.href : localizePath(c.href, locale)}

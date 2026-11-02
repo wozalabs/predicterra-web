@@ -43,7 +43,7 @@ const { video, pixel } = hero;
     <p class="hpx__eyebrow t-small">{pixel.eyebrow}</p>
     <!-- Only one hero is displayed at a time; the hidden ones are out of the
          accessibility tree, so this heading never competes with the other h1. -->
-    <p id="hpx-title" class="hpx__title" role="heading" aria-level="1">
+    <p id="hpx-title" class="hpx__title" role="heading" aria-level="1" data-render>
       <span>{pixel.titleLine1}</span>
       <span>{pixel.titleLine2}</span>
     </p>
