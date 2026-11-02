@@ -474,8 +474,8 @@ html.js-render-wait [data-render-step] {
   visibility: hidden;
 }
 
-/* Titles render in: characters arrive in a loose sweep, flash orange (a few
-   as a solid pixel first) and settle to their own colour. */
+/* Titles render in: letters appear progressively, left to right, with a short
+   orange leading edge, and settle to their own colour. */
 .render .rw {
   white-space: nowrap;
 }
@@ -485,74 +485,27 @@ html.js-render-wait [data-render-step] {
 }
 
 .render--go .rc {
-  animation: render-char 700ms ease var(--d, 0ms) both;
+  animation: render-char 600ms var(--ease-out) var(--d, 0ms) both;
 }
 
-/* A few characters are a small orange pixel first, then the glyph. */
-.render .rc--block {
-  position: relative;
-}
-
-.render--go .rc--block {
-  animation-name: render-glyph;
-}
-
-.render--go .rc--block::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 0.22em;
-  width: 0.26em;
-  height: 0.26em;
-  margin-left: -0.13em;
-  background: var(--render-flash, var(--accent));
-  animation: render-pixel 700ms linear var(--d, 0ms) both;
-}
-
-/* Orange holds, then snaps to the final colour (no muddy orange-to-black blend). */
+/* Each letter fades in orange, holds for a beat, then snaps to its own colour
+   (no muddy orange-to-black blend). Letters go strictly left to right. */
 @keyframes render-char {
   0% {
     opacity: 0;
     color: var(--render-flash, var(--accent));
   }
-  10% {
+  22% {
     opacity: 1;
     color: var(--render-flash, var(--accent));
   }
-  46% {
+  38% {
     opacity: 1;
-    color: var(--render-flash, var(--accent));
-    animation-timing-function: steps(1, start);
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes render-glyph {
-  0%,
-  30% {
-    opacity: 1;
-    color: transparent;
-  }
-  31%,
-  52% {
     color: var(--render-flash, var(--accent));
     animation-timing-function: steps(1, start);
   }
   100% {
     opacity: 1;
-  }
-}
-
-@keyframes render-pixel {
-  0%,
-  30% {
-    opacity: 1;
-  }
-  31%,
-  100% {
-    opacity: 0;
   }
 }
 

@@ -4,10 +4,11 @@
 //                        the viewport. Inside [data-reveal-group] the children
 //                        are staggered.
 // [data-render]          titles and labels "render" in once they are well in
-//                        view: characters appear in a loose left-to-right sweep,
-//                        hold in orange for a moment (some start as a small
-//                        orange pixel), then snap to their normal colour. When
-//                        it is done the original markup is put back untouched.
+//                        view: the original letters appear one after another,
+//                        left to right, each briefly in orange before settling
+//                        to its normal colour (a short orange leading edge runs
+//                        through the line). When it is done the original markup
+//                        is put back untouched.
 // [data-render-step]     same effect, replayed every time its [data-step]
 //                        becomes active (3D section titles).
 //
@@ -18,11 +19,9 @@
 
 const REVEAL_STAGGER_MS = 70;
 const RENDER_START_MS = 100;
-const CHAR_STEP_MS = 22;
-const MAX_SWEEP_MS = 700;
-const CHAR_JITTER_MS = 200;
-const CHAR_MS = 700;
-const BLOCK_CHANCE = 0.12;
+const CHAR_STEP_MS = 26;
+const MAX_SWEEP_MS = 800;
+const CHAR_MS = 600;
 
 type RenderEl = HTMLElement & { __original?: string; __busy?: boolean };
 
@@ -135,9 +134,9 @@ function prepare(el: RenderEl) {
       word.className = 'rw';
       for (const ch of part) {
         const span = document.createElement('span');
-        span.className = Math.random() < BLOCK_CHANCE ? 'rc rc--block' : 'rc';
+        span.className = 'rc';
         span.textContent = ch;
-        const delay = RENDER_START_MS + index * step + Math.random() * CHAR_JITTER_MS;
+        const delay = RENDER_START_MS + index * step;
         span.style.setProperty('--d', `${Math.round(delay)}ms`);
         word.append(span);
         index++;
@@ -148,7 +147,7 @@ function prepare(el: RenderEl) {
   }
 
   el.dataset.renderReady = '';
-  el.dataset.renderTotal = String(RENDER_START_MS + index * step + CHAR_JITTER_MS + CHAR_MS);
+  el.dataset.renderTotal = String(RENDER_START_MS + index * step + CHAR_MS);
   el.classList.add('render');
   el.__original = original;
 }

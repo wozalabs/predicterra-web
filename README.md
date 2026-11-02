@@ -76,7 +76,7 @@ The first version of the 3D section (`SectorScene.astro`, opens on the whole net
 `scripts/reveal.ts`, mounted from `BaseLayout.astro`:
 
 - `data-reveal`: a 14 px rise and fade the first time the element enters the viewport (700 to 900 ms, strong ease-out). Children of `data-reveal-group` are staggered by 70 ms. The hooks are removed afterwards so hover transitions are unaffected.
-- `data-render` (section titles and labels, hero titles and eyebrows, key-figure values, case titles): once the text is well in view, characters appear in a loose left-to-right sweep, hold in orange for a moment (about one in eight starts as a small orange pixel) and snap to their normal colour. The original markup is restored at the end. `--render-flash` changes the flash colour.
+- `data-render` (section titles and labels, hero titles and eyebrows, key-figure values, case titles): once the text is well in view, the original letters appear one after another, left to right, each briefly in orange (a short orange leading edge) before settling to its normal colour. The original markup is restored at the end. `--render-flash` changes the flash colour.
 - `data-render-step`: the 3D section titles replay the effect each time their step becomes active.
 - Rendering waits for the Archivo web font (`document.fonts.ready`) and titles stay hidden until then (`html.js-render-wait`, with a 2.5 s safety timer in `BaseLayout.astro`), so a title never shows in the fallback font on three lines and then jumps to two.
 - Nothing is hidden without JavaScript. With reduced motion there is only a short fade and no render effect.
