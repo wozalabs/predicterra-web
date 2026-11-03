@@ -53,6 +53,8 @@ const { cta } = getCopy(locale).home;
     padding: clamp(3rem, 2rem + 4vw, 5.5rem) var(--gutter);
     /* Matches CTA_GROUND in scripts/cta-scene.ts (shown until WebGL is ready). */
     background: #eaeaea;
+    /* Notched top edge: the success-stories card notch, mirrored to the top. */
+    clip-path: polygon(0 18px, calc(42% - 18px) 18px, 42% 0, 100% 0, 100% 100%, 0 100%);
     color: var(--ink);
   }
 

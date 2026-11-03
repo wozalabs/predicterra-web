@@ -58,6 +58,8 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
   let openId: SectorId | null = null;
   let pinnedId: SectorId | null = null;
   let closeTimer = 0;
+  // Live 3D view in the asset panel, loaded on first open.
+  let preview: typeof import('./asset-preview') | null = null;
   let width = stage.clientWidth;
   let height = stage.clientHeight;
   let needsFrame = true;
@@ -164,6 +166,13 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
     needsFrame = true;
     positionOverlays();
     card.toggleAttribute('data-open', true);
+    const canvas = card.querySelector<HTMLCanvasElement>('[data-preview]');
+    if (canvas) {
+      import('./asset-preview').then((m) => {
+        preview = m;
+        if (openId === id) m.showPreview(id, canvas, { reducedMotion: reduceMotion.matches });
+      });
+    }
   }
 
   function closeAlert(immediate = false) {
@@ -171,6 +180,7 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
     const id = openId;
     const run = () => {
       cards.get(id)?.removeAttribute('data-open');
+      preview?.hidePreview();
       markers.get(id)?.querySelector('button')?.setAttribute('aria-expanded', 'false');
       if (openId === id) openId = null;
       if (pinnedId === id) pinnedId = null;

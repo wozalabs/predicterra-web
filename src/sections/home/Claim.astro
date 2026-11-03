@@ -13,7 +13,8 @@ const accentWords = claim.accent.split(' ');
 
 <section class="claim" aria-labelledby="claim-label" data-claim>
   <div class="container claim__grid">
-    <h2 id="claim-label" class="label claim__label" data-reveal>{claim.label}</h2>
+    <!-- Heading kept for the outline and screen readers, not shown. -->
+    <h2 id="claim-label" class="visually-hidden">{claim.label}</h2>
     <div class="claim__body">
       <p class="t-statement claim__text" data-claim-text>
         {words.map((w) => <span class="w">{w} </span>)}
@@ -43,24 +44,14 @@ const accentWords = claim.accent.split(' ');
 
   .claim__grid {
     display: grid;
-    gap: 2rem;
   }
 
-  @media (min-width: 64rem) {
-    .claim__grid {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 10fr);
-      gap: var(--gutter);
-    }
-    .claim__label {
-      align-self: start;
-      padding-top: 0.6rem;
-    }
-  }
-
+  /* Statement: larger for impact (52 px at the top end), still a paragraph. */
   .claim__text {
-    max-width: 30ch;
-    font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.375rem); /* 38px on desktop */
-    line-height: 1.12;
+    max-width: 28ch;
+    font-size: clamp(2rem, 1.25rem + 2.3vw, 3.25rem);
+    line-height: 1.08;
+    letter-spacing: var(--track-heading);
   }
 
   /* Scroll-linked reading highlight. Only applied when JS runs and motion is allowed. */

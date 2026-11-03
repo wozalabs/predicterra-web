@@ -1,0 +1,435 @@
+---
+/**
+ * Asset information panel shown when a 3D marker is hovered, focused or tapped.
+ * Layout follows the Predicterra app's asset card: identity, IDs, a live 3D
+ * view of the same asset (drawn by scripts/sector-scene/asset-preview.ts into
+ * [data-preview]), risk scores and land cover. Values are illustrative.
+ */
+import { icons } from '../data/icons';
+
+type Row = { label: string; value: string; score: number; alert?: boolean };
+interface Props {
+  panel: {
+    name: string;
+    place: string;
+    type: string;
+    year: string;
+    registration: string;
+    geohash: string;
+    coordinates: string;
+    assetType: string;
+    tile: string;
+    rows: Row[];
+    cover: Record<'bare' | 'crops' | 'built' | 'water' | 'rangeland' | 'forest', number>;
+  };
+  labels: {
+    registration: string;
+    geohash: string;
+    coordinates: string;
+    assetType: string;
+    details: string;
+    tile: string;
+    viewAlerts: string;
+    outOf: string;
+    cover: Record<string, string>;
+    note: string;
+  };
+}
+const { panel: p, labels: l } = Astro.props;
+const coverOrder = ['bare', 'crops', 'built', 'water', 'rangeland', 'forest'] as const;
+---
+
+<div class="ap">
+  <header class="ap__head">
+    <div class="ap__identity">
+      <p class="ap__name">
+        {p.name}
+        <svg class="ap__more" viewBox="0 -960 960 960" aria-hidden="true"><path d={icons.more_vert} /></svg>
+      </p>
+      <p class="ap__place">{p.place}</p>
+    </div>
+    <div class="ap__tags">
+      <span class="ap__tag ap__tag--accent">{p.type}</span>
+      <span class="ap__tag t-num">{p.year}</span>
+    </div>
+  </header>
+
+  <dl class="ap__ids">
+    <div>
+      <dt>{l.registration}</dt>
+      <dd class="t-num">{p.registration}</dd>
+    </div>
+    <div>
+      <dt>{l.geohash}</dt>
+      <dd>{p.geohash}</dd>
+    </div>
+    <div>
+      <dt>{l.coordinates}</dt>
+      <dd class="t-num">{p.coordinates}</dd>
+    </div>
+  </dl>
+
+  <div class="ap__view">
+    <canvas class="ap__canvas" data-preview aria-hidden="true"></canvas>
+    <p class="ap__type">
+      <span>{l.assetType}</span>
+      <span>{p.assetType}</span>
+    </p>
+  </div>
+
+  <div class="ap__details">
+    <p class="ap__h">{l.details}</p>
+    <p class="ap__tile t-num">{l.tile} {p.tile}</p>
+    <ul class="ap__rows">
+      {
+        p.rows.map((r) => (
+          <li class:list={['ap__row', r.alert && 'is-alert']} style={`--score:${r.score}`}>
+            <span class="ap__label">
+              {r.label}
+              <span class="ap__i" aria-hidden="true">i</span>
+              {r.alert && (
+                <span class="ap__chip">
+                  {l.viewAlerts}
+                  <svg viewBox="0 -960 960 960" aria-hidden="true">
+                    <path d={icons.chevron_right} />
+                  </svg>
+                </span>
+              )}
+            </span>
+            <span class="ap__value">{r.value}</span>
+            <span class="ap__score t-num">
+              {r.score}
+              {l.outOf}
+            </span>
+            <span class="ap__bar" aria-hidden="true" />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="ap__cover">
+    <div class="ap__stack" aria-hidden="true">
+      {coverOrder.filter((k) => p.cover[k] > 0).map((k) => <span class={`c-${k}`} style={`flex-grow:${p.cover[k]}`} />)}
+    </div>
+    <ul class="ap__legend">
+      {
+        coverOrder.map((k) => (
+          <li>
+            <span class={`ap__sw c-${k}`} aria-hidden="true" />
+            <span class="ap__lk">{l.cover[k]}</span>
+            <span class="t-num">{p.cover[k]}%</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <p class="ap__note">{l.note}</p>
+</div>
+
+<style>
+  .ap {
+    --ap-pad: 1rem;
+    --ap-line: var(--line);
+    display: grid;
+    color: var(--ink);
+    font-size: 0.8125rem;
+    letter-spacing: var(--track-small);
+  }
+
+  /* ---------- Identity ---------- */
+  .ap__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: var(--ap-pad);
+  }
+
+  .ap__identity {
+    display: grid;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .ap__name {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 1.25rem;
+    line-height: 1.15;
+    letter-spacing: var(--track-title);
+  }
+
+  .ap__more {
+    flex: none;
+    width: 1.125rem;
+    height: 1.125rem;
+    fill: var(--grey-400);
+  }
+
+  .ap__place {
+    color: var(--muted);
+  }
+
+  .ap__tags {
+    display: flex;
+    flex: none;
+    gap: 0.25rem;
+  }
+
+  .ap__tag {
+    display: inline-flex;
+    align-items: center;
+    height: 1.625rem;
+    padding: 0 0.5rem;
+    background: var(--chip-bg);
+    font-size: 0.75rem;
+  }
+
+  .ap__tag--accent {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  /* ---------- IDs ---------- */
+  .ap__ids {
+    display: grid;
+    grid-template-columns: 0.8fr 0.8fr 1.4fr;
+    border-block: 1px solid var(--ap-line);
+  }
+
+  .ap__ids > div {
+    display: grid;
+    gap: 0.125rem;
+    padding: 0.625rem var(--ap-pad);
+    min-width: 0;
+  }
+
+  .ap__ids > div + div {
+    border-left: 1px solid var(--ap-line);
+    padding-left: 0.75rem;
+  }
+
+  .ap__ids dt {
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  .ap__ids dd {
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ---------- 3D view ---------- */
+  .ap__view {
+    position: relative;
+    height: 9.5rem;
+    background: var(--canvas);
+    border-bottom: 1px solid var(--ap-line);
+  }
+
+  .ap__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ap__type {
+    position: absolute;
+    left: var(--ap-pad);
+    bottom: 0.75rem;
+    display: grid;
+  }
+
+  .ap__type span:first-child {
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  .ap__type span:last-child {
+    font-size: 0.9375rem;
+  }
+
+  /* ---------- Details ---------- */
+  .ap__details {
+    padding: 0.875rem var(--ap-pad) 0.25rem;
+  }
+
+  .ap__h {
+    font-size: 0.9375rem;
+    letter-spacing: var(--track-title);
+  }
+
+  .ap__tile {
+    margin-top: 0.125rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  .ap__rows {
+    display: grid;
+    margin-top: 0.375rem;
+  }
+
+  .ap__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 2.5rem;
+    align-items: center;
+    column-gap: 0.75rem;
+    padding-top: 0.5rem;
+  }
+
+  .ap__label {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-width: 0;
+  }
+
+  .ap__i {
+    display: inline-grid;
+    place-items: center;
+    width: 1rem;
+    height: 1rem;
+    background: var(--chip-bg);
+    color: var(--muted);
+    font-size: 0.625rem;
+  }
+
+  .ap__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+    height: 1.375rem;
+    padding: 0 0.25rem 0 0.375rem;
+    background: var(--chip-bg);
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .ap__chip svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    fill: currentColor;
+  }
+
+  .ap__value {
+    text-align: right;
+  }
+
+  .ap__score {
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .is-alert .ap__value {
+    color: var(--accent);
+  }
+
+  /* Score bar: a row of thin ticks; the filled part darkens (orange on the alert row). */
+  .ap__bar {
+    --ticks: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 5px);
+    position: relative;
+    grid-column: 1 / -1;
+    height: 6px;
+    margin-top: 0.4375rem;
+    color: #d6d6d6;
+    background: var(--ticks);
+  }
+
+  .ap__bar::after {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: calc(var(--score) * 10%);
+    color: var(--grey-600);
+    background: var(--ticks);
+  }
+
+  .is-alert .ap__bar::after {
+    color: var(--accent);
+  }
+
+  /* ---------- Land cover ---------- */
+  .ap__cover {
+    padding: 0.75rem var(--ap-pad) 0;
+  }
+
+  .ap__stack {
+    display: flex;
+    gap: 2px;
+    height: 4px;
+  }
+
+  .ap__legend {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.25rem 0.5rem;
+    margin-top: 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .ap__legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .ap__lk {
+    color: var(--muted);
+  }
+
+  .ap__sw {
+    width: 0.625rem;
+    height: 0.625rem;
+  }
+
+  .c-bare {
+    background: #cfcfcf;
+  }
+  .c-crops {
+    background: #a9cf96;
+  }
+  .c-built {
+    background: #a8c3d6;
+  }
+  .c-water {
+    background: #4a7fb3;
+  }
+  .c-rangeland {
+    background: #d9c38f;
+  }
+  .c-forest {
+    background: #5a9a5e;
+  }
+
+  .ap__note {
+    padding: 0.625rem var(--ap-pad) 0.75rem;
+    color: var(--muted);
+    font-size: 0.6875rem;
+  }
+
+  /* Short screens: drop land cover so the panel always fits. */
+  @media (max-height: 46rem) {
+    .ap__cover {
+      display: none;
+    }
+    .ap__view {
+      height: 7.5rem;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .ap__view {
+      height: 7rem;
+    }
+    .ap__cover {
+      display: none;
+    }
+  }
+</style>

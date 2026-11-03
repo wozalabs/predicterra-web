@@ -97,6 +97,19 @@ export default {
     actionLabel: 'Recommended action',
     openAlert: 'Open alert for',
     footnote: 'Illustrative alerts. Values are examples.',
+    // Asset panel labels
+    panelLabels: {
+      registration: 'Registration',
+      geohash: 'GeoHash',
+      coordinates: 'Coordinates',
+      assetType: 'Asset type',
+      details: 'Detailed information',
+      tile: 'Tile',
+      viewAlerts: 'View alerts',
+      outOf: '/10',
+      cover: { bare: 'Bare', crops: 'Crops', built: 'Built', water: 'Water', rangeland: 'Rangeland', forest: 'Forest' },
+      note: 'Illustrative data',
+    },
     sectors: [
       {
         id: 'grid',
@@ -116,6 +129,25 @@ export default {
           window: 'In 48 h',
           confidence: '0.88',
           action: 'Clear vegetation within 4 m of the conductor and pre-position a crew.',
+        },
+        // Asset panel shown on hover (illustrative values).
+        panel: {
+          name: 'Tower T-1184',
+          place: 'Bizkaia, País Vasco, Spain',
+          type: 'Tower',
+          year: '2024',
+          registration: '220-1184',
+          geohash: 'ezwnqh',
+          coordinates: '43.2630, -2.9350',
+          assetType: 'Transmission tower',
+          tile: '0313333001022',
+          rows: [
+            { label: 'Flood risk', value: 'No', score: 0 },
+            { label: 'Fire frequency', value: 'High', score: 7 },
+            { label: 'Fire severity', value: 'High', score: 8 },
+            { label: 'Base fire risk', value: 'Critical', score: 9, alert: true }
+          ],
+          cover: { bare: 4, crops: 6, built: 2, water: 0, rangeland: 30, forest: 58 }
         },
       },
       {
@@ -137,6 +169,25 @@ export default {
           confidence: '0.91',
           action: 'Inspect the transformer yard and pre-position crews before the peak.',
         },
+        // Asset panel shown on hover (illustrative values).
+        panel: {
+          name: 'Substation SE-42',
+          place: 'Basauri, Bizkaia, Spain',
+          type: 'Substation',
+          year: '2024',
+          registration: '132-0042',
+          geohash: 'ezwnp5',
+          coordinates: '43.2386, -2.8853',
+          assetType: 'Transformer T2',
+          tile: '0313333001130',
+          rows: [
+            { label: 'Flood risk', value: 'High', score: 8, alert: true },
+            { label: 'T10 economic risk', value: 'Medium', score: 5 },
+            { label: 'T100 economic risk', value: 'High', score: 7 },
+            { label: 'Heat stress', value: 'Low', score: 2 }
+          ],
+          cover: { bare: 12, crops: 8, built: 46, water: 6, rangeland: 10, forest: 18 }
+        },
       },
       {
         id: 'solar',
@@ -156,6 +207,25 @@ export default {
           window: 'Next 3 days',
           confidence: '0.86',
           action: 'Move maintenance windows and apply inverter derating at midday.',
+        },
+        // Asset panel shown on hover (illustrative values).
+        panel: {
+          name: 'Solar plant PV-07',
+          place: 'Mérida, Extremadura, Spain',
+          type: 'Solar',
+          year: '2024',
+          registration: 'PV-0007',
+          geohash: 'eyw8m2',
+          coordinates: '38.9161, -6.3437',
+          assetType: 'Module tables, block C',
+          tile: '0331022130213',
+          rows: [
+            { label: 'Heat stress', value: 'High', score: 8, alert: true },
+            { label: 'Hail risk', value: 'Low', score: 2 },
+            { label: 'Soiling loss', value: 'Medium', score: 4 },
+            { label: 'Flood risk', value: 'No', score: 0 }
+          ],
+          cover: { bare: 28, crops: 44, built: 4, water: 0, rangeland: 22, forest: 2 }
         },
       },
       {
@@ -177,6 +247,25 @@ export default {
           confidence: '0.90',
           action: 'Schedule a controlled shutdown and suspend site access.',
         },
+        // Asset panel shown on hover (illustrative values).
+        panel: {
+          name: 'Turbine WT-12',
+          place: 'Oiz, Bizkaia, Spain',
+          type: 'Turbine',
+          year: '2024',
+          registration: 'WT-0012',
+          geohash: 'ezwj9v',
+          coordinates: '43.2271, -2.5960',
+          assetType: 'Wind turbine, 2.3 MW',
+          tile: '0313333010031',
+          rows: [
+            { label: 'Extreme wind', value: 'Critical', score: 9, alert: true },
+            { label: 'Icing risk', value: 'Medium', score: 4 },
+            { label: 'Lightning', value: 'Low', score: 3 },
+            { label: 'Fire frequency', value: 'Low', score: 2 }
+          ],
+          cover: { bare: 8, crops: 2, built: 0, water: 0, rangeland: 52, forest: 38 }
+        },
       },
       {
         id: 'oilgas',
@@ -196,6 +285,25 @@ export default {
           window: 'In 30 h',
           confidence: '0.84',
           action: 'Activate the perimeter protocol and keep access routes clear.',
+        },
+        // Asset panel shown on hover (illustrative values).
+        panel: {
+          name: 'Tank farm TF-3',
+          place: 'Muskiz, Bizkaia, Spain',
+          type: 'Tank',
+          year: '2024',
+          registration: 'TF-0003',
+          geohash: 'ezwq0d',
+          coordinates: '43.3247, -3.1203',
+          assetType: 'Storage tank, 40,000 m³',
+          tile: '0313333000233',
+          rows: [
+            { label: 'Wildfire spread', value: 'High', score: 8, alert: true },
+            { label: 'Flood risk', value: 'Low', score: 2 },
+            { label: 'T100 economic risk', value: 'Medium', score: 5 },
+            { label: 'Heat stress', value: 'Low', score: 3 }
+          ],
+          cover: { bare: 22, crops: 0, built: 38, water: 6, rangeland: 18, forest: 16 }
         },
       },
     ],

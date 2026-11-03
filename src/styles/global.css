@@ -210,6 +210,9 @@ ol {
   --btn-fg: var(--on-accent);
   --btn-sq: #ffffff;
   --btn-arrow: var(--grey-700);
+  /* Hover: an ordered dither of slightly darker pixels (2 px), denser under the
+     label. It only darkens the fill, so text contrast goes up, never down. */
+  --btn-dither: #c92c00;
   /* Sizes on a 4 px grid: md 36 px, lg 40 px; the square is the height minus the inset. */
   --btn-h: 2.25rem;
   --btn-inset: 0.25rem;
@@ -224,10 +227,60 @@ ol {
   line-height: 1;
   letter-spacing: var(--track-body);
   white-space: nowrap;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   transition:
     transform 160ms var(--ease-out),
     background-color 200ms ease;
   -webkit-tap-highlight-color: transparent;
+}
+
+.btn > * {
+  position: relative;
+}
+
+.btn::before,
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-dither);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+  mask-size:
+    4px 4px,
+    100% 100%;
+  mask-repeat: repeat, no-repeat;
+  mask-composite: intersect;
+}
+
+/* One pixel in four across the whole button */
+.btn::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='2' height='2'/%3E%3C/svg%3E");
+  mask-size: 4px 4px;
+  mask-repeat: repeat;
+}
+
+/* Checkerboard under the label, fading out by halfway */
+.btn::after {
+  mask-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='2' height='2'/%3E%3Crect x='2' y='2' width='2' height='2'/%3E%3C/svg%3E"),
+    linear-gradient(90deg, #000 0 46%, transparent 46%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover::before,
+  .btn:hover::after {
+    opacity: 1;
+  }
+}
+
+.btn:focus-visible::before,
+.btn:focus-visible::after {
+  opacity: 1;
 }
 
 .btn__sq {
@@ -278,6 +331,7 @@ ol {
   --btn-fg: var(--grey-700);
   --btn-sq: var(--grey-700);
   --btn-arrow: #ffffff;
+  --btn-dither: #dcdcdc;
 }
 
 .theme-dark .btn--secondary {
@@ -285,6 +339,7 @@ ol {
   --btn-fg: #ffffff;
   --btn-sq: #ffffff;
   --btn-arrow: var(--grey-700);
+  --btn-dither: #2a2a2a;
 }
 
 /* Pill / chip (square in this brand): 1px outline + 10% grey fill */

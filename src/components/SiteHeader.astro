@@ -441,7 +441,7 @@ const { header, menu } = common;
       if (value === 'centred') delete document.documentElement.dataset.hero;
       else document.documentElement.dataset.hero = value;
       try {
-        localStorage.setItem('predicterra:hero', value);
+        localStorage.setItem('predicterra:hero-layout', value);
       } catch {
         /* storage unavailable: applies to this page view only */
       }

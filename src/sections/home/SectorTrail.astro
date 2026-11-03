@@ -4,6 +4,7 @@
  * to the bottom right along a circuit-like trace. Assets at risk are orange.
  */
 import Icon from '../../components/Icon.astro';
+import AssetPanel from '../../components/AssetPanel.astro';
 import { getCopy, type Locale } from '../../i18n/config';
 import type { IconName } from '../../data/icons';
 
@@ -28,7 +29,7 @@ const stops = scene.sectors.length; // one stop per sector, no overview
     <!-- Copy: one layer per sector. All text stays in the DOM for crawlers and screen readers. -->
     <div class="sectors__copy container">
       <div class="sectors__heading">
-        <h2 id="sectors-title" class="label" data-render>{scene.label}</h2>
+        <h2 id="sectors-title" class="visually-hidden">{scene.label}</h2>
         <p class="visually-hidden">{scene.title}. {scene.intro}</p>
       </div>
       {
@@ -71,38 +72,8 @@ const stops = scene.sectors.length; // one stop per sector, no overview
     <div class="sectors__alerts">
       {
         scene.sectors.map((s) => (
-          <div class="alert" id={`alert-${s.id}`} data-alert={s.id} role="group" aria-label={`${s.alert.hazard}, ${s.alert.asset}`}>
-            <div class="alert__top">
-              <span class="alert__badge">{scene.requiresAction}</span>
-              <span class="alert__sev t-caption">{s.alert.severity}</span>
-            </div>
-            <div class="alert__title">
-              <Icon name={s.alert.hazardIcon as IconName} boxed size="2rem" />
-              <p class="t-h4">{s.alert.hazard}</p>
-            </div>
-            <p class="alert__asset">
-              {s.alert.asset}
-              <span class="t-muted">{s.alert.context}</span>
-            </p>
-            <dl class="alert__data">
-              <div>
-                <dt class="t-caption t-muted">{s.alert.metricLabel}</dt>
-                <dd class="t-num">{s.alert.metric}</dd>
-              </div>
-              <div>
-                <dt class="t-caption t-muted">{scene.windowLabel}</dt>
-                <dd class="t-num">{s.alert.window}</dd>
-              </div>
-              <div>
-                <dt class="t-caption t-muted">{scene.confidenceLabel}</dt>
-                <dd class="t-num">{s.alert.confidence}</dd>
-              </div>
-            </dl>
-            <div class="alert__action">
-              <p class="t-caption t-muted">{scene.actionLabel}</p>
-              <p class="t-small">{s.alert.action}</p>
-            </div>
-            <p class="alert__note t-caption t-muted">{scene.footnote}</p>
+          <div class="alert" id={`alert-${s.id}`} data-alert={s.id} role="group" aria-label={`${s.panel.name}, ${s.alert.hazard}`}>
+            <AssetPanel panel={s.panel} labels={scene.panelLabels} />
           </div>
         ))
       }
@@ -332,15 +303,12 @@ const stops = scene.sectors.length; // one stop per sector, no overview
     position: absolute;
     top: 0;
     left: 0;
-    width: 20.5rem;
-    display: grid;
-    gap: 0.875rem;
-    padding: 1rem;
+    width: 22.5rem;
     background: var(--surface);
     border: 1px solid var(--line);
     box-shadow:
       0 1px 2px rgb(30 30 30 / 0.06),
-      0 12px 32px -8px rgb(30 30 30 / 0.18);
+      0 16px 40px -12px rgb(30 30 30 / 0.22);
     pointer-events: none;
     opacity: 0;
     visibility: hidden;
@@ -361,65 +329,6 @@ const stops = scene.sectors.length; // one stop per sector, no overview
       opacity 180ms ease,
       transform 220ms var(--ease-out),
       visibility 0s;
-  }
-
-  .alert__top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .alert__badge {
-    display: inline-flex;
-    align-items: center;
-    min-height: 1.625rem;
-    padding: 0 0.5rem;
-    background: var(--accent);
-    color: var(--on-accent);
-    font-size: var(--fs-caption);
-  }
-
-  .alert__title {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-  }
-
-  .alert__asset {
-    display: grid;
-    font-size: var(--fs-small);
-  }
-
-  .alert__data {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    border-top: 1px solid var(--line);
-  }
-
-  .alert__data > div {
-    padding: 0.625rem 0.5rem 0 0;
-  }
-
-  .alert__data > div + div {
-    padding-left: 0.625rem;
-    border-left: 1px solid var(--line);
-  }
-
-  .alert__data dd {
-    font-size: 1.0625rem;
-    letter-spacing: var(--track-title);
-  }
-
-  .alert__note {
-    margin-top: -0.25rem;
-  }
-
-  .alert__action {
-    display: grid;
-    gap: 0.25rem;
-    padding: 0.75rem;
-    background: var(--chip-bg);
-    border: 1px solid var(--line);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -454,6 +363,8 @@ const stops = scene.sectors.length; // one stop per sector, no overview
       top: auto;
       bottom: var(--gutter);
       width: auto;
+      max-height: 74svh;
+      overflow: auto;
       transform-origin: 50% 100%;
       transform: translateY(8px) scale(0.98);
     }

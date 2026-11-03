@@ -61,7 +61,8 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
       try {
         var scene = localStorage.getItem('predicterra:scene');
         if (scene === 'overview') document.documentElement.dataset.scene = 'overview';
-        var hero = localStorage.getItem('predicterra:hero');
+        // New key: earlier saved choices are ignored, so everyone starts on Centred.
+        var hero = localStorage.getItem('predicterra:hero-layout');
         if (['split', 'cutout', 'pixel', 'clean'].indexOf(hero) > -1) document.documentElement.dataset.hero = hero;
       } catch (e) {}
     </script>

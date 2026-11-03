@@ -28,11 +28,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
     <div class="solutions__grid">
       <div class="solutions__head" data-reveal-group>
         <h2 id="solutions-title" class="t-h2" data-render>{solutions.title}</h2>
-        <p class="solutions__caption" data-reveal>{solutions.caption}</p>
-        <p class="solutions__count" data-reveal>
-          <span class="solutions__count-n t-num">{solutions.sectors.length}</span>
-          <span class="t-small">{solutions.countLabel}</span>
-        </p>
       </div>
 
       <div class="reel" data-reel data-reveal>
@@ -67,17 +62,17 @@ const pad = (n: number) => String(n).padStart(2, '0');
   .solutions__inner {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
     min-height: 100svh;
-    padding-top: calc(var(--header-h) + 1.5rem);
+    padding-top: calc(var(--header-h) + 1rem);
     padding-bottom: clamp(2rem, 1.5rem + 2vw, 4rem);
   }
 
+  /* Same rhythm as Key figures: title top left, just below the rule. */
   .solutions__grid {
     display: grid;
     gap: 2rem var(--gutter);
-    align-items: center;
+    align-items: start;
+    padding-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
   }
 
   @media (min-width: 64rem) {
@@ -90,26 +85,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
     display: grid;
     align-content: start;
     gap: 1rem;
-  }
-
-  .solutions__caption {
-    max-width: 28ch;
-    color: var(--ink-2);
-  }
-
-  .solutions__count {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    color: var(--muted);
-  }
-
-  .solutions__count-n {
-    font-size: clamp(2.5rem, 2rem + 1.5vw, 3.5rem);
-    line-height: 1;
-    letter-spacing: var(--track-display);
-    color: var(--ink);
   }
 
   /* ---------- Reel ---------- */
