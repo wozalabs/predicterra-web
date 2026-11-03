@@ -116,6 +116,10 @@ Platform, About and Contact sit as text links next to **Request a demo** on scre
 
 The header animates in on the first page of a visit only (`sessionStorage` key `predicterra:seen` adds `html.is-return`). Navigations between pages use cross-document view transitions (`@view-transition` in `global.css`): the page cross-fades in 200 ms and the header (`view-transition-name: site-header`) stays in place. Browsers without support just load the page; reduced motion turns it off.
 
+## Typeface test switch
+
+A **Font** select in the header swaps the global typeface (`--font-sans`) to compare alternatives with Archivo. The list is in `src/data/fonts.ts`: 13 Google Fonts, regular (400) only, none monospaced. Archivo stays self-hosted; the others load from Google Fonts only when chosen. The choice is saved in `localStorage` (`predicterra:font`) and applied before paint by an inline script in `BaseLayout.astro` (`window.predicterraFont`). Tracking tokens are tuned for Archivo, and the fallback font is metric-matched to it, so other faces can shift slightly while loading. Remove `fonts.ts`, the select in `SiteHeader.astro` and the inline script once a face is chosen (self-host the winner with Fontsource).
+
 ## Adding a page
 
 1. Create `src/pages/<route>.astro` using `BaseLayout`.

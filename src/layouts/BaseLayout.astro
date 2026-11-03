@@ -1,4 +1,5 @@
 ---
+import { testFonts, FONT_KEY } from '../data/fonts';
 import '../styles/global.css';
 import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url';
 import SiteHeader from '../components/SiteHeader.astro';
@@ -73,6 +74,34 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
         sessionStorage.setItem('predicterra:seen', '1');
       } catch (e) {}
 
+    </script>
+
+    <!-- Test switch (header): global typeface. Runs before paint. -->
+    <script is:inline define:vars={{ testFonts, FONT_KEY }}>
+      window.predicterraFont = function (id) {
+        var f = testFonts.filter(function (x) { return x.id === id; })[0] || testFonts[0];
+        var root = document.documentElement;
+        if (!f.href) {
+          root.style.removeProperty('--font-sans');
+          delete root.dataset.font;
+        } else {
+          if (!document.getElementById('gf-' + f.id)) {
+            var l = document.createElement('link');
+            l.id = 'gf-' + f.id;
+            l.rel = 'stylesheet';
+            l.href = f.href;
+            document.head.appendChild(l);
+          }
+          root.style.setProperty('--font-sans', f.stack);
+          root.dataset.font = f.id;
+        }
+        try { localStorage.setItem(FONT_KEY, f.id); } catch (e) {}
+        return f.id;
+      };
+      try {
+        var saved = localStorage.getItem(FONT_KEY);
+        if (saved && saved !== 'archivo') window.predicterraFont(saved);
+      } catch (e) {}
     </script>
 
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />

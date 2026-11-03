@@ -10,6 +10,8 @@ export default {
     closeMenu: 'Close menu',
     demo: 'Request a demo',
     navLabel: 'Main',
+    font: 'Font',
+    fontLabel: 'Typeface (test)',
     nav: [
       { label: 'Platform', href: routes.platform },
       { label: 'About', href: routes.about },
