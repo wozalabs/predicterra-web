@@ -20,10 +20,12 @@ const gridCells = Array.from({ length: 24 });
   <div class="hero__top container">
     <div class="hero__titles">
       <p class="hero__eyebrow t-small">{hero.eyebrow}</p>
-      <h1 id="hero-title" class="hero__title">
+      <!-- Only one hero is displayed at a time; the hidden ones are out of the
+           accessibility tree, so this heading never competes with the h1 (Clean). -->
+      <p id="hero-title" class="hero__title" role="heading" aria-level="1">
         <span>{hero.titleLine1}</span>
         <span>{hero.titleLine2}</span>
-      </h1>
+      </p>
     </div>
     <!-- Partner logos, inside the first viewport -->
     <Logos locale={locale} class="hero__logos" />
@@ -36,7 +38,7 @@ const gridCells = Array.from({ length: 24 });
       muted
       loop
       playsinline
-      preload="metadata"
+      preload="none"
       poster={withBase(video.poster)}
       disablepictureinpicture
       aria-hidden="true"
@@ -45,9 +47,6 @@ const gridCells = Array.from({ length: 24 });
       <source src={withBase(video.large)} type="video/mp4" media="(min-width: 60em)" />
       <source src={withBase(video.small)} type="video/mp4" />
     </video>
-
-    <!-- Entrance: the footage resolves from big pixels (scripts/hero-intro.ts) -->
-    <canvas class="band__pixels" aria-hidden="true" data-hero-pixels></canvas>
 
     <div class="band__grid" aria-hidden="true">
       {gridCells.map(() => <span />)}
@@ -196,61 +195,6 @@ const gridCells = Array.from({ length: 24 });
     filter: saturate(0.85) brightness(0.78);
   }
 
-  /* Pixelated entrance layer. Nearest-neighbour upscale keeps the blocks crisp.
-     Without the script it fades away on its own, so the video is never hidden. */
-  .band__pixels {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--grey-700);
-    image-rendering: pixelated;
-    filter: saturate(0.85) brightness(0.78);
-    transition: opacity 260ms ease;
-    animation: pixels-fallback 1ms linear 3s forwards;
-  }
-
-  .band__pixels.is-done {
-    opacity: 0;
-  }
-
-  @keyframes pixels-fallback {
-    to {
-      opacity: 0;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .band__pixels {
-      display: none;
-    }
-  }
-
-  /* Top copy rises in, staggered: eyebrow, title, logos. */
-  @media (prefers-reduced-motion: no-preference) {
-    .hero__eyebrow,
-    .hero__title,
-    .hero__top :global(.hero__logos) {
-      animation: hero-rise 800ms var(--ease-out) both;
-    }
-    .hero__eyebrow {
-      animation-delay: 60ms;
-    }
-    .hero__title {
-      animation-delay: 140ms;
-    }
-    .hero__top :global(.hero__logos) {
-      animation-delay: 300ms;
-    }
-  }
-
-  @keyframes hero-rise {
-    from {
-      opacity: 0;
-      transform: translateY(14px);
-    }
-  }
-
   .band__grid,
   .band__cells {
     position: absolute;
@@ -336,8 +280,7 @@ const gridCells = Array.from({ length: 24 });
   @media (prefers-reduced-motion: no-preference) {
     .cell {
       animation: cell-in 600ms var(--ease-out) both;
-      /* After the pixels have mostly resolved */
-      animation-delay: calc(760ms + var(--i) * 70ms);
+      animation-delay: calc(200ms + var(--i) * 60ms);
     }
   }
 
@@ -383,10 +326,5 @@ const gridCells = Array.from({ length: 24 });
 
 <script>
   import { mountHeroVideos } from '../../scripts/hero-video';
-  import { mountHeroIntro } from '../../scripts/hero-intro';
   mountHeroVideos();
-  const band = document.querySelector<HTMLElement>('[data-hero-variant="default"] .band');
-  // Only when the default hero is the one on screen (the others are test layouts).
-  if (band && band.getClientRects().length) mountHeroIntro(band);
-  else band?.querySelector('[data-hero-pixels]')?.remove();
 </script>

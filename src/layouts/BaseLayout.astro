@@ -61,10 +61,19 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
       try {
         var scene = localStorage.getItem('predicterra:scene');
         if (scene === 'overview') document.documentElement.dataset.scene = 'overview';
-        // New key: earlier saved choices are ignored, so everyone starts on Centred.
-        var hero = localStorage.getItem('predicterra:hero-layout');
-        if (['split', 'cutout', 'pixel', 'clean'].indexOf(hero) > -1) document.documentElement.dataset.hero = hero;
-      } catch (e) {}
+        // Clean is the default hero. New key: earlier saved choices are ignored.
+        var hero = localStorage.getItem('predicterra:hero');
+        document.documentElement.dataset.hero = ['centred', 'split', 'cutout', 'pixel'].indexOf(hero) > -1 ? hero : 'clean';
+      } catch (e) {
+        document.documentElement.dataset.hero = 'clean';
+      }
+      // Clean hero entrance (scripts/hero-mosaic.ts). Safety: never longer than 3 s.
+      if (document.documentElement.dataset.hero === 'clean' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('hero-intro');
+        setTimeout(function () {
+          document.documentElement.classList.remove('hero-intro');
+        }, 3000);
+      }
     </script>
 
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />

@@ -491,19 +491,19 @@ html[data-scene='overview'] [data-sectors='trail'] {
 }
 
 /* ---------- Hero layout test switch (menu) ---------- */
+/* Clean is the default (also without JavaScript); the others are test layouts. */
 [data-hero-variant='cutout'],
 [data-hero-variant='pixel'],
 [data-hero-variant='clean'] {
   display: none;
 }
+html:not([data-hero]) [data-hero-variant='clean'],
+html[data-hero='clean'] [data-hero-variant='clean'],
 html[data-hero='cutout'] [data-hero-variant='cutout'],
-html[data-hero='pixel'] [data-hero-variant='pixel'],
-html[data-hero='clean'] [data-hero-variant='clean'] {
+html[data-hero='pixel'] [data-hero-variant='pixel'] {
   display: block;
 }
-html[data-hero='cutout'] [data-hero-variant='default'],
-html[data-hero='pixel'] [data-hero-variant='default'],
-html[data-hero='clean'] [data-hero-variant='default'] {
+html:not([data-hero='centred']):not([data-hero='split']) [data-hero-variant='default'] {
   display: none;
 }
 

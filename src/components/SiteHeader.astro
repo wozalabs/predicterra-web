@@ -79,11 +79,11 @@ const { header, menu } = common;
     <div class="menu__test" role="group" aria-label={menu.hero.label}>
       <span class="t-small t-muted">{menu.hero.label}</span>
       <div class="seg">
-        <button type="button" class="seg__btn" data-hero-option="centred" aria-pressed="true">{menu.hero.centred}</button>
+        <button type="button" class="seg__btn" data-hero-option="clean" aria-pressed="true">{menu.hero.clean}</button>
+        <button type="button" class="seg__btn" data-hero-option="centred" aria-pressed="false">{menu.hero.centred}</button>
         <button type="button" class="seg__btn" data-hero-option="split" aria-pressed="false">{menu.hero.split}</button>
         <button type="button" class="seg__btn" data-hero-option="cutout" aria-pressed="false">{menu.hero.cutout}</button>
         <button type="button" class="seg__btn" data-hero-option="pixel" aria-pressed="false">{menu.hero.pixel}</button>
-        <button type="button" class="seg__btn" data-hero-option="clean" aria-pressed="false">{menu.hero.clean}</button>
       </div>
     </div>
 
@@ -112,6 +112,10 @@ const { header, menu } = common;
   @media (prefers-reduced-motion: no-preference) {
     .site-header__inner {
       animation: header-in 600ms var(--ease-out) 40ms both;
+    }
+    /* With the clean hero, wait until the mosaic has mostly filled. */
+    :global(html.hero-intro) .site-header__inner {
+      animation-delay: 520ms;
     }
   }
 
@@ -445,16 +449,15 @@ const { header, menu } = common;
   // Hero layout test switch: applies instantly, remembered for next visits.
   const heroOptions = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-hero-option]'));
   const syncHero = () => {
-    const now = document.documentElement.dataset.hero ?? 'centred';
+    const now = document.documentElement.dataset.hero ?? 'clean';
     heroOptions.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.heroOption === now)));
   };
   heroOptions.forEach((btn) =>
     btn.addEventListener('click', () => {
       const value = btn.dataset.heroOption!;
-      if (value === 'centred') delete document.documentElement.dataset.hero;
-      else document.documentElement.dataset.hero = value;
+      document.documentElement.dataset.hero = value;
       try {
-        localStorage.setItem('predicterra:hero-layout', value);
+        localStorage.setItem('predicterra:hero', value);
       } catch {
         /* storage unavailable: applies to this page view only */
       }

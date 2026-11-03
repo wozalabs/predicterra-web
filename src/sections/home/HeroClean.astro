@@ -1,7 +1,9 @@
 ---
 /**
- * Hero, clean layout (test). Only the video, the title and one action.
- * Shown only when Menu > Hero layout (test) = Clean.
+ * Hero, clean layout (default). The video, the title, a line of copy, one
+ * action and the partner logos. On load the footage assembles from big pixels
+ * with gaps of the page background (scripts/hero-mosaic.ts), then the title
+ * lines slide up out of a mask and the rest settles in.
  */
 import Button from '../../components/Button.astro';
 import Logos from './Logos.astro';
@@ -21,7 +23,7 @@ const { video, clean } = hero;
     muted
     loop
     playsinline
-    preload="none"
+    preload="metadata"
     poster={withBase(video.poster)}
     disablepictureinpicture
     aria-hidden="true"
@@ -31,14 +33,13 @@ const { video, clean } = hero;
     <source src={withBase(video.small)} type="video/mp4" />
   </video>
   <div class="hcl__scrim" aria-hidden="true"></div>
+  <canvas class="hcl__mosaic" aria-hidden="true" data-hero-mosaic></canvas>
 
   <div class="hcl__content container">
-    <!-- Only one hero is displayed at a time; the hidden ones are out of the
-         accessibility tree, so this heading never competes with the other h1. -->
-    <p id="hcl-title" class="hcl__title" role="heading" aria-level="1" data-render>
-      <span>{clean.titleLine1}</span>
-      <span>{clean.titleLine2}</span>
-    </p>
+    <h1 id="hcl-title" class="hcl__title">
+      <span class="hcl__line"><span>{clean.titleLine1}</span></span>
+      <span class="hcl__line"><span>{clean.titleLine2}</span></span>
+    </h1>
     <p class="hcl__text">{clean.text}</p>
     <Button class="hcl__cta" href={localizePath(clean.cta.href, locale)} label={clean.cta.label} size="lg" />
   </div>
@@ -167,21 +168,121 @@ const { video, clean } = hero;
     color: #ffffff;
   }
 
+  /* ---------- Entrance ----------
+     While html.hero-intro is set (inline script in BaseLayout, removed by
+     hero-mosaic.ts) the section shows the page background and the footage is
+     drawn as a pixel mosaic on the canvas. Then the copy comes in:
+     title lines slide up out of a mask, the rest focuses in, logos one by one. */
+  .hcl__mosaic {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    /* Matches the dimmed video + scrim, so the hand-off is seamless */
+    filter: saturate(0.8) brightness(0.58);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 420ms ease;
+  }
+
+  :global(html.hero-intro) .hcl {
+    background: var(--canvas);
+  }
+
+  :global(html.hero-intro) .hcl__mosaic {
+    opacity: 1;
+    transition: none;
+  }
+
+  .hcl__video,
+  .hcl__scrim {
+    transition: opacity 420ms ease;
+  }
+
+  :global(html.hero-intro) .hcl__video,
+  :global(html.hero-intro) .hcl__scrim {
+    opacity: 0;
+    transition: none;
+  }
+
+  /* Masked lines (padding keeps descenders inside the mask) */
+  .hcl__line {
+    display: block;
+    overflow: clip;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+
+  .hcl__line > span {
+    display: block;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
+    .hcl__line > span {
+      animation: hcl-line 1100ms cubic-bezier(0.19, 1, 0.22, 1) both;
+      animation-delay: var(--d, 0ms);
+    }
+    .hcl__line:nth-child(1) > span {
+      --d: 620ms;
+    }
+    .hcl__line:nth-child(2) > span {
+      --d: 720ms;
+    }
+    .hcl__text,
     .hcl__content :global(.hcl__cta) {
-      animation: hcl-in 700ms var(--ease-out) 500ms backwards;
+      animation: hcl-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
+    .hcl__text {
+      animation-delay: 900ms;
+    }
+    .hcl__content :global(.hcl__cta) {
+      animation-delay: 1000ms;
+    }
+    .hcl__logos :global(.logos__item) {
+      animation: hcl-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) both;
+      animation-delay: calc(1100ms + var(--li, 0) * 70ms);
+    }
+    .hcl__logos :global(.logos__item:nth-child(2)) {
+      --li: 1;
+    }
+    .hcl__logos :global(.logos__item:nth-child(3)) {
+      --li: 2;
+    }
+    .hcl__logos :global(.logos__item:nth-child(4)) {
+      --li: 3;
+    }
+    .hcl__logos :global(.logos__item:nth-child(5)) {
+      --li: 4;
     }
   }
 
-  @keyframes hcl-in {
+  @keyframes hcl-line {
+    from {
+      transform: translateY(108%);
+    }
+  }
+
+  @keyframes hcl-focus {
     from {
       opacity: 0;
       transform: translateY(10px);
+      filter: blur(6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hcl__mosaic {
+      display: none;
     }
   }
 </style>
 
 <script>
   import { mountHeroVideos } from '../../scripts/hero-video';
+  import { mountHeroMosaic } from '../../scripts/hero-mosaic';
   mountHeroVideos();
+  const root = document.querySelector<HTMLElement>('[data-hero-variant="clean"]');
+  if (root && root.getClientRects().length) mountHeroMosaic(root);
+  else document.documentElement.classList.remove('hero-intro');
 </script>
