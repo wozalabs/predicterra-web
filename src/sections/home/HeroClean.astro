@@ -33,6 +33,8 @@ const { video, clean } = hero;
     <source src={withBase(video.small)} type="video/mp4" />
   </video>
   <div class="hcl__scrim" aria-hidden="true"></div>
+  <!-- Film grain over the footage: hides compression and low resolution -->
+  <div class="hcl__grain" aria-hidden="true"></div>
 
   <div class="hcl__content container">
     <h1 id="hcl-title" class="hcl__title">
@@ -81,7 +83,47 @@ const { video, clean } = hero;
     background:
       linear-gradient(to bottom, rgb(16 16 16 / 0.35), rgb(16 16 16 / 0) 24%),
       linear-gradient(to top, rgb(16 16 16 / 0.82), rgb(16 16 16 / 0) 62%),
-      rgb(16 16 16 / 0.38);
+      rgb(16 16 16 / 0.5);
+  }
+
+  /* Grain: a tiled fractal-noise texture, greyscale, blended softly. It jumps
+     to a new offset a few times a second like film grain (transform only, so
+     it stays on the compositor); static with reduced motion. */
+  .hcl__grain {
+    position: absolute;
+    inset: -50%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: 0.42;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hcl__grain {
+      animation: hcl-grain 0.9s steps(1, end) infinite;
+    }
+  }
+
+  @keyframes hcl-grain {
+    0% {
+      transform: translate(0, 0);
+    }
+    16% {
+      transform: translate(-7%, 4%);
+    }
+    33% {
+      transform: translate(5%, -6%);
+    }
+    50% {
+      transform: translate(-3%, -9%);
+    }
+    66% {
+      transform: translate(8%, 3%);
+    }
+    83% {
+      transform: translate(-6%, 7%);
+    }
   }
 
   .hcl__content {
