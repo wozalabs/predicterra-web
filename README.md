@@ -104,6 +104,16 @@ The first version of the 3D section (`SectorScene.astro`, opens on the whole net
 
 `src/data/logo.ts` holds the logotype paths (viewBox 0 0 1056 170). The corner mark is always #FF3700; the wordmark uses `currentColor`, so it follows the header colour (dark on light, light on video and dark sections). The favicon uses the mark and the P.
 
+## About page
+
+`src/pages/about.astro`, copy in `src/i18n/en/about.ts` (texts from predicterra.com/about). Same language as the homepage: a light typographic intro, then Our story, Recognition, Team and Where we are, each after a notched rule with the title left and content right (4 : 8). Team and office photos use the success-stories notched frame. It ends with the homepage CTA card (`Cta.astro` takes an optional `copy` prop; the secondary button only shows when the copy has one). JSON-LD: `AboutPage`.
+
+Photos live in `public/about/*.webp`. To fetch them from the current site, run once: `node scripts/fetch-about-images.mjs` (downloads from the Framer CDN, crops and converts with sharp). Until then the frames show grey.
+
+## Header navigation
+
+Platform, About and Contact sit as text links next to **Request a demo** on screens 56rem and wider (`header.nav` in `common.ts`); smaller screens use the menu. The current page gets `aria-current="page"` and a small orange square under its label.
+
 ## Adding a page
 
 1. Create `src/pages/<route>.astro` using `BaseLayout`.
@@ -126,10 +136,11 @@ The first version of the 3D section (`SectorScene.astro`, opens on the whole net
 
 ## Content to confirm before publishing
 
+- The live About page numbers its team 01, 02, 10, 04, 10; this site numbers them 01 to 05.
 - Naturgy and Moeve case cards contain `[Pending]` placeholders.
 - Alerts in the 3D section are illustrative; asset names and values are examples.
 - The old site shows two addresses ("BAT Aceleration Tower" and "BAT - Gran Vía 1"). This site uses BAT Tower, Gran Vía 1, 48001 Bilbao.
 - Compliance figure: the old site says both 95% and 80% less time. This site uses 95%.
-- Linked pages (platform, sectors, about, contact, privacy, legal) do not exist yet and fall through to the 404 page.
+- Linked pages (platform, sectors, contact, privacy, legal) do not exist yet and fall through to the 404 page.
 
 > Note: write `backdrop-filter` without the `-webkit-` duplicate. The CSS minifier keeps only one of the two, and with both present it drops the standard property (blur would not show in Chrome).

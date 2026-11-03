@@ -2,11 +2,22 @@
 import Button from '../../components/Button.astro';
 import { getCopy, localizePath, type Locale } from '../../i18n/config';
 
+interface CtaCopy {
+  label: string;
+  titleLine1: string;
+  titleLine2: string;
+  titleAccent: string;
+  text: string;
+  primary: { label: string; href: string };
+  secondary?: { label: string; href: string };
+}
 interface Props {
   locale?: Locale;
+  /** Other pages pass their own copy; defaults to the homepage CTA. */
+  copy?: CtaCopy;
 }
-const { locale = 'en' } = Astro.props;
-const { cta } = getCopy(locale).home;
+const { locale = 'en', copy } = Astro.props;
+const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
 ---
 
 <!--
@@ -27,7 +38,7 @@ const { cta } = getCopy(locale).home;
       <p class="cta__text">{cta.text}</p>
       <div class="cta__actions">
         <Button href={localizePath(cta.primary.href, locale)} label={cta.primary.label} size="lg" />
-        <Button href={cta.secondary.href} label={cta.secondary.label} variant="secondary" size="lg" external />
+        {cta.secondary && <Button href={cta.secondary.href} label={cta.secondary.label} variant="secondary" size="lg" external />}
       </div>
     </div>
   </div>

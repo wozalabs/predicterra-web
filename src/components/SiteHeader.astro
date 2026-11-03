@@ -11,6 +11,9 @@ interface Props {
 const { locale = 'en' } = Astro.props;
 const { common } = getCopy(locale);
 const { header, menu } = common;
+// Compare without the base path and trailing slash to mark the current page.
+const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '') === here;
 ---
 
 <header class="site-header" data-site-header>
@@ -20,6 +23,19 @@ const { header, menu } = common;
     </a>
 
     <div class="site-header__actions">
+      <nav class="site-header__nav" aria-label={header.navLabel}>
+        <ul>
+          {
+            header.nav.map((link) => (
+              <li>
+                <a href={localizePath(link.href, locale)} aria-current={isCurrent(link.href) ? 'page' : undefined}>
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
       <Button class="site-header__demo" href={localizePath(routes.demo, locale)} label={header.demo} />
       <button
         class="site-header__menu"
@@ -146,6 +162,56 @@ const { header, menu } = common;
     display: flex;
     align-items: stretch;
     height: 2.5rem;
+  }
+
+  /* Top-level pages, always visible on wide screens (the drawer has them on small ones). */
+  .site-header__nav {
+    display: none;
+  }
+
+  @media (min-width: 56rem) {
+    .site-header__nav {
+      display: flex;
+      align-items: center;
+      margin-right: 1.75rem;
+    }
+  }
+
+  .site-header__nav ul {
+    display: flex;
+    gap: 1.75rem;
+  }
+
+  .site-header__nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 2.5rem;
+    font-size: 0.9375rem;
+    opacity: 0.72;
+    transition: opacity 160ms ease;
+  }
+
+  .site-header__nav a[aria-current='page'] {
+    opacity: 1;
+  }
+
+  /* Current page: a small orange square under the label */
+  .site-header__nav a[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0.125rem;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    background: var(--accent);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-header__nav a:hover {
+      opacity: 1;
+    }
   }
 
   .site-header__menu {

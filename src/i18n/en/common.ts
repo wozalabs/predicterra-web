@@ -9,6 +9,12 @@ export default {
     menu: 'Menu',
     closeMenu: 'Close menu',
     demo: 'Request a demo',
+    navLabel: 'Main',
+    nav: [
+      { label: 'Platform', href: routes.platform },
+      { label: 'About', href: routes.about },
+      { label: 'Contact', href: routes.contact },
+    ],
   },
 
   menu: {
