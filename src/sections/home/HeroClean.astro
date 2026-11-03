@@ -1,9 +1,9 @@
 ---
 /**
  * Hero, clean layout (default). The video, the title, a line of copy, one
- * action and the partner logos. On load the footage assembles from big pixels
- * with gaps of the page background (scripts/hero-mosaic.ts), then the title
- * lines slide up out of a mask and the rest settles in.
+ * action and the partner logos. On load the footage fades up out of the dark
+ * while easing back from a slight zoom; the title lines slide up out of a mask
+ * and the rest focuses in.
  */
 import Button from '../../components/Button.astro';
 import Logos from './Logos.astro';
@@ -33,7 +33,6 @@ const { video, clean } = hero;
     <source src={withBase(video.small)} type="video/mp4" />
   </video>
   <div class="hcl__scrim" aria-hidden="true"></div>
-  <canvas class="hcl__mosaic" aria-hidden="true" data-hero-mosaic></canvas>
 
   <div class="hcl__content container">
     <h1 id="hcl-title" class="hcl__title">
@@ -169,43 +168,9 @@ const { video, clean } = hero;
   }
 
   /* ---------- Entrance ----------
-     While html.hero-intro is set (inline script in BaseLayout, removed by
-     hero-mosaic.ts) the section shows the page background and the footage is
-     drawn as a pixel mosaic on the canvas. Then the copy comes in:
-     title lines slide up out of a mask, the rest focuses in, logos one by one. */
-  .hcl__mosaic {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    image-rendering: pixelated;
-    /* Matches the dimmed video + scrim, so the hand-off is seamless */
-    filter: saturate(0.8) brightness(0.58);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 420ms ease;
-  }
-
-  :global(html.hero-intro) .hcl {
-    background: var(--canvas);
-  }
-
-  :global(html.hero-intro) .hcl__mosaic {
-    opacity: 1;
-    transition: none;
-  }
-
-  .hcl__video,
-  .hcl__scrim {
-    transition: opacity 420ms ease;
-  }
-
-  :global(html.hero-intro) .hcl__video,
-  :global(html.hero-intro) .hcl__scrim {
-    opacity: 0;
-    transition: none;
-  }
-
+     The footage fades up from the dark section background while easing back
+     from a 4% zoom (one long, soft move). Then the title lines slide up out of
+     a mask, the description and button focus in, logos one by one. */
   /* Masked lines (padding keeps descenders inside the mask) */
   .hcl__line {
     display: block;
@@ -219,29 +184,32 @@ const { video, clean } = hero;
   }
 
   @media (prefers-reduced-motion: no-preference) {
+    .hcl__video {
+      animation: hcl-video 1800ms cubic-bezier(0.19, 1, 0.22, 1) 80ms both;
+    }
     .hcl__line > span {
       animation: hcl-line 1100ms cubic-bezier(0.19, 1, 0.22, 1) both;
       animation-delay: var(--d, 0ms);
     }
     .hcl__line:nth-child(1) > span {
-      --d: 620ms;
+      --d: 380ms;
     }
     .hcl__line:nth-child(2) > span {
-      --d: 720ms;
+      --d: 470ms;
     }
     .hcl__text,
     .hcl__content :global(.hcl__cta) {
       animation: hcl-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) both;
     }
     .hcl__text {
-      animation-delay: 900ms;
+      animation-delay: 640ms;
     }
     .hcl__content :global(.hcl__cta) {
-      animation-delay: 1000ms;
+      animation-delay: 740ms;
     }
     .hcl__logos :global(.logos__item) {
       animation: hcl-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) both;
-      animation-delay: calc(1100ms + var(--li, 0) * 70ms);
+      animation-delay: calc(860ms + var(--li, 0) * 70ms);
     }
     .hcl__logos :global(.logos__item:nth-child(2)) {
       --li: 1;
@@ -254,6 +222,13 @@ const { video, clean } = hero;
     }
     .hcl__logos :global(.logos__item:nth-child(5)) {
       --li: 4;
+    }
+  }
+
+  @keyframes hcl-video {
+    from {
+      opacity: 0;
+      transform: scale(1.04);
     }
   }
 
@@ -271,18 +246,9 @@ const { video, clean } = hero;
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .hcl__mosaic {
-      display: none;
-    }
-  }
 </style>
 
 <script>
   import { mountHeroVideos } from '../../scripts/hero-video';
-  import { mountHeroMosaic } from '../../scripts/hero-mosaic';
   mountHeroVideos();
-  const root = document.querySelector<HTMLElement>('[data-hero-variant="clean"]');
-  if (root && root.getClientRects().length) mountHeroMosaic(root);
-  else document.documentElement.classList.remove('hero-intro');
 </script>

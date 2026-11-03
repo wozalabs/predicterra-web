@@ -113,10 +113,6 @@ const { header, menu } = common;
     .site-header__inner {
       animation: header-in 600ms var(--ease-out) 40ms both;
     }
-    /* With the clean hero, wait until the mosaic has mostly filled. */
-    :global(html.hero-intro) .site-header__inner {
-      animation-delay: 520ms;
-    }
   }
 
   @keyframes header-in {

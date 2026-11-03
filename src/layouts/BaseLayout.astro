@@ -67,13 +67,7 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
       } catch (e) {
         document.documentElement.dataset.hero = 'clean';
       }
-      // Clean hero entrance (scripts/hero-mosaic.ts). Safety: never longer than 3 s.
-      if (document.documentElement.dataset.hero === 'clean' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.documentElement.classList.add('hero-intro');
-        setTimeout(function () {
-          document.documentElement.classList.remove('hero-intro');
-        }, 3000);
-      }
+
     </script>
 
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
