@@ -109,6 +109,19 @@ const { header, menu } = common;
     transition: color 240ms ease;
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    .site-header__inner {
+      animation: header-in 600ms var(--ease-out) 40ms both;
+    }
+  }
+
+  @keyframes header-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+
   .site-header__inner {
     display: flex;
     align-items: center;
