@@ -1,0 +1,127 @@
+---
+/**
+ * Success-story card: notched image frame (grey until photography is ready),
+ * client and sector, title and arrow. Used on the homepage, the index and the
+ * "more success stories" row of each case page.
+ */
+import Icon from './Icon.astro';
+import { localizePath, withBase, type Locale } from '../i18n/config';
+import { casePath, type CaseStory } from '../i18n/en/cases';
+
+interface Props {
+  story: CaseStory;
+  locale?: Locale;
+  /** Heading level for the title, to fit the page outline. */
+  as?: 'h2' | 'h3';
+  /** Client and sector above the title. */
+  meta?: boolean;
+  /** The homepage animates titles in (data-render). */
+  render?: boolean;
+}
+const { story, locale = 'en', as: Heading = 'h3', meta = true, render = false } = Astro.props;
+const sector = story.sector.startsWith('[') ? '' : story.sector;
+---
+
+<a class="case" href={localizePath(casePath(story.slug), locale)}>
+  <div class="case__media" aria-hidden={story.image ? undefined : 'true'}>
+    {
+      story.image && (
+        <img
+          src={withBase(story.image.src)}
+          alt={story.image.alt}
+          width={story.image.w}
+          height={story.image.h}
+          loading="lazy"
+          decoding="async"
+        />
+      )
+    }
+  </div>
+  <div class="case__body">
+    <div class="case__text">
+      {
+        meta && (
+          <p class="case__meta t-small">
+            {story.client}
+            {sector && <span aria-hidden="true"> · </span>}
+            {sector}
+          </p>
+        )
+      }
+      <Heading class="case__title" data-render={render ? '' : undefined}>{story.title}</Heading>
+    </div>
+    <span class="case__arrow" aria-hidden="true">
+      <Icon name="arrow_forward" />
+    </span>
+  </div>
+</a>
+
+<style>
+  .case {
+    display: grid;
+    gap: 1.25rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .case__media {
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: #e4e4e4;
+    /* Notched bottom edge, Hut 8 card pattern */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
+    transition: background-color 240ms ease;
+  }
+
+  .case__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 600ms var(--ease-out);
+  }
+
+  .case__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 1.5rem;
+  }
+
+  .case__text {
+    display: grid;
+    gap: 0.375rem;
+  }
+
+  .case__meta {
+    color: var(--muted);
+  }
+
+  .case__title {
+    max-width: 24ch;
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    letter-spacing: var(--track-title);
+  }
+
+  .case__arrow {
+    display: inline-flex;
+    font-size: 1.25rem;
+    transition: transform 200ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .case:hover .case__media {
+      background: #dadada;
+    }
+    .case:hover .case__media img {
+      transform: scale(1.02);
+    }
+    .case:hover .case__arrow {
+      transform: translateX(4px);
+    }
+  }
+
+  .case:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+</style>

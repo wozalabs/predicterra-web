@@ -1,0 +1,74 @@
+---
+/**
+ * Light, typographic page intro (About, Success stories): an eyebrow with the
+ * orange square, the page's h1, and a short text in the content column.
+ */
+interface Props {
+  eyebrow: string;
+  title: string;
+  text?: string;
+  id?: string;
+}
+const { eyebrow, title, text, id = 'page-title' } = Astro.props;
+---
+
+<section class="intro" aria-labelledby={id}>
+  <div class="container intro__inner">
+    <p class="intro__eyebrow t-small" data-reveal>{eyebrow}</p>
+    <h1 id={id} class="intro__title" data-render>{title}</h1>
+    {text && <p class="intro__text" data-reveal>{text}</p>}
+  </div>
+</section>
+
+<style>
+  .intro__inner {
+    display: grid;
+    gap: 1.5rem 0;
+    padding-top: calc(var(--header-h) + clamp(4rem, 2rem + 9vh, 9rem));
+    padding-bottom: clamp(4rem, 2rem + 6vw, 8rem);
+  }
+
+  .intro__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--muted);
+  }
+
+  .intro__eyebrow::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--accent);
+  }
+
+  .intro__title {
+    max-width: 16ch;
+    font-size: clamp(2.75rem, 1rem + 4.6vw, 6rem);
+    line-height: 0.96;
+    letter-spacing: var(--track-display);
+  }
+
+  .intro__text {
+    max-width: 38ch;
+    margin-top: clamp(0.5rem, 0.25rem + 1vw, 1.5rem);
+    font-size: var(--fs-lead);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  @media (min-width: 64rem) {
+    /* The text sits in the content column, like the sections below */
+    .intro__inner {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      column-gap: var(--gutter);
+    }
+    .intro__eyebrow,
+    .intro__title {
+      grid-column: 1 / -1;
+    }
+    .intro__text {
+      grid-column: 2;
+    }
+  }
+</style>

@@ -1,0 +1,84 @@
+---
+/**
+ * Success stories index: the light intro, every case as a card on the
+ * homepage grid, and the CTA card.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/PageIntro.astro';
+import NotchRule from '../../components/NotchRule.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import Cta from '../../sections/home/Cta.astro';
+import { getCopy, localizePath } from '../../i18n/config';
+import { casePath } from '../../i18n/en/cases';
+import { routes } from '../../data/routes';
+
+const locale = 'en';
+const { cases } = getCopy(locale);
+const site = Astro.site ?? new URL('https://www.predicterra.com');
+const abs = (path: string) => new URL(localizePath(path, locale), site).href;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: cases.seo.title,
+    description: cases.seo.description,
+    url: abs(routes.cases),
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: cases.items.map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: abs(casePath(c.slug)),
+        name: c.title,
+      })),
+    },
+  },
+];
+---
+
+<BaseLayout title={cases.seo.title} description={cases.seo.description} locale={locale} jsonLd={jsonLd}>
+  <PageIntro id="cases-title" eyebrow={cases.hero.eyebrow} title={cases.hero.title} text={cases.hero.text} />
+
+  <section class="cs-index" aria-label={cases.listLabel}>
+    <div class="container">
+      <NotchRule at={70} />
+      <ul class="cs-index__grid" data-reveal-group>
+        {
+          cases.items.map((story) => (
+            <li data-reveal>
+              <CaseCard story={story} locale={locale} as="h2" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Cta locale={locale} copy={cases.cta} />
+</BaseLayout>
+
+<style>
+  .cs-index {
+    padding-bottom: var(--section-y);
+  }
+
+  .cs-index__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem var(--gutter);
+    padding-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  @media (min-width: 40rem) {
+    .cs-index__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .cs-index__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

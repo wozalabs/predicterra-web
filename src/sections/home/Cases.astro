@@ -1,14 +1,17 @@
 ---
 import NotchRule from '../../components/NotchRule.astro';
 import Button from '../../components/Button.astro';
-import Icon from '../../components/Icon.astro';
+import CaseCard from '../../components/CaseCard.astro';
 import { getCopy, localizePath, type Locale } from '../../i18n/config';
 
 interface Props {
   locale?: Locale;
 }
 const { locale = 'en' } = Astro.props;
-const { cases } = getCopy(locale).home;
+const copy = getCopy(locale);
+const { cases } = copy.home;
+// The first three success stories (src/i18n/en/cases.ts).
+const stories = copy.cases.items.slice(0, 3);
 ---
 
 <section class="cases" id="success-stories" aria-labelledby="cases-title">
@@ -23,22 +26,9 @@ const { cases } = getCopy(locale).home;
 
       <ul class="cases__list" data-reveal-group>
         {
-          cases.items.map((c) => (
-            <li class="case" data-reveal>
-              <a
-                class="case__link"
-                href={c.external ? c.href : localizePath(c.href, locale)}
-                {...(c.external ? { target: '_blank', rel: 'noopener' } : {})}
-              >
-                <!-- Placeholder image: light grey until case photography is ready -->
-                <div class="case__media" aria-hidden="true"></div>
-                <div class="case__body">
-                  <h3 class="case__title" data-render>{c.title}</h3>
-                  <span class="case__arrow" aria-hidden="true">
-                    <Icon name="arrow_forward" />
-                  </span>
-                </div>
-              </a>
+          stories.map((story) => (
+            <li data-reveal>
+              <CaseCard story={story} locale={locale} meta={false} render />
             </li>
           ))
         }
@@ -85,46 +75,4 @@ const { cases } = getCopy(locale).home;
     gap: 2.5rem var(--gutter);
   }
 
-  .case__link {
-    display: grid;
-    gap: 1.25rem;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .case__media {
-    aspect-ratio: 4 / 3;
-    background: #e4e4e4;
-    /* Notched bottom edge, Hut 8 card pattern */
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
-    transition: background-color 240ms ease;
-  }
-
-  .case__body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-    gap: 1.5rem;
-  }
-
-  .case__title {
-    max-width: 24ch;
-    font-size: var(--fs-h4);
-    line-height: 1.2;
-    letter-spacing: var(--track-title);
-  }
-
-  .case__arrow {
-    display: inline-flex;
-    font-size: 1.25rem;
-    transition: transform 200ms var(--ease-out);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .case__link:hover .case__media {
-      background: #dadada;
-    }
-    .case__link:hover .case__arrow {
-      transform: translateX(4px);
-    }
-  }
 </style>

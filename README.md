@@ -116,6 +116,16 @@ Platform, About and Contact sit as text links next to **Request a demo** on scre
 
 The header animates in on the first page of a visit only (`sessionStorage` key `predicterra:seen` adds `html.is-return`). Navigations between pages use cross-document view transitions (`@view-transition` in `global.css`): the page cross-fades in 200 ms and the header (`view-transition-name: site-header`) stays in place. Browsers without support just load the page; reduced motion turns it off.
 
+## Success stories
+
+Copy for every case lives in `src/i18n/en/cases.ts` (one entry per case: client, sector, region, year, title, summary, key figures, article sections, quote, optional coverage link and image). It feeds:
+
+- the homepage cards (first three, `sections/home/Cases.astro`),
+- the index at `/success-stories` (`pages/success-stories/index.astro`, JSON-LD `CollectionPage`),
+- one page per case at `/success-stories/<slug>` (`pages/success-stories/[slug].astro`, JSON-LD `Article` + `BreadcrumbList`).
+
+A case page has the image on top, then the article: facts and key figures in the left column (sticky on wide screens) and the text in one 40rem reading column on the right. Below it, the other cases (in order, wrapping around) and the CTA card. Cards share `components/CaseCard.astro`. To add a case, add an entry to `items`; to add a photo, put it in `public/cases/` and set `image` (until then the frame is light grey). The About page and the index share the light intro, `components/PageIntro.astro`.
+
 ## Typeface test switch
 
 A **Font** select in the header swaps the global typeface (`--font-sans`) to compare alternatives with Archivo. The list is in `src/data/fonts.ts`: 13 Google Fonts, regular (400) only, none monospaced. Archivo stays self-hosted; the others load from Google Fonts only when chosen. The choice is saved in `localStorage` (`predicterra:font`) and applied before paint by an inline script in `BaseLayout.astro` (`window.predicterraFont`). Tracking tokens are tuned for Archivo, and the fallback font is metric-matched to it, so other faces can shift slightly while loading. Remove `fonts.ts`, the select in `SiteHeader.astro` and the inline script once a face is chosen (self-host the winner with Fontsource).
@@ -143,7 +153,7 @@ A **Font** select in the header swaps the global typeface (`--font-sans`) to com
 ## Content to confirm before publishing
 
 - The live About page numbers its team 01, 02, 10, 04, 10; this site numbers them 01 to 05.
-- Naturgy and Moeve case cards contain `[Pending]` placeholders.
+- Success stories: all article copy, quotes, regions and years are `[Pending]` placeholders; Naturgy and Moeve titles, sectors and key figures too. Only the Iberdrola title, its two key figures and the coverage link are real.
 - Alerts in the 3D section are illustrative; asset names and values are examples.
 - The old site shows two addresses ("BAT Aceleration Tower" and "BAT - Gran Vía 1"). This site uses BAT Tower, Gran Vía 1, 48001 Bilbao.
 - Compliance figure: the old site says both 95% and 80% less time. This site uses 95%.

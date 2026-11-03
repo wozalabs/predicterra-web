@@ -1,0 +1,448 @@
+---
+/**
+ * Case page: the image on top, then the article. Facts (client, sector,
+ * region, year, key figures) sit in the left column and stay in view; the
+ * article reads as one narrow column on the right. Below it, the other
+ * success stories, then the CTA card.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NotchRule from '../../components/NotchRule.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import Button from '../../components/Button.astro';
+import Icon from '../../components/Icon.astro';
+import Cta from '../../sections/home/Cta.astro';
+import { getCopy, localizePath, withBase } from '../../i18n/config';
+import cases, { casePath, type CaseStory } from '../../i18n/en/cases';
+import { routes } from '../../data/routes';
+
+export function getStaticPaths() {
+  return cases.items.map((story) => ({ params: { slug: story.slug }, props: { story } }));
+}
+
+interface Props {
+  story: CaseStory;
+}
+const { story } = Astro.props;
+const locale = 'en';
+const { cases: copy } = getCopy(locale);
+const { labels } = copy;
+
+// The next cases in order, wrapping around, so every page links to the rest.
+const i = copy.items.findIndex((c) => c.slug === story.slug);
+const others = [...copy.items.slice(i + 1), ...copy.items.slice(0, i)].slice(0, 3);
+
+const meta = [
+  { label: labels.client, value: story.client },
+  { label: labels.sector, value: story.sector },
+  { label: labels.region, value: story.region },
+  { label: labels.year, value: story.year },
+];
+
+const site = Astro.site ?? new URL('https://www.predicterra.com');
+const abs = (path: string) => new URL(localizePath(path, locale), site).href;
+const url = abs(casePath(story.slug));
+const seoTitle = `${story.title} | ${story.client} | Predicterra`;
+const seoDescription = story.summary;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: story.title,
+    description: story.summary,
+    url,
+    mainEntityOfPage: url,
+    about: { '@type': 'Organization', name: story.client },
+    publisher: { '@id': new URL('/#organization', site).href },
+    ...(story.image ? { image: new URL(withBase(story.image.src), site).href } : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: abs(routes.home) },
+      { '@type': 'ListItem', position: 2, name: labels.back, item: abs(routes.cases) },
+      { '@type': 'ListItem', position: 3, name: story.title, item: url },
+    ],
+  },
+];
+---
+
+<BaseLayout title={seoTitle} description={seoDescription} locale={locale} jsonLd={jsonLd}>
+  <article class="cs" aria-labelledby="case-title">
+    <!-- Image on top -->
+    <div class="container cs-top">
+      <a class="cs-back t-small" href={localizePath(routes.cases, locale)}>
+        <Icon name="arrow_back" />
+        <span>{labels.back}</span>
+      </a>
+      <figure class="cs-media" data-reveal>
+        {
+          story.image ? (
+            <img src={withBase(story.image.src)} alt={story.image.alt} width={story.image.w} height={story.image.h} fetchpriority="high" decoding="async" />
+          ) : (
+            <div class="cs-media__placeholder" aria-hidden="true" />
+          )
+        }
+      </figure>
+    </div>
+
+    <!-- Article -->
+    <div class="container cs-grid">
+      <header class="cs-head">
+        <p class="cs-eyebrow t-small" data-reveal>{story.client}</p>
+        <h1 id="case-title" class="cs-title" data-render>{story.title}</h1>
+        <p class="cs-summary" data-reveal>{story.summary}</p>
+      </header>
+
+      <aside class="cs-aside" aria-label={labels.keyFigures} data-reveal>
+        <dl class="cs-meta">
+          {
+            meta.map((m) => (
+              <div class="cs-meta__row">
+                <dt class="t-small">{m.label}</dt>
+                <dd class="t-small">{m.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <div class="cs-facts">
+          <p class="label">{labels.keyFigures}</p>
+          <ul>
+            {
+              story.facts.map((f) => (
+                <li class="cs-fact">
+                  <span class="cs-fact__value t-num">{f.value}</span>
+                  <span class="cs-fact__label t-small">{f.label}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </aside>
+
+      <div class="cs-body">
+        {
+          story.sections.map((s, n) => (
+            <section class="cs-section" aria-labelledby={`cs-s${n}`}>
+              <h2 id={`cs-s${n}`} class="cs-section__title">{s.heading}</h2>
+              {s.paragraphs.map((p) => <p>{p}</p>)}
+            </section>
+          ))
+        }
+
+        {
+          story.quote && (
+            <figure class="cs-quote">
+              <blockquote>
+                <p>{story.quote.text}</p>
+              </blockquote>
+              <figcaption class="t-small">
+                <span>{story.quote.author}</span>
+                <span class="t-muted">{story.quote.role}</span>
+              </figcaption>
+            </figure>
+          )
+        }
+
+        {
+          story.coverage && (
+            <div class="cs-coverage">
+              <Button href={story.coverage.href} label={story.coverage.label} variant="secondary" external />
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </article>
+
+  <!-- Other cases -->
+  {
+    others.length > 0 && (
+      <section class="cs-more" aria-labelledby="more-title">
+        <div class="container">
+          <NotchRule at={70} />
+          <div class="cs-more__head">
+            <p class="label">{labels.more}</p>
+            <h2 id="more-title" class="t-h2" data-render>
+              {labels.moreTitle}
+            </h2>
+          </div>
+          <ul class="cs-more__grid" data-reveal-group>
+            {others.map((o) => (
+              <li data-reveal>
+                <CaseCard story={o} locale={locale} />
+              </li>
+            ))}
+          </ul>
+          <div class="cs-more__all">
+            <Button href={localizePath(routes.cases, locale)} label={labels.back} variant="secondary" />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <Cta locale={locale} copy={copy.cta} />
+</BaseLayout>
+
+<style>
+  /* ---------- Image ---------- */
+  .cs-top {
+    padding-top: calc(var(--header-h) + clamp(0.5rem, 0.25rem + 1vw, 1.5rem));
+  }
+
+  .cs-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    color: var(--ink-2);
+    transition: color 160ms ease;
+  }
+
+  .cs-back :global(.icon) {
+    font-size: 1rem;
+    transition: transform 200ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cs-back:hover {
+      color: var(--ink);
+    }
+    .cs-back:hover :global(.icon) {
+      transform: translateX(-3px);
+    }
+  }
+
+  .cs-media {
+    overflow: hidden;
+    margin-top: 0.75rem;
+    aspect-ratio: 4 / 3;
+    background: #e4e4e4;
+    /* Same notched bottom edge as the case cards */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
+  }
+
+  @media (min-width: 48rem) {
+    .cs-media {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .cs-media {
+      aspect-ratio: 21 / 9;
+    }
+  }
+
+  .cs-media img,
+  .cs-media__placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ---------- Article ---------- */
+  .cs-grid {
+    display: grid;
+    grid-template-areas: 'head' 'aside' 'body';
+    gap: 2.5rem var(--gutter);
+    padding-block: clamp(2.5rem, 1.5rem + 3vw, 4.5rem) var(--section-y);
+  }
+
+  @media (min-width: 64rem) {
+    .cs-grid {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      grid-template-areas: 'aside head' 'aside body';
+      grid-template-rows: auto 1fr;
+      row-gap: 3.5rem;
+    }
+  }
+
+  .cs-head {
+    grid-area: head;
+    display: grid;
+    gap: 1.25rem;
+    /* The reading column: about 65 characters a line */
+    max-width: 40rem;
+  }
+
+  .cs-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--muted);
+  }
+
+  .cs-eyebrow::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--accent);
+  }
+
+  .cs-title {
+    font-size: var(--fs-display);
+    line-height: 1.02;
+    letter-spacing: var(--track-display);
+    text-wrap: balance;
+  }
+
+  .cs-summary {
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  /* Facts: in view while reading on wide screens */
+  .cs-aside {
+    grid-area: aside;
+    display: grid;
+    align-content: start;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    .cs-aside {
+      position: sticky;
+      top: calc(var(--header-h) + 1.5rem);
+      align-self: start;
+      max-width: 22rem;
+    }
+  }
+
+  .cs-meta__row {
+    display: grid;
+    grid-template-columns: minmax(0, 6rem) minmax(0, 1fr);
+    gap: 1rem;
+    padding-block: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .cs-meta__row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cs-meta dt {
+    color: var(--muted);
+  }
+
+  .cs-facts {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .cs-facts ul {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .cs-fact {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .cs-fact__value {
+    font-size: var(--fs-h2);
+    line-height: 1;
+    letter-spacing: var(--track-heading);
+  }
+
+  .cs-fact__label {
+    color: var(--ink-2);
+  }
+
+  /* Body: one narrow column, comfortable leading */
+  .cs-body {
+    grid-area: body;
+    max-width: 40rem;
+    font-size: clamp(1.0625rem, 1.02rem + 0.15vw, 1.125rem);
+    line-height: 1.65;
+    color: var(--ink-2);
+  }
+
+  .cs-section + .cs-section {
+    margin-top: 3rem;
+  }
+
+  .cs-section__title {
+    margin-bottom: 1rem;
+    font-size: var(--fs-h3);
+    line-height: 1.15;
+    letter-spacing: var(--track-heading);
+    color: var(--ink);
+  }
+
+  .cs-section p + p {
+    margin-top: 1.1em;
+  }
+
+  .cs-quote {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 3.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .cs-quote blockquote {
+    font-size: var(--fs-statement);
+    line-height: 1.2;
+    letter-spacing: var(--track-heading);
+    color: var(--ink);
+  }
+
+  .cs-quote blockquote p::before {
+    content: '“';
+  }
+
+  .cs-quote blockquote p::after {
+    content: '”';
+  }
+
+  .cs-quote figcaption {
+    display: grid;
+    gap: 0.125rem;
+    color: var(--ink);
+  }
+
+  .cs-coverage {
+    margin-top: 3rem;
+  }
+
+  /* ---------- More cases ---------- */
+  .cs-more {
+    padding-bottom: var(--section-y);
+  }
+
+  .cs-more__head {
+    display: grid;
+    gap: 1rem;
+    padding-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
+  }
+
+  .cs-more__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem var(--gutter);
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  .cs-more__all {
+    margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  @media (min-width: 40rem) {
+    .cs-more__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .cs-more__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

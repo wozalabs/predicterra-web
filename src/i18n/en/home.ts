@@ -354,12 +354,7 @@ export default {
     exploreKicker: 'Explore',
     exploreLabel: 'All success stories',
     exploreHref: routes.cases,
-    // Images are light grey placeholders until real case photography is ready.
-    items: [
-      { title: 'Protecting 1.1M km of power line from the climate', href: external.iberdrolaCoverage, external: true },
-      { title: '[Pending] Case title for Naturgy', href: routes.cases, external: false },
-      { title: '[Pending] Case title for Moeve', href: routes.cases, external: false },
-    ],
+    // Cards come from src/i18n/en/cases.ts (first three).
   },
 
 
