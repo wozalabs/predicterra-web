@@ -1,4 +1,4 @@
-// One-off: downloads the About page photos from the current predicterra.com
+// Refreshes the About page photos from the current predicterra.com
 // (Framer CDN) and writes them to public/about as .webp.
 // Run once from the project root:  node scripts/fetch-about-images.mjs
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -12,7 +12,6 @@ const images = [
   ['martin-tanielian', 'KPuprovkmyrR90RXpZ4sjCN4xfQ', 600, 600],
   ['omer-gomez', 'wVyHR717l8mCpjsXusGWZw6dfk', 600, 600],
   ['bilbao-1', 'LBVpM0In5O3SxWIsJZgi4b8faFE', 1200, 800],
-  ['bilbao-2', 'YlHdh8k6oHGeCmCg5BqP5rNZv4c', 1600, 896],
 ];
 
 const out = new URL('../public/about/', import.meta.url);

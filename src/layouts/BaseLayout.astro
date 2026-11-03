@@ -67,6 +67,11 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
       } catch (e) {
         document.documentElement.dataset.hero = 'clean';
       }
+      // The header animates in on the first page of a visit only, not on every navigation.
+      try {
+        if (sessionStorage.getItem('predicterra:seen')) document.documentElement.classList.add('is-return');
+        sessionStorage.setItem('predicterra:seen', '1');
+      } catch (e) {}
 
     </script>
 

@@ -106,13 +106,15 @@ The first version of the 3D section (`SectorScene.astro`, opens on the whole net
 
 ## About page
 
-`src/pages/about.astro`, copy in `src/i18n/en/about.ts` (texts from predicterra.com/about). Same language as the homepage: a light typographic intro, then Our story, Recognition, Team and Where we are, each after a notched rule with the title left and content right (4 : 8). Team and office photos use the success-stories notched frame. It ends with the homepage CTA card (`Cta.astro` takes an optional `copy` prop; the secondary button only shows when the copy has one). JSON-LD: `AboutPage`.
+`src/pages/about.astro`, copy in `src/i18n/en/about.ts` (texts from predicterra.com/about). Same language as the homepage: a light typographic intro, then Team and Where we are, each after a notched rule with the title left and content right (4 : 8), ending with the homepage CTA card (`Cta.astro` takes an optional `copy` prop; the secondary button only shows when the copy has one). JSON-LD: `AboutPage`.
 
-Photos live in `public/about/*.webp`. To fetch them from the current site, run once: `node scripts/fetch-about-images.mjs` (downloads from the Framer CDN, crops and converts with sharp). Until then the frames show grey.
+Photos in `public/about/*.webp` come from predicterra.com/about: portraits 600×600 (cut out on white; `mix-blend-mode: multiply` turns the white into the frame grey), office 1200×800. Both use the success-stories notched frame. `node scripts/fetch-about-images.mjs` downloads them again if they change.
 
 ## Header navigation
 
 Platform, About and Contact sit as text links next to **Request a demo** on screens 56rem and wider (`header.nav` in `common.ts`); smaller screens use the menu. The current page gets `aria-current="page"` and a small orange square under its label.
+
+The header animates in on the first page of a visit only (`sessionStorage` key `predicterra:seen` adds `html.is-return`). Navigations between pages use cross-document view transitions (`@view-transition` in `global.css`): the page cross-fades in 200 ms and the header (`view-transition-name: site-header`) stays in place. Browsers without support just load the page; reduced motion turns it off.
 
 ## Adding a page
 

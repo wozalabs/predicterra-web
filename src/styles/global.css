@@ -3,6 +3,30 @@
 
 
 
+/* ---------- Page navigation ----------
+   Same-site navigations cross-fade the page while the header stays put
+   (SiteHeader sets view-transition-name: site-header). No-op where
+   cross-document view transitions aren't supported. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+}
+
+::view-transition-group(site-header),
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
 /* ---------- Reset ---------- */
 *,
 *::before,

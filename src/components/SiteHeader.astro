@@ -121,6 +121,8 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     z-index: var(--z-header);
     height: var(--header-h);
     color: color-mix(in oklab, #f1f1f1 var(--hpct), #1e1e1e);
+    /* Kept in place across page navigations (see @view-transition in global.css). */
+    view-transition-name: site-header;
     /* No background or border: the header floats over the page. */
     transition: color 240ms ease;
   }
@@ -129,6 +131,11 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     .site-header__inner {
       animation: header-in 600ms var(--ease-out) 40ms both;
     }
+  }
+
+  /* Later pages of the same visit: the header is simply there. */
+  :global(html.is-return) .site-header__inner {
+    animation: none;
   }
 
   @keyframes header-in {
