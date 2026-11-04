@@ -12,6 +12,8 @@ import type { World, SectorId } from './world';
 const HOLD = 0.32;
 /** Extra viewport fraction to hold on the last stop before the cover starts (matches CSS). */
 const LAST_HOLD = 0.5;
+/** Trace variant: how far (in hops) the camera drifts past the last stop. */
+const GLIDE = 0.6;
 /** Marker positions (fractions of the stage) used when WebGL is unavailable. */
 const FALLBACK: Record<SectorId, [number, number]> = {
   grid: [0.6, 0.42],
@@ -75,7 +77,11 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
     const lastStop = stopCount - 1;
     if (p >= lastStop) {
       // Hold the last stop for half a viewport, then the next section slides over.
-      focus = lastStop;
+      // The trace keeps gliding through the hold and the cover so the end of the
+      // section never stops dead: same speed on arrival, then it eases off
+      // (k·(1 − e^(−x/k)) has slope 1 at the stop and settles k hops later).
+      const x = p - lastStop;
+      focus = variant === 'trail' ? lastStop + GLIDE * (1 - Math.exp(-x / GLIDE)) : lastStop;
       cover = clamp(p - lastStop - LAST_HOLD, 0, 1);
     } else {
       const i = Math.floor(p);
@@ -88,7 +94,7 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
           : i + easeInOut(clamp((t - HOLD) / (1 - HOLD), 0, 1));
       cover = 0;
     }
-    applyStep(Math.round(focus));
+    applyStep(Math.min(stopCount - 1, Math.round(focus)));
     applyCover();
     world?.setFocus(focus);
     needsFrame = true;

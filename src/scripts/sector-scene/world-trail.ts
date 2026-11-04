@@ -193,8 +193,9 @@ export function createTrailWorld(
   const og = oilGas(statics, s4[0] - 2, s4[1], risky, 1);
 
   // 06 Digitalization: a chip on the trace; the cable bundle runs into its core
-  // and traces fan in from every side. Nothing at risk here.
-  const dig = chip(statics, s5[0], s5[1]);
+  // and traces fan in from every side. Nothing at risk: the orange core is an
+  // accent only (no marker, no panel, no hazard field).
+  const dig = chip(statics, s5[0], s5[1], risky);
   const { paths: fanIn, live: fanInLive } = chipTraces(dig.sides);
   fanIn.forEach((path) => {
     const end = plan(path[0][0], path[0][1], 0.04);
@@ -202,7 +203,8 @@ export function createTrailWorld(
   });
 
   // 07 Compliance: a surveyed site with a measured setback to a protected stream.
-  const site = surveyedSite(statics, s6[0], s6[1]);
+  // The fence is the orange accent.
+  const site = surveyedSite(statics, s6[0], s6[1], risky);
 
   // Vias: small square pads on every bend of the trace.
   fullRoute.slice(1, -1).forEach(([u, v]) => {
@@ -222,14 +224,15 @@ export function createTrailWorld(
   // Clear radius around each stop (the chip's traces and the site's woodland reach further).
   const clearR = [16, 16, 16, 16, 16, 12, 24];
   const hopLen = Math.hypot(HOP_DU, HOP_DV);
-  for (let u = -60; u <= STOPS * HOP_DU + 40; u += 11) {
-    for (let v = -50; v <= STOPS * HOP_DV + 20; v += 10) {
+  // The band runs two hops past the last stop: the camera glides there under the next section.
+  for (let u = -60; u <= (STOPS + 2) * HOP_DU + 40; u += 11) {
+    for (let v = -50; v <= (STOPS + 2) * HOP_DV + 20; v += 10) {
       const ju = u + (rand() - 0.5) * 6;
       const jv = v + (rand() - 0.5) * 5;
       // keep to a band around the diagonal
       const along = (ju * HOP_DU + jv * HOP_DV) / Math.hypot(HOP_DU, HOP_DV);
       const across = Math.abs(ju * HOP_DV - jv * HOP_DU) / Math.hypot(HOP_DU, HOP_DV);
-      if (across > 60 || along < -40 || along > (STOPS - 1) * hopLen + 60) continue;
+      if (across > 60 || along < -40 || along > (STOPS + 1) * hopLen + 60) continue;
       if (stopsPlan.some(([a, b], k) => Math.hypot(ju - a, jv - b) < clearR[k])) continue;
       if (segDist(ju, jv) < 5) continue;
       const kind = rand();
@@ -348,16 +351,20 @@ export function createTrailWorld(
 
   function goalFor(f: number) {
     const i = Math.min(STOPS - 2, Math.floor(f));
+    // Past the last stop t > 1: the camera keeps gliding along the last hop's
+    // direction (and the conductor keeps filling) while the next section covers
+    // the stage, so the scroll never stalls. View, lift and angles hold.
     const t = f - i;
+    const tc = Math.min(1, t);
     // The conductor fills along the circuit route…
     goal.s = stopS[i] + (stopS[i + 1] - stopS[i]) * t;
     // …but the camera travels in a straight line between stops, with no zoom bump,
     // so the move reads as one linear diagonal glide (no zig-zag at the bends).
     goal.target.lerpVectors(stopWorld[i], stopWorld[i + 1], t);
-    goal.target.y = lift[i] + (lift[i + 1] - lift[i]) * t;
-    goal.view = views[i] + (views[i + 1] - views[i]) * t;
+    goal.target.y = lift[i] + (lift[i + 1] - lift[i]) * tc;
+    goal.view = views[i] + (views[i + 1] - views[i]) * tc;
     // Angle variations between stops, eased so they settle as each asset arrives.
-    const e = t * t * (3 - 2 * t);
+    const e = tc * tc * (3 - 2 * tc);
     goal.az = STOP_AZIMUTH[i] + (STOP_AZIMUTH[i + 1] - STOP_AZIMUTH[i]) * e;
     goal.el = STOP_ELEVATION[i] + (STOP_ELEVATION[i + 1] - STOP_ELEVATION[i]) * e;
   }
@@ -390,7 +397,8 @@ export function createTrailWorld(
   }
 
   function setFocus(f: number) {
-    focusF = Math.max(0, Math.min(STOPS - 1, f));
+    // Up to two hops past the last stop (the glide under the next section).
+    focusF = Math.max(0, Math.min(STOPS + 1, f));
     goalFor(focusF);
     const active = Math.round(focusF);
     for (let k = 0; k < HAZARD_SLOTS; k++) hazardTarget[k] = active === k ? 1 : 0;

@@ -451,16 +451,16 @@ export interface ChipSide {
 
 /**
  * Microchip package lying on the board: stepped body, lid and die, a pin-1
- * mark, and gull-wing pins on all four sides. Returns the pin tips so the
- * traces can run into it.
+ * mark, and gull-wing pins on all four sides. The die (the core) goes to the
+ * `accent` bucket when given. Returns the pin tips so the traces can run into it.
  */
-export function chip(b: Bucket, u: number, v: number, size = 10, pinsPerSide = 9) {
+export function chip(b: Bucket, u: number, v: number, accent: Bucket = b, size = 10, pinsPerSide = 9) {
   const f = frame(u, v);
   const half = size / 2;
   b.push(box(size, 0.9, size, f.at(0, 0.45, 0), f.rot));
   // Lid and die step up so they cast small dithered shadows on the body.
   b.push(box(size * 0.64, 0.4, size * 0.64, f.at(0, 1.1, 0), f.rot));
-  b.push(box(size * 0.34, 0.36, size * 0.34, f.at(0, 1.48, 0), f.rot));
+  accent.push(box(size * 0.34, 0.36, size * 0.34, f.at(0, 1.48, 0), f.rot));
   // Pin-1 mark: a shallow dimple in the top corner.
   b.push(cylinder(0.32, 0.32, 0.05, f.at(-half + 1.1, 0.92, -half + 1.1), 18));
 
@@ -500,9 +500,10 @@ export function tree(b: Bucket, u: number, v: number, h = 2.4) {
  * Compliance: a surveyed site. A fenced parcel on a low plinth with a small
  * plant inside, a dashed buffer line around it with survey posts at the
  * corners, and a measured setback to a protected stream (the stream itself is
- * returned as a separate strip so it can take its own material).
+ * returned as a separate strip so it can take its own material). The fence
+ * goes to the `accent` bucket when given.
  */
-export function surveyedSite(b: Bucket, u: number, v: number) {
+export function surveyedSite(b: Bucket, u: number, v: number, accent: Bucket = b) {
   const f = frame(u, v);
   const W = 16;
   const D = 11;
@@ -530,11 +531,11 @@ export function surveyedSite(b: Bucket, u: number, v: number) {
   for (let i = 0; i < 4; i++) {
     const a = corners[i];
     const c = corners[(i + 1) % 4];
-    for (const h of [0.6, 1.1]) b.push(beam(new Vector3(a.x, h, a.z), new Vector3(c.x, h, c.z), 0.04));
+    for (const h of [0.6, 1.1]) accent.push(beam(new Vector3(a.x, h, a.z), new Vector3(c.x, h, c.z), 0.05));
     const n = Math.round(a.distanceTo(c) / 1.4);
     for (let k = 0; k < n; k++) {
       const p = new Vector3().lerpVectors(a, c, k / n);
-      b.push(box(0.07, 1.2, 0.07, new Vector3(p.x, 0.8, p.z)));
+      accent.push(box(0.08, 1.2, 0.08, new Vector3(p.x, 0.8, p.z)));
     }
   }
 
