@@ -59,8 +59,8 @@ const stops = scene.sectors.length + 1; // overview + one stop per sector
     <!-- Markers: square dots projected from the 3D anchors. -->
     <div class="sectors__markers" data-markers>
       {
-        scene.sectors.map((s) => (
-          <div class="marker" data-marker={s.id}>
+        scene.sectors.map((s, i) => (
+          <div class="marker" data-marker={s.id} data-index={i}>
             <button
               class="marker__btn"
               type="button"

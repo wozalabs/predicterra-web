@@ -1,13 +1,13 @@
 /**
  * Scroll controller for the pinned 3D sector section.
- * - Maps scroll position to a focus value (overview → sector 1 … 5).
+ * - Maps scroll position to a focus value (overview → stop 1 … n). The stops
+ *   are the [data-step] layers; markers belong to the sector stops only.
  * - Swaps the copy layers, highlights the active marker, keeps the progress nav in sync.
  * - Lazy-loads three.js only when the section is about to enter the viewport.
  * - Alert cards open on hover (fine pointers), focus, or tap.
  */
 import type { World, SectorId } from './world';
 
-const SECTORS: SectorId[] = ['grid', 'substation', 'solar', 'wind', 'oilgas'];
 /** Fraction of each scroll segment spent holding on a stop before travelling. */
 const HOLD = 0.32;
 /** Extra viewport fraction to hold on the last stop before the cover starts (matches CSS). */
@@ -46,7 +46,10 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
   const narrow = window.matchMedia('(max-width: 47.99rem)');
 
-  const stopCount = SECTORS.length + first;
+  // Sectors with an at-risk asset (marker + panel), and the step each one belongs to.
+  const SECTORS = [...markers.keys()];
+  const stepOf = (id: SectorId) => Number(markers.get(id)!.dataset.index) + first;
+  const stopCount = steps.length;
   let world: World | null = null;
   let loading = false;
   let visible = false;
@@ -96,13 +99,13 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
     activeIndex = index;
     steps.forEach((el) => el.toggleAttribute('data-active', Number(el.dataset.step) === index));
     root.toggleAttribute('data-has-focus', index >= first);
-    markers.forEach((m, id) => m.toggleAttribute('data-active', SECTORS.indexOf(id) + first === index));
+    markers.forEach((m, id) => m.toggleAttribute('data-active', stepOf(id) === index));
     gotoButtons.forEach((b) => {
       if (Number(b.dataset.goto) === index) b.setAttribute('aria-current', 'step');
       else b.removeAttribute('aria-current');
     });
     // Close alerts that belong to a sector that is no longer in focus.
-    if (openId && SECTORS.indexOf(openId) + first !== index && !finePointer.matches) closeAlert();
+    if (openId && stepOf(openId) !== index && !finePointer.matches) closeAlert();
   }
 
   function applyCover() {

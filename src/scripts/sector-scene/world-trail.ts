@@ -4,6 +4,9 @@
  * cable bundle. The camera starts on the first asset and travels along the
  * trace as the user scrolls; the orange conductor fills up behind it.
  * The asset carrying the alert in each sector is painted orange.
+ * After the five sectors come two capability stops with nothing at risk:
+ * Digitalization (a chip, traces running into its core) and Compliance
+ * (a surveyed site: fenced parcel, buffer line, setback to a protected stream).
  */
 import {
   AmbientLight,
@@ -11,6 +14,7 @@ import {
   BufferGeometry,
   Color,
   DirectionalLight,
+  DoubleSide,
   Group,
   HemisphereLight,
   Line,
@@ -40,7 +44,10 @@ import {
   silos,
   cable,
   box,
+  chip,
+  surveyedSite,
   type Bucket,
+  type ChipSide,
 } from './geometry';
 import { createGroundMaterial, createFlowMaterial, HAZARD_SLOTS } from './materials';
 import type { SectorId, World } from './world';
@@ -48,8 +55,8 @@ import type { SectorId, World } from './world';
 const AZIMUTH = Math.PI / 4;
 const DEG = Math.PI / 180;
 /** Camera angle at each stop (degrees): small variations make each arrival feel different. */
-const STOP_AZIMUTH = [45, 33, 56, 38, 50];
-const STOP_ELEVATION = [34, 29, 41, 27, 36];
+const STOP_AZIMUTH = [45, 33, 56, 38, 50, 40, 40];
+const STOP_ELEVATION = [34, 29, 41, 27, 36, 44, 38];
 /** Mouse tilt range (degrees) for the decorative parallax. */
 const TILT_ELEVATION = 3.5;
 const TILT_AZIMUTH = 2.5;
@@ -77,7 +84,8 @@ const HOP: P[] = [
 ];
 const HOP_DU = 32;
 const HOP_DV = 42;
-const STOPS = 5;
+/** Five sectors, then Digitalization and Compliance. */
+const STOPS = 7;
 
 export const TRAIL_ORDER: SectorId[] = ['grid', 'substation', 'solar', 'wind', 'oilgas'];
 
@@ -148,7 +156,7 @@ export function createTrailWorld(
   /* ---------------- Assets ---------------- */
   const statics: Bucket = [];
   const risky: Bucket = [];
-  const [s0, s1, s2, s3, s4] = stopsPlan;
+  const [s0, s1, s2, s3, s4, s5, s6] = stopsPlan;
 
   // 01 Grid: line of towers crossing the first stop; the middle one is at risk.
   const towerSpots: P[] = [-2, -1, 0, 1, 2].map((k) => [s0[0] - 2 + k * 8, s0[1] + 4 - k * 3.2]);
@@ -184,6 +192,18 @@ export function createTrailWorld(
   // 05 Oil & gas: one tank at risk.
   const og = oilGas(statics, s4[0] - 2, s4[1], risky, 1);
 
+  // 06 Digitalization: a chip on the trace; the cable bundle runs into its core
+  // and traces fan in from every side. Nothing at risk here.
+  const dig = chip(statics, s5[0], s5[1]);
+  const { paths: fanIn, live: fanInLive } = chipTraces(dig.sides);
+  fanIn.forEach((path) => {
+    const end = plan(path[0][0], path[0][1], 0.04);
+    statics.push(box(0.55, 0.08, 0.55, end, Math.PI / 4));
+  });
+
+  // 07 Compliance: a surveyed site with a measured setback to a protected stream.
+  const site = surveyedSite(statics, s6[0], s6[1]);
+
   // Vias: small square pads on every bend of the trace.
   fullRoute.slice(1, -1).forEach(([u, v]) => {
     const p = plan(u, v, 0.04);
@@ -194,18 +214,23 @@ export function createTrailWorld(
   const rand = mulberry32(19);
   const segDist = (u: number, v: number) => {
     let d = Infinity;
-    for (let i = 1; i < fullRoute.length; i++) d = Math.min(d, distToSeg([u, v], fullRoute[i - 1], fullRoute[i]));
+    for (const path of [fullRoute, ...fanIn, site.stream]) {
+      for (let i = 1; i < path.length; i++) d = Math.min(d, distToSeg([u, v], path[i - 1], path[i]));
+    }
     return d;
   };
-  for (let u = -60; u <= 200; u += 11) {
-    for (let v = -50; v <= 230; v += 10) {
+  // Clear radius around each stop (the chip's traces and the site's woodland reach further).
+  const clearR = [16, 16, 16, 16, 16, 12, 24];
+  const hopLen = Math.hypot(HOP_DU, HOP_DV);
+  for (let u = -60; u <= STOPS * HOP_DU + 40; u += 11) {
+    for (let v = -50; v <= STOPS * HOP_DV + 20; v += 10) {
       const ju = u + (rand() - 0.5) * 6;
       const jv = v + (rand() - 0.5) * 5;
       // keep to a band around the diagonal
       const along = (ju * HOP_DU + jv * HOP_DV) / Math.hypot(HOP_DU, HOP_DV);
       const across = Math.abs(ju * HOP_DV - jv * HOP_DU) / Math.hypot(HOP_DU, HOP_DV);
-      if (across > 60 || along < -40 || along > 270) continue;
-      if (stopsPlan.some(([a, b]) => Math.hypot(ju - a, jv - b) < 16)) continue;
+      if (across > 60 || along < -40 || along > (STOPS - 1) * hopLen + 60) continue;
+      if (stopsPlan.some(([a, b], k) => Math.hypot(ju - a, jv - b) < clearR[k])) continue;
       if (segDist(ju, jv) < 5) continue;
       const kind = rand();
       if (kind < 0.3) {
@@ -261,6 +286,34 @@ export function createTrailWorld(
   addBundle(scene, shifted(-20, 18), decoMat, null, 4, 0.22);
   addBundle(scene, shifted(46, -30), decoMat, null, 3, 0.22);
 
+  // Chip traces: grey, with one live trace per side whose pulses run into the core.
+  const coreMat = createFlowMaterial();
+  coreMat.uniforms.uMinAlpha.value = 0.12;
+  coreMat.uniforms.uSpeed.value = 7;
+  coreMat.uniforms.uPeriod.value = 18;
+  fanIn.forEach((path, k) => {
+    const pts = path.map(([u, v]) => plan(u, v, 0.03));
+    const geo = new BufferGeometry().setFromPoints(pts);
+    if (fanInLive.has(k)) {
+      // Distance grows towards the chip, so the pulses travel inwards.
+      const dist = new Float32Array(pts.length);
+      for (let i = 1; i < pts.length; i++) dist[i] = dist[i - 1] + pts[i].distanceTo(pts[i - 1]);
+      geo.setAttribute('aDist', new BufferAttribute(dist, 1));
+      const line = new Line(geo, coreMat);
+      line.renderOrder = 2;
+      scene.add(line);
+    } else {
+      scene.add(new Line(geo, lineMat));
+    }
+  });
+
+  // The protected stream: a flat ribbon slightly darker than the ground.
+  const streamMat = new MeshLambertMaterial({ color: new Color('#D6D6D6'), side: DoubleSide });
+  const streamGeo = ribbon(site.stream, 2.2, 0.02);
+  const streamMesh = new Mesh(streamGeo, streamMat);
+  streamMesh.receiveShadow = true;
+  scene.add(streamMesh);
+
   /* ---------------- Anchors, hazards, stops ---------------- */
   const anchors: Record<SectorId, Vector3> = {
     grid: towers[2].top.clone().add(new Vector3(0, 0.6, 0)),
@@ -269,8 +322,8 @@ export function createTrailWorld(
     wind: turbines[1].top.clone().add(new Vector3(0, 0.4, 0)),
     oilgas: og.anchor.clone().add(new Vector3(0, 0.4, 0)),
   };
-  const lift = [4.2, 1.8, 0.6, 5, 2.4];
-  const views = [24, 22, 24, 28, 24];
+  const lift = [4.2, 1.8, 0.6, 5, 2.4, 0.8, 1.2];
+  const views = [24, 22, 24, 28, 24, 30, 32];
 
   const hz = groundMat.uniforms.uHazards.value as Vector4[];
   TRAIL_ORDER.forEach((id, i) => {
@@ -397,6 +450,7 @@ export function createTrailWorld(
       rotors.forEach((r, i) => (r.children[0].rotation.z -= dt * (0.9 + i * 0.07)));
       groundMat.uniforms.uTime.value = time;
       trailMat.uniforms.uTime.value = time;
+      coreMat.uniforms.uTime.value = time;
     }
     renderer.render(scene, camera);
     return moving;
@@ -417,6 +471,9 @@ export function createTrailWorld(
     riskMat.dispose();
     groundMat.dispose();
     trailMat.dispose();
+    coreMat.dispose();
+    streamGeo.dispose();
+    streamMat.dispose();
     lineMat.dispose();
     decoMat.dispose();
     scene.traverse((o) => {
@@ -506,4 +563,62 @@ function mulberry32(seed: number) {
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+/**
+ * Traces running into the chip from every side, PCB style: straight out of
+ * each pin, a 45° jog to gather into a tight group, then straight out to the
+ * edge of the board. Sides that the main cable bundle uses keep a clear band
+ * around it and lean away from the route. Paths run from the outer end to the
+ * pin, so distance grows towards the core.
+ */
+function chipTraces(sides: ChipSide[]) {
+  const R = 26; // how far the traces reach from the chip centre
+  const GAP = 0.4;
+  const paths: P[][] = [];
+  const live = new Set<number>();
+  for (const side of sides) {
+    const [nu, nv] = side.n;
+    const [tu, tv] = side.t;
+    // Where the main route crosses this side (it enters from −v at u = −2 and leaves through +u at v = 0).
+    const keepOut: [number, number] | null = nv === -1 ? [-3.3, -0.7] : nu === 1 ? [-1.3, 1.3] : null;
+    const lean = nv === -1 ? 6 : nu === 1 ? -6 : 0;
+    const centre: P = [
+      side.tips[0][0] - nu * side.reach - tu * side.offsets[0],
+      side.tips[0][1] - nv * side.reach - tv * side.offsets[0],
+    ];
+    const at = (d: number, t: number): P => [centre[0] + nu * d + tu * t, centre[1] + nv * d + tv * t];
+    const used = side.offsets.filter((o) => !keepOut || o < keepOut[0] || o > keepOut[1]);
+    const mid = (used.length - 1) / 2;
+    used.forEach((o, rank) => {
+      const c = lean + (rank - mid) * GAP;
+      const d1 = side.reach + 1.2;
+      const d2 = d1 + Math.abs(c - o);
+      if (Math.round(mid) === rank) live.add(paths.length);
+      paths.push([at(R, c), at(d2, c), at(d1, o), at(side.reach, o)]);
+    });
+  }
+  return { paths, live };
+}
+
+/** Flat strip of constant width along a plan polyline (the stream). */
+function ribbon(path: P[], width: number, y: number) {
+  const a = offsetPolyline(path, -width / 2);
+  const b = offsetPolyline(path, width / 2);
+  const pos: number[] = [];
+  const idx: number[] = [];
+  path.forEach((_, i) => {
+    const pa = plan(a[i][0], a[i][1], y);
+    const pb = plan(b[i][0], b[i][1], y);
+    pos.push(pa.x, pa.y, pa.z, pb.x, pb.y, pb.z);
+    if (i > 0) {
+      const k = i * 2;
+      idx.push(k - 2, k - 1, k, k - 1, k + 1, k);
+    }
+  });
+  const geo = new BufferGeometry();
+  geo.setAttribute('position', new BufferAttribute(new Float32Array(pos), 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
 }

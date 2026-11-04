@@ -431,3 +431,163 @@ export function silos(b: Bucket, u: number, v: number) {
   ];
   for (const [x, z] of spots) b.push(cylinder(0.6, 0.6, 1.1, f.at(x, 0.55, z), 18));
 }
+
+/* ------------------------------------------------------------------ */
+/* Capability stops (trace variant): no asset at risk                  */
+/* ------------------------------------------------------------------ */
+
+type PlanPt = [number, number];
+
+/** One side of the chip: outward normal and tangent in plan (u, v), pin tips in plan. */
+export interface ChipSide {
+  n: PlanPt;
+  t: PlanPt;
+  /** Pin offsets along the tangent, and the matching tip points in plan. */
+  offsets: number[];
+  tips: PlanPt[];
+  /** Distance from the chip centre to the pin tips. */
+  reach: number;
+}
+
+/**
+ * Microchip package lying on the board: stepped body, lid and die, a pin-1
+ * mark, and gull-wing pins on all four sides. Returns the pin tips so the
+ * traces can run into it.
+ */
+export function chip(b: Bucket, u: number, v: number, size = 10, pinsPerSide = 9) {
+  const f = frame(u, v);
+  const half = size / 2;
+  b.push(box(size, 0.9, size, f.at(0, 0.45, 0), f.rot));
+  // Lid and die step up so they cast small dithered shadows on the body.
+  b.push(box(size * 0.64, 0.4, size * 0.64, f.at(0, 1.1, 0), f.rot));
+  b.push(box(size * 0.34, 0.36, size * 0.34, f.at(0, 1.48, 0), f.rot));
+  // Pin-1 mark: a shallow dimple in the top corner.
+  b.push(cylinder(0.32, 0.32, 0.05, f.at(-half + 1.1, 0.92, -half + 1.1), 18));
+
+  const pitch = (size - 2) / (pinsPerSide - 1);
+  const offsets = Array.from({ length: pinsPerSide }, (_, k) => -half + 1 + k * pitch);
+  const reach = half + 1.45;
+  const dirs: [PlanPt, PlanPt][] = [
+    [[1, 0], [0, 1]],
+    [[-1, 0], [0, 1]],
+    [[0, 1], [1, 0]],
+    [[0, -1], [1, 0]],
+  ];
+  const sides: ChipSide[] = dirs.map(([n, t]) => {
+    const alongU = n[0] !== 0; // pins run along u on the ±u sides
+    const tips: PlanPt[] = [];
+    for (const o of offsets) {
+      const at = (d: number, y: number) => f.at(n[0] * d + t[0] * o, y, n[1] * d + t[1] * o);
+      // Arm out of the body, drop, and a foot on the board.
+      b.push(box(alongU ? 0.9 : 0.3, 0.12, alongU ? 0.3 : 0.9, at(half + 0.45, 0.5), f.rot));
+      b.push(box(alongU ? 0.12 : 0.3, 0.5, alongU ? 0.3 : 0.12, at(half + 0.9, 0.27), f.rot));
+      b.push(box(alongU ? 0.6 : 0.3, 0.08, alongU ? 0.3 : 0.6, at(half + 1.15, 0.04), f.rot));
+      tips.push([u + n[0] * reach + t[0] * o, v + n[1] * reach + t[1] * o]);
+    }
+    return { n, t, offsets, tips, reach };
+  });
+  return { anchor: f.at(0, 1.7, 0), sides };
+}
+
+/** Conifer: trunk and a cone crown. */
+export function tree(b: Bucket, u: number, v: number, h = 2.4) {
+  const p = plan(u, v);
+  b.push(cylinder(0.1, 0.12, h * 0.3, new Vector3(p.x, h * 0.15, p.z), 6));
+  b.push(cylinder(0, h * 0.28, h * 0.8, new Vector3(p.x, h * 0.3 + h * 0.4, p.z), 10));
+}
+
+/**
+ * Compliance: a surveyed site. A fenced parcel on a low plinth with a small
+ * plant inside, a dashed buffer line around it with survey posts at the
+ * corners, and a measured setback to a protected stream (the stream itself is
+ * returned as a separate strip so it can take its own material).
+ */
+export function surveyedSite(b: Bucket, u: number, v: number) {
+  const f = frame(u, v);
+  const W = 16;
+  const D = 11;
+  // Parcel plinth
+  b.push(box(W, 0.2, D, f.at(0, 0.1, 0), f.rot));
+
+  // The plant inside: process building, office, tanks, a row of modules.
+  b.push(box(5.2, 2.6, 3.6, f.at(-3.6, 1.5, -1.4), f.rot));
+  b.push(box(1.8, 0.5, 1.4, f.at(-2.6, 3.05, -1.9), f.rot));
+  b.push(box(2.6, 1.6, 2.2, f.at(-4.8, 1.0, 2.9), f.rot));
+  for (const [x, z] of [
+    [2.6, -2.6],
+    [4.6, -2.6],
+    [2.6, -0.4],
+  ]) {
+    b.push(cylinder(0.8, 0.8, 1.9, f.at(x, 1.15, z), 22));
+    b.push(cylinder(0.25, 0.82, 0.25, f.at(x, 2.22, z), 22));
+  }
+  for (let i = 0; i < 6; i++) b.push(box(0.55, 0.45, 2.0, f.at(0.6 + i * 1.0, 0.43, 3.1), f.rot));
+
+  // Perimeter fence on the parcel edge: posts and two rails.
+  const fx = W / 2 - 0.25;
+  const fz = D / 2 - 0.25;
+  const corners = [f.at(-fx, 0, -fz), f.at(fx, 0, -fz), f.at(fx, 0, fz), f.at(-fx, 0, fz)];
+  for (let i = 0; i < 4; i++) {
+    const a = corners[i];
+    const c = corners[(i + 1) % 4];
+    for (const h of [0.6, 1.1]) b.push(beam(new Vector3(a.x, h, a.z), new Vector3(c.x, h, c.z), 0.04));
+    const n = Math.round(a.distanceTo(c) / 1.4);
+    for (let k = 0; k < n; k++) {
+      const p = new Vector3().lerpVectors(a, c, k / n);
+      b.push(box(0.07, 1.2, 0.07, new Vector3(p.x, 0.8, p.z)));
+    }
+  }
+
+  // Buffer line: dashes on the ground, 3.5 units out from the parcel.
+  const bx = W / 2 + 3.5;
+  const bz = D / 2 + 3.5;
+  const ring: [number, number][] = [
+    [-bx, -bz],
+    [bx, -bz],
+    [bx, bz],
+    [-bx, bz],
+  ];
+  for (let i = 0; i < 4; i++) {
+    const [ax, az] = ring[i];
+    const [cx, cz] = ring[(i + 1) % 4];
+    const len = Math.hypot(cx - ax, cz - az);
+    const n = Math.floor(len / 1.2);
+    for (let k = 0; k < n; k++) {
+      const t = (k + 0.5) / n;
+      const x = ax + (cx - ax) * t;
+      const z = az + (cz - az) * t;
+      const alongX = Math.abs(cx - ax) > 0;
+      b.push(box(alongX ? 0.6 : 0.14, 0.04, alongX ? 0.14 : 0.6, f.at(x, 0.02, z), f.rot));
+    }
+  }
+  // Survey posts at the buffer corners: a mast with a square cap.
+  for (const [x, z] of ring) {
+    b.push(box(0.14, 2.4, 0.14, f.at(x, 1.2, z), f.rot));
+    b.push(box(0.42, 0.26, 0.42, f.at(x, 2.5, z), f.rot));
+    b.push(box(0.7, 0.06, 0.7, f.at(x, 0.03, z), f.rot));
+  }
+
+  // Protected stream below the parcel, and the measured setback to it.
+  const streamV = D / 2 + 7.2;
+  const stream: PlanPt[] = [];
+  for (let x = -30; x <= 30; x += 1.5) stream.push([u + x, v + streamV + Math.sin(x * 0.16) * 1.6]);
+  const edgeAt = (x: number) => streamV + Math.sin(x * 0.16) * 1.6 - 0.9;
+  const mx = -bx + 2;
+  const from = f.at(mx, 0.05, D / 2);
+  const to = f.at(mx, 0.05, edgeAt(mx));
+  b.push(beam(from, to, 0.05));
+  for (const p of [from, to]) b.push(box(0.9, 0.05, 0.08, new Vector3(p.x, 0.05, p.z), f.rot));
+
+  // Protected woodland on the far bank.
+  const rand = (() => {
+    let s = 7;
+    return () => ((s = (s * 16807) % 2147483647) / 2147483647);
+  })();
+  for (let k = 0; k < 16; k++) {
+    const x = -14 + k * 1.9 + (rand() - 0.5) * 1.2;
+    const z = streamV + 3 + rand() * 4.5;
+    tree(b, u + x, v + z, 2 + rand() * 1.4);
+  }
+
+  return { anchor: f.at(0, 3, 0), stream, ring: ring.map(([x, z]) => [u + x, v + z] as PlanPt) };
+}

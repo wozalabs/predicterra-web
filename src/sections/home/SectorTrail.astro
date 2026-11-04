@@ -13,7 +13,10 @@ interface Props {
 }
 const { locale = 'en' } = Astro.props;
 const { scene } = getCopy(locale).home;
-const stops = scene.sectors.length; // one stop per sector, no overview
+// One stop per sector, then the capability stops (no overview). Only sectors
+// carry an at-risk asset, a marker and a panel.
+const steps = [...scene.sectors, ...scene.capabilities];
+const stops = steps.length;
 ---
 
 <section
@@ -33,7 +36,7 @@ const stops = scene.sectors.length; // one stop per sector, no overview
         <p class="visually-hidden">{scene.title}. {scene.intro}</p>
       </div>
       {
-        scene.sectors.map((s, i) => (
+        steps.map((s, i) => (
           <article class="step" data-step={i} data-active={i === 0 ? '' : undefined} aria-labelledby={`sector-${s.id}-title`}>
             <div class="step__head">
               <Icon name={s.icon as IconName} boxed size="var(--step-size)" />
@@ -51,8 +54,8 @@ const stops = scene.sectors.length; // one stop per sector, no overview
     <!-- Markers: square dots projected from the 3D anchors. -->
     <div class="sectors__markers" data-markers>
       {
-        scene.sectors.map((s) => (
-          <div class="marker" data-marker={s.id}>
+        scene.sectors.map((s, i) => (
+          <div class="marker" data-marker={s.id} data-index={i}>
             <button
               class="marker__btn"
               type="button"

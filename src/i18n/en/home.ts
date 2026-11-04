@@ -307,6 +307,26 @@ export default {
         },
       },
     ],
+    // Stops after the sectors in the trace (3D variant): capabilities, not exposed
+    // assets, so they have no orange asset, no marker and no panel.
+    capabilities: [
+      {
+        id: 'digital',
+        icon: 'memory',
+        index: '06',
+        title: 'Digitalization',
+        text: 'A living digital twin of your operation. SCADA, GIS, historians, satellite and climate feeds fused into one model your systems can query.',
+        href: routes.sectors.digitalization,
+      },
+      {
+        id: 'compliance',
+        icon: 'verified_user',
+        index: '07',
+        title: 'Compliance',
+        text: 'Prove compliance from one source of truth. CSRD, TCFD and internal resilience reporting drawn from the same live model, in a fraction of the time.',
+        href: routes.sectors.climate,
+      },
+    ],
   },
 
   solutions: {
