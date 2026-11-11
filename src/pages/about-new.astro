@@ -32,6 +32,7 @@ const missionAccent = a.mission.accent.split(' ');
 
 // Woza Labs logo, recoloured to follow the text colour (light on the dark section).
 const wozaLogo = wozaLogoRaw
+  .replace(/<metadata[\s\S]*?<\/metadata>/g, '') // keep the page light: no embedded file metadata
   .replace(/fill="#161616"/g, 'fill="currentColor"')
   .replace('<svg ', '<svg role="img" aria-label="Woza Labs" focusable="false" ');
 
