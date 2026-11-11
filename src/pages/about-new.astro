@@ -6,8 +6,9 @@
  * image frames, grey CTA card), with no eyebrows and every section at least one
  * viewport tall. Like the homepage it mixes a classic reading layout with a few
  * scroll-driven moments: the mission statement lights up word by word, the
- * milestones turn on a dial with each year's text beside it, and the dark Trust
- * section slides over the pinned sovereignty section while the page turns dark.
+ * milestones turn on a dial with each year's text beside it, the sovereignty
+ * points rise out of a 3D landscape one by one (scripts/about-horizon.ts), and
+ * the dark Trust section slides over that pinned scene while the page turns dark.
  * Reduced motion gets the static layout. Not indexed while it is a draft.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -29,6 +30,13 @@ const last = n - 1;
 // Mission statement split in words for the scroll highlight; the payoff in orange.
 const missionHead = a.mission.title.slice(0, a.mission.title.length - a.mission.accent.length).trim().split(' ');
 const missionAccent = a.mission.accent.split(' ');
+
+// Woza card mosaic: a field of squares (the brand's pixel pattern), one of them
+// the orange point. Deterministic, so every build draws the same field.
+const MOSAIC = { cols: 24, rows: 5, point: 34 }; // index 34: visible in both the 24- and 12-column layouts
+let seed = 11;
+const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+const mosaic = Array.from({ length: MOSAIC.cols * MOSAIC.rows }, (_, i) => (i === MOSAIC.point ? -1 : 0.03 + rnd() * rnd() * 0.22));
 
 // Woza Labs logo, recoloured to follow the text colour (light on the dark section).
 const wozaLogo = wozaLogoRaw
@@ -120,25 +128,31 @@ const wozaLogo = wozaLogoRaw
     </div>
   </section>
 
-  <!-- 4–5. The sovereignty section stays pinned while the dark Trust section slides over it -->
+  <!-- 4–5. Sovereignty: a pinned 3D landscape where each point rises as a line
+       with its text, then glides back to the horizon as the next one rises.
+       Without WebGL or with reduced motion: title and rows, pinned while Trust
+       slides over it. -->
   <div class="an-pin">
-    <section class="an-full an-pinned" aria-labelledby="sovereign-title" data-pinned>
-      <div class="container an-full__inner">
-        <NotchRule at={70} />
-        <div class="an-body">
-          <div class="an-grid">
-            <h2 id="sovereign-title" class="t-h2 an-head" data-render>{a.sovereign.title}</h2>
-            <ul class="an-rows" data-reveal-group>
-              {
-                a.sovereign.items.map((it) => (
-                  <li class="an-row an-row--icon" data-reveal>
-                    <Icon name={it.icon as IconName} boxed size="2.75rem" />
-                    <h3 class="an-row__title">{it.title}</h3>
-                    <p class="an-row__text">{it.text}</p>
-                  </li>
-                ))
-              }
-            </ul>
+    <section class="an-full an-pinned an-sov" aria-labelledby="sovereign-title" data-pinned data-sov>
+      <div class="an-sov__stage" data-sov-stage>
+        <canvas class="an-sov__canvas" aria-hidden="true" data-sov-canvas></canvas>
+        <div class="container an-full__inner an-sov__inner">
+          <NotchRule at={70} />
+          <div class="an-body">
+            <div class="an-grid">
+              <h2 id="sovereign-title" class="t-h2 an-head" data-render>{a.sovereign.title}</h2>
+              <ul class="an-rows an-sov__list" data-sov-list>
+                {
+                  a.sovereign.items.map((it) => (
+                    <li class="an-row an-row--icon an-sov__card" data-sov-card>
+                      <Icon name={it.icon as IconName} boxed size="2.75rem" />
+                      <h3 class="an-row__title">{it.title}</h3>
+                      <p class="an-row__text">{it.text}</p>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -237,6 +251,9 @@ const wozaLogo = wozaLogoRaw
     <div class="container an-full__inner">
       <a class="an-woza" href={a.woza.link.href} target="_blank" rel="noopener" data-btn-host data-reveal>
         <div class="an-woza__logo" set:html={wozaLogo} />
+        <div class="an-woza__field" aria-hidden="true">
+          {mosaic.map((o, i) => (o < 0 ? <span class="is-point" /> : <span style={`--o:${o.toFixed(3)}`} />))}
+        </div>
         <h2 id="woza-title" class="an-woza__title">{a.woza.title}</h2>
         <div class="an-woza__side">
           <p class="an-woza__text">{a.woza.text}</p>
@@ -745,6 +762,103 @@ const wozaLogo = wozaLogoRaw
     grid-area: text;
   }
 
+  /* ---------- Sovereignty in 3D (.is-3d, set by the script) ----------
+     The section becomes as tall as its scroll; the stage sticks; the landscape
+     fills it; the title stays top left; each point's card is placed by the
+     script at the top of its line. Trust then slides over the stuck stage. */
+  .an-sov__canvas {
+    display: none;
+  }
+
+  .an-sov.is-3d {
+    position: relative;
+    top: auto;
+    display: block;
+    min-height: 0;
+  }
+
+  .an-sov.is-3d .an-sov__stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+  }
+
+  .an-sov.is-3d .an-sov__canvas {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Static, so the cards' list is positioned against the stage (the scene's frame). */
+  .an-sov.is-3d .an-sov__inner {
+    position: static;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .an-sov.is-3d .an-head {
+    position: relative;
+    z-index: 1;
+  }
+
+  .an-sov.is-3d .an-body {
+    align-content: start;
+  }
+
+  .an-sov.is-3d .an-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .an-sov.is-3d .an-head {
+    max-width: 22ch;
+  }
+
+  .an-sov.is-3d .an-sov__list {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .an-sov.is-3d .an-sov__card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: min(23rem, 68vw);
+    padding: 0.875rem 1rem 1rem;
+    border: 0;
+    background: rgb(var(--canvas-rgb) / 0.9);
+    transform-origin: 0 0;
+    visibility: hidden;
+    will-change: transform, opacity;
+  }
+
+  /* The card sits just right of the top of its line; a small orange square marks the point. */
+  .an-sov.is-3d .an-sov__card::after {
+    content: '';
+    position: absolute;
+    left: -18px;
+    bottom: -4px;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+  }
+
+  .an-sov.is-3d .an-sov__card[data-side='left']::after {
+    left: auto;
+    right: -18px;
+  }
+
+  .an-sov.is-3d .an-sov__card[data-side='clamp']::after {
+    display: none;
+  }
+
+  .an-sov.is-3d + .an-trust {
+    margin-top: -100svh;
+  }
+
   /* ---------- Pinned section + Trust slides over (homepage Solutions pattern) ---------- */
   .an-pin {
     position: relative;
@@ -901,8 +1015,8 @@ const wozaLogo = wozaLogoRaw
   .an-woza {
     flex: 1;
     display: grid;
-    grid-template-areas: 'logo' 'title' 'side';
-    grid-template-rows: auto 1fr auto;
+    grid-template-areas: 'logo' 'field' 'title' 'side';
+    grid-template-rows: auto 1fr auto auto;
     gap: clamp(1.5rem, 1rem + 2vw, 3rem);
     padding: clamp(1.5rem, 1rem + 3vw, 4rem);
     background: var(--surface);
@@ -915,8 +1029,8 @@ const wozaLogo = wozaLogoRaw
   @media (min-width: 64rem) {
     .an-woza {
       grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
-      grid-template-areas: 'logo .' 'title side';
-      grid-template-rows: 1fr auto;
+      grid-template-areas: 'logo logo' 'field field' 'title side';
+      grid-template-rows: auto 1fr auto;
       column-gap: clamp(2.5rem, 1rem + 5vw, 7.5rem);
     }
   }
@@ -931,6 +1045,62 @@ const wozaLogo = wozaLogoRaw
   .an-woza:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: -6px;
+  }
+
+  /* Field of squares across the middle of the card, fading at the edges, with
+     the orange point glowing on it (the homepage/LinkedIn pixel motif). */
+  .an-woza__field {
+    grid-area: field;
+    align-self: center;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(4px, 0.25rem + 0.3vw, 8px);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  }
+
+  .an-woza__field span {
+    aspect-ratio: 1;
+    background: rgb(241 241 241 / var(--o, 0.06));
+    transition: background-color 400ms ease;
+  }
+
+  /* Phones: half the columns. */
+  .an-woza__field span:nth-child(n + 61) {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .an-woza__field {
+      grid-template-columns: repeat(24, minmax(0, 1fr));
+    }
+    .an-woza__field span:nth-child(n + 61) {
+      display: block;
+    }
+  }
+
+  .an-woza__field .is-point {
+    position: relative;
+    background: var(--accent);
+    box-shadow: 0 0 2.5rem 0.25rem rgb(255 55 0 / 0.45);
+  }
+
+  /* The corner mark of the logo, in white, on the point. */
+  .an-woza__field .is-point::after {
+    content: '';
+    position: absolute;
+    left: 18%;
+    top: 18%;
+    width: 26%;
+    height: 26%;
+    border-left: 3px solid #fff;
+    border-top: 3px solid #fff;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .an-woza:hover .an-woza__field span:not(.is-point) {
+      background: rgb(241 241 241 / calc(var(--o, 0.06) + 0.04));
+    }
   }
 
   .an-woza__logo {
@@ -1096,12 +1266,65 @@ const wozaLogo = wozaLogoRaw
 
   // The sovereignty section sticks when its bottom meets the bottom of the
   // viewport, so Trust slides over it instead of pushing it away.
-  const pinned = document.querySelector<HTMLElement>('[data-pinned]');
+  const pinned = document.querySelector<HTMLElement>('[data-pinned]:not(.is-3d)');
   if (pinned) {
     const setTop = () => pinned.style.setProperty('--pin-top', `${Math.min(0, window.innerHeight - pinned.offsetHeight)}px`);
     setTop();
     new ResizeObserver(setTop).observe(pinned);
     window.addEventListener('resize', setTop, { passive: true });
+  }
+
+  // Sovereignty: the 3D landscape (lazy, only with WebGL and motion allowed).
+  const sov = document.querySelector<HTMLElement>('[data-sov]');
+  const hasGL = (() => {
+    try {
+      return !!document.createElement('canvas').getContext('webgl2');
+    } catch {
+      return false;
+    }
+  })();
+  if (sov && hasGL && !reduce) {
+    const stage = sov.querySelector<HTMLElement>('[data-sov-stage]')!;
+    const canvas = sov.querySelector<HTMLCanvasElement>('[data-sov-canvas]')!;
+    const cards = Array.from(sov.querySelectorAll<HTMLElement>('[data-sov-card]'));
+    const n = cards.length;
+    const DWELL = 0.35;
+    const SEGMENTS = n - 1 + 0.6;
+    sov.classList.add('is-3d');
+
+    const size = () => {
+      const vh = window.innerHeight;
+      // Scroll for the points, then one more screen while Trust slides over.
+      sov.style.height = `${vh * (1 + SEGMENTS * 0.85) + vh}px`;
+    };
+    size();
+
+    // Point position from the scroll: the first one rises as the section pins,
+    // each one rests, then the next rises while the previous glides back.
+    const position = () => {
+      const vh = window.innerHeight;
+      const travel = sov.offsetHeight - 2 * vh;
+      const p = clamp01(-sov.getBoundingClientRect().top / Math.max(1, travel));
+      const raw = p * (SEGMENTS + 0.5) - 0.5;
+      if (raw < 0) return raw;
+      const k = Math.min(n - 1, Math.floor(raw));
+      return k >= n - 1 ? n - 1 : k + smooth(clamp01((raw - k - DWELL) / (1 - DWELL)));
+    };
+
+    import('../scripts/about-horizon').then(({ createHorizon }) => {
+      let horizon: ReturnType<typeof createHorizon>;
+      try {
+        horizon = createHorizon(canvas, stage, cards);
+      } catch {
+        sov.classList.remove('is-3d');
+        sov.style.height = '';
+        return;
+      }
+      const draw = () => horizon.render(position());
+      window.addEventListener('resize', () => (size(), horizon.resize(), draw()), { passive: true });
+      draw();
+      whileNear(sov, draw, '10% 0px');
+    });
   }
 
   if (!reduce) {
