@@ -138,7 +138,7 @@ const stops = steps.length;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: linear-gradient(90deg, rgb(240 240 240 / 0.92) 0%, rgb(240 240 240 / 0.7) 24%, rgb(240 240 240 / 0) 42%);
+    background: linear-gradient(90deg, rgb(var(--canvas-rgb) / 0.92) 0%, rgb(var(--canvas-rgb) / 0.7) 24%, rgb(var(--canvas-rgb) / 0) 42%);
   }
 
   .sectors__canvas {
@@ -344,7 +344,7 @@ const stops = steps.length;
   /* ---------- Small screens ---------- */
   @media (max-width: 47.99rem) {
     .sectors__stage::before {
-      background: linear-gradient(180deg, rgb(240 240 240 / 0.94) 0%, rgb(240 240 240 / 0.8) 26%, rgb(240 240 240 / 0) 42%);
+      background: linear-gradient(180deg, rgb(var(--canvas-rgb) / 0.94) 0%, rgb(var(--canvas-rgb) / 0.8) 26%, rgb(var(--canvas-rgb) / 0) 42%);
     }
     .step {
       top: calc(var(--header-h) + 3rem);

@@ -97,12 +97,12 @@ export function createTrailWorld(
   const dpr = Math.min(window.devicePixelRatio || 1, opts.lowPower ? 1.5 : 2);
   renderer.setPixelRatio(dpr);
   renderer.outputColorSpace = SRGBColorSpace;
-  renderer.setClearColor(new Color('#F0F0F0'), 1);
+  renderer.setClearColor(new Color('#FAFAFA'), 1);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
 
   const scene = new Scene();
-  scene.background = new Color('#F0F0F0');
+  scene.background = new Color('#FAFAFA');
 
   /* ---------------- Trace geometry (plan space) ---------------- */
   const stopsPlan: P[] = Array.from({ length: STOPS }, (_, i) => [i * HOP_DU, i * HOP_DV]);

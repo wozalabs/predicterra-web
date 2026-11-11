@@ -27,7 +27,7 @@ import { cable, oilGas, rotorGeometry, solarPlant, substation, tower, windTurbin
 import { createGroundMaterial } from './materials';
 import type { SectorId } from './world';
 
-const BG = '#F0F0F0';
+const BG = '#FAFAFA';
 const AZ = (45 * Math.PI) / 180;
 const EL = (26 * Math.PI) / 180;
 const TURN_SPEED = 0.25; // rad/s

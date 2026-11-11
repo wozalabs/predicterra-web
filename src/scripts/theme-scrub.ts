@@ -16,6 +16,9 @@ export function mountThemeScrub() {
   // Next rendered section (skip inline <script> tags Astro may place in between).
   let next = dark.nextElementSibling as HTMLElement | null;
   while (next && next.tagName !== 'SECTION') next = next.nextElementSibling as HTMLElement | null;
+  // When the dark section is the last child of a wrapper (About: pinned pair), the
+  // section that brings the light back is marked explicitly.
+  if (!next) next = document.querySelector<HTMLElement>('[data-theme-next]');
   const scrubbed = Array.from(document.querySelectorAll<HTMLElement>('.theme-scrub'));
 
   let raf = 0;

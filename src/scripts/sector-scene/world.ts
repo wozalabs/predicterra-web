@@ -85,12 +85,12 @@ export function createWorld(
   const dpr = Math.min(window.devicePixelRatio || 1, opts.lowPower ? 1.5 : 2);
   renderer.setPixelRatio(dpr);
   renderer.outputColorSpace = SRGBColorSpace;
-  renderer.setClearColor(new Color('#F0F0F0'), 1);
+  renderer.setClearColor(new Color('#FAFAFA'), 1);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
 
   const scene = new Scene();
-  scene.background = new Color('#F0F0F0');
+  scene.background = new Color('#FAFAFA');
 
   /* ---------------- Lights ---------------- */
   scene.add(new HemisphereLight(0xffffff, 0xc4c4c4, 2.0));

@@ -24,7 +24,7 @@ export function createGroundMaterial(opts: { pixel: number }) {
     UniformsLib.lights,
     UniformsLib.fog,
     {
-      uBase: { value: new Color('#F0F0F0') },
+      uBase: { value: new Color('#FAFAFA') },
       uGridDot: { value: new Color('#C9C9C9') },
       uShadow: { value: new Color('#A7A7A7') },
       uAccent: { value: new Color('#FF3700') },
@@ -125,7 +125,7 @@ export function createFlowMaterial() {
     depthWrite: false,
     uniforms: {
       uColor: { value: new Color('#FF3700') },
-      uBase: { value: new Color('#F0F0F0') },
+      uBase: { value: new Color('#FAFAFA') },
       uTime: { value: 0 },
       uSpeed: { value: 6 },
       uPeriod: { value: 14 },

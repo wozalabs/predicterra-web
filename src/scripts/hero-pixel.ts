@@ -51,7 +51,7 @@ export function mountHeroPixel(root: HTMLElement) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
   const styles = getComputedStyle(document.documentElement);
-  const lightColor = styles.getPropertyValue('--canvas').trim() || '#f0f0f0';
+  const lightColor = styles.getPropertyValue('--canvas').trim() || '#fafafa';
   const fontFamily = styles.getPropertyValue('--font-sans').trim() || 'sans-serif';
 
   root.classList.add('hpx--live');

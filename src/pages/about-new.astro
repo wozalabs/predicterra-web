@@ -3,8 +3,12 @@
  * About, new draft (/about-new). Content from the "predicterra-about.md" brief,
  * laid out in the site's current design language so it can be compared with
  * /about. The brief's visual notes are interpreted, not copied:
- * light canvas, notched rules, 4 : 8 grid, notched image frames, one dark
- * section (Trust), the grey CTA card. Not indexed while it is a draft.
+ * light canvas, notched rules, 4 : 8 grid, notched image frames, the grey CTA
+ * card. Like the homepage it mixes a classic reading layout with a few
+ * scroll-driven moments: the mission statement lights up word by word, the
+ * milestones pin and run sideways, and the dark Trust section slides over the
+ * pinned Independent section while the page theme turns dark. Reduced motion
+ * gets the static layout. Not indexed while it is a draft.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import NotchRule from '../components/NotchRule.astro';
@@ -20,6 +24,9 @@ const locale = 'en';
 const { aboutNew: a } = getCopy(locale);
 const pad = (n: number) => String(n).padStart(2, '0');
 const last = a.milestones.items.length - 1;
+const missionWords = a.mission.title.split(' ');
+// The payoff of the statement, in orange (one accent per statement).
+const missionAccentFrom = missionWords.length - 2;
 ---
 
 <BaseLayout title={a.seo.title} description={a.seo.description} locale={locale} noindex>
@@ -28,6 +35,7 @@ const last = a.milestones.items.length - 1;
   <div class="container">
     <figure class="an-hero-media" data-reveal>
       <img
+        data-parallax
         src={withBase(a.hero.photo.src)}
         alt={a.hero.photo.alt}
         width={a.hero.photo.w}
@@ -43,7 +51,9 @@ const last = a.milestones.items.length - 1;
     <div class="container">
       <NotchRule at={70} />
       <p class="label an-label">{a.mission.label}</p>
-      <h2 id="mission-title" class="an-statement" data-render>{a.mission.title}</h2>
+      <h2 id="mission-title" class="an-statement" data-lit>
+        {missionWords.map((w, i) => <span class:list={['w', i >= missionAccentFrom && 'accent']}>{w} </span>)}
+      </h2>
       <div class="an-grid an-grid--tight">
         <div aria-hidden="true"></div>
         <div class="an-mission" data-reveal-group>
@@ -76,27 +86,49 @@ const last = a.milestones.items.length - 1;
     </div>
   </section>
 
-  <!-- 4. Milestones -->
-  <section class="an-sec" aria-labelledby="milestones-title">
-    <div class="container">
-      <NotchRule at={70} />
-      <div class="an-grid">
-        <div class="an-head">
-          <p class="label">{a.milestones.label}</p>
-          <h2 id="milestones-title" class="t-h2" data-render>{a.milestones.title}</h2>
+  <!-- 4. Milestones: pinned, one year at a time, moving sideways with the scroll -->
+  <section class="an-ms" aria-labelledby="milestones-title" data-ms style={`--n:${a.milestones.items.length}`}>
+    <div class="an-ms__stage" data-ms-stage>
+      <div class="container an-ms__head">
+        <NotchRule at={70} />
+        <div class="an-grid">
+          <div class="an-head">
+            <p class="label">{a.milestones.label}</p>
+            <h2 id="milestones-title" class="t-h2" data-render>{a.milestones.title}</h2>
+          </div>
         </div>
       </div>
-      <ol class="an-time" data-reveal-group>
-        {
-          a.milestones.items.map((m, i) => (
-            <li class:list={['an-time__item', i === last && 'is-last']} data-reveal>
-              <span class="an-time__node" aria-hidden="true" />
-              <p class="an-time__year t-num">{m.year}</p>
-              <p class="an-time__text t-small">{m.text}</p>
-            </li>
-          ))
-        }
-      </ol>
+
+      <div class="container an-ms__viewport" data-ms-viewport>
+        <ol class="an-ms__track" data-ms-track>
+          {
+            a.milestones.items.map((m, i) => (
+              <li class:list={['an-ms__panel', i === last && 'is-last']} data-ms-panel>
+                <span class="an-ms__node" aria-hidden="true" />
+                <p class="an-ms__year t-num">{m.year}</p>
+                <p class="an-ms__text">{m.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <div class="container an-ms__rail" aria-hidden="true">
+        <div class="an-ms__line">
+          <span class="an-ms__fill" data-ms-fill />
+          <span class="an-ms__fill an-ms__fill--last" data-ms-fill-last />
+        </div>
+        <ol class="an-ms__ticks">
+          {
+            a.milestones.items.map((m, i) => (
+              <li class:list={['an-ms__tick', i === last && 'is-last']} style={`--i:${i}`} data-ms-tick>
+                <span class="an-ms__tick-node" />
+                <span class="an-ms__tick-year t-num">{m.year}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
     </div>
   </section>
 
@@ -125,8 +157,9 @@ const last = a.milestones.items.length - 1;
     </div>
   </section>
 
-  <!-- 6. Independent -->
-  <section class="an-sec" aria-labelledby="independent-title">
+  <!-- 6–7. Independent stays pinned while the dark Trust section slides over it -->
+  <div class="an-pin">
+  <section class="an-sec an-pinned" aria-labelledby="independent-title" data-pinned>
     <div class="container">
       <NotchRule at={70} />
       <div class="an-grid">
@@ -151,8 +184,8 @@ const last = a.milestones.items.length - 1;
     </div>
   </section>
 
-  <!-- 7. Trust (dark) -->
-  <section class="an-trust theme-dark" aria-labelledby="trust-title" data-header-dark>
+  <!-- 7. Trust: dark, scrubbed from light to dark as it covers the pinned section -->
+  <section class="an-trust theme-scrub" aria-labelledby="trust-title" data-theme-dark data-header-dark="scrub">
     <div class="container an-trust__inner">
       <div class="an-grid">
         <div class="an-head">
@@ -177,9 +210,10 @@ const last = a.milestones.items.length - 1;
       </ul>
     </div>
   </section>
+  </div>
 
-  <!-- 8. Recognition -->
-  <section class="an-sec an-sec--first" aria-labelledby="recognition-title">
+  <!-- 8. Recognition: scrubbed back from dark to light as it comes in -->
+  <section class="an-sec an-sec--first an-recog theme-scrub" aria-labelledby="recognition-title" data-theme-next>
     <div class="container">
       <div class="an-grid">
         <div class="an-head">
@@ -379,8 +413,13 @@ const last = a.milestones.items.length - 1;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Brief: photo treated in grey. */
-    filter: grayscale(1) contrast(1.05);
+  }
+
+  /* Slow drift while the photo scrolls past (scripts below); never with reduced motion. */
+  .an-hero-media.is-parallax img {
+    height: 116%;
+    transform: translate3d(0, var(--py, 0px), 0);
+    will-change: transform;
   }
 
   /* ---------- Mission ---------- */
@@ -393,6 +432,11 @@ const last = a.milestones.items.length - 1;
     text-wrap: balance;
   }
 
+  :global(.lit-on) .an-statement .w {
+    opacity: var(--o, 0.16);
+    transition: opacity 200ms linear;
+  }
+
   .an-mission {
     display: grid;
     gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
@@ -403,7 +447,7 @@ const last = a.milestones.items.length - 1;
     gap: 0.875rem;
     max-width: 40rem;
     padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
-    background: var(--surface);
+    background: var(--card);
   }
 
   .an-dfn__text dfn {
@@ -431,15 +475,23 @@ const last = a.milestones.items.length - 1;
     color: var(--ink-2);
   }
 
-  /* ---------- Milestones ---------- */
-  .an-time {
+  /* ---------- Milestones ----------
+   Static by default (no JS, reduced motion): a vertical list on phones and a
+   five-column timeline on wide screens. With JS, .is-pinned turns it into a
+   sticky stage whose track moves sideways with the scroll, one year per screen. */
+  .an-ms {
     --node: 0.625rem;
+    position: relative;
+    padding-bottom: var(--section-y);
+  }
+
+  .an-ms__track {
     display: grid;
     gap: 0 var(--gutter);
     margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
   }
 
-  .an-time__item {
+  .an-ms__panel {
     position: relative;
     display: grid;
     align-content: start;
@@ -448,7 +500,7 @@ const last = a.milestones.items.length - 1;
   }
 
   /* The line: vertical on small screens, horizontal from 64rem. */
-  .an-time__item::before {
+  .an-ms__panel::before {
     content: '';
     position: absolute;
     left: calc(var(--node) / 2 - 0.5px);
@@ -458,7 +510,7 @@ const last = a.milestones.items.length - 1;
     background: var(--line-strong);
   }
 
-  .an-time__node {
+  .an-ms__node {
     position: absolute;
     left: 0;
     top: 0.25rem;
@@ -467,35 +519,37 @@ const last = a.milestones.items.length - 1;
     background: var(--ink);
   }
 
-  .an-time__item.is-last::before {
+  .an-ms__panel.is-last::before,
+  .an-ms__panel.is-last .an-ms__node {
     background: var(--accent);
   }
 
-  .an-time__item.is-last .an-time__node {
-    background: var(--accent);
-  }
-
-  .an-time__year {
+  .an-ms__year {
     font-size: var(--fs-h2);
     line-height: 0.9;
     letter-spacing: var(--track-display);
   }
 
-  .an-time__text {
+  .an-ms__text {
     max-width: 30ch;
+    font-size: var(--fs-small);
     color: var(--ink-2);
   }
 
+  .an-ms__rail {
+    display: none;
+  }
+
   @media (min-width: 64rem) {
-    .an-time {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+    .an-ms:not(.is-pinned) .an-ms__track {
+      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
     }
 
-    .an-time__item {
+    .an-ms:not(.is-pinned) .an-ms__panel {
       padding: 2.25rem 0 0;
     }
 
-    .an-time__item::before {
+    .an-ms:not(.is-pinned) .an-ms__panel::before {
       left: 0;
       right: calc(-1 * var(--gutter));
       top: calc(var(--node) / 2 - 0.5px);
@@ -504,14 +558,181 @@ const last = a.milestones.items.length - 1;
       height: 1px;
     }
 
-    .an-time__item.is-last::before {
+    .an-ms:not(.is-pinned) .an-ms__panel.is-last::before {
       right: 0;
       height: 2px;
     }
 
-    .an-time__node {
+    .an-ms:not(.is-pinned) .an-ms__node {
       top: 0;
     }
+  }
+
+  /* Pinned: the section is as tall as its scroll distance (set by the script);
+     the stage sticks for that distance and the track slides. */
+  .an-ms.is-pinned {
+    padding-bottom: 0;
+  }
+
+  .an-ms.is-pinned .an-ms__stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100svh;
+    overflow: clip;
+    padding-top: calc(var(--header-h) + 0.5rem);
+    padding-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+
+  .an-ms.is-pinned .an-ms__viewport {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-height: 0;
+    /* Clip to the content box, so only the current year shows, never the next one peeking in the gutter. */
+    clip-path: inset(0 var(--gutter));
+  }
+
+  .an-ms.is-pinned .an-ms__track {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    gap: 0;
+    will-change: transform;
+  }
+
+  .an-ms.is-pinned .an-ms__panel {
+    flex: 0 0 100%;
+    display: grid;
+    align-items: end;
+    gap: 1.5rem var(--gutter);
+    padding: 0;
+  }
+
+  .an-ms.is-pinned .an-ms__panel::before,
+  .an-ms.is-pinned .an-ms__node {
+    display: none;
+  }
+
+  .an-ms.is-pinned .an-ms__year {
+    font-size: clamp(6rem, 2.5rem + 17vw, 19rem);
+    line-height: 0.8;
+    letter-spacing: -0.06em;
+  }
+
+  .an-ms.is-pinned .an-ms__panel.is-last .an-ms__year {
+    color: var(--accent);
+  }
+
+  .an-ms.is-pinned .an-ms__text {
+    max-width: 34ch;
+    font-size: var(--fs-h4);
+    line-height: 1.35;
+    letter-spacing: var(--track-title);
+    color: var(--ink);
+    /* Fades in as its year settles (set by the script). */
+    opacity: var(--t, 1);
+  }
+
+  @media (min-width: 64rem) {
+    .an-ms.is-pinned .an-ms__panel {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+    .an-ms.is-pinned .an-ms__text {
+      padding-bottom: 0.75rem;
+    }
+  }
+
+  /* Rail: every year on one line, progress filled up to the current one; the
+     last segment and node are orange. */
+  .an-ms.is-pinned .an-ms__rail {
+    display: block;
+    position: relative;
+    padding-top: 1.25rem;
+  }
+
+  .an-ms__line {
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    top: calc(1.25rem + var(--node) / 2);
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      var(--line-strong) calc((var(--n) - 2) / (var(--n) - 1) * 100%),
+      rgb(255 55 0 / 0.3) 0
+    );
+  }
+
+  .an-ms__fill {
+    position: absolute;
+    left: 0;
+    top: -0.5px;
+    height: 2px;
+    width: calc((var(--n) - 2) / (var(--n) - 1) * 100%);
+    background: var(--ink);
+    transform-origin: left center;
+    transform: scaleX(var(--fa, 0));
+  }
+
+  .an-ms__fill--last {
+    left: calc((var(--n) - 2) / (var(--n) - 1) * 100%);
+    width: calc(100% / (var(--n) - 1));
+    background: var(--accent);
+    transform: scaleX(var(--fb, 0));
+  }
+
+  .an-ms__ticks {
+    position: relative;
+    height: 2.75rem;
+  }
+
+  .an-ms__tick {
+    position: absolute;
+    left: calc(var(--i) / (var(--n) - 1) * 100%);
+    top: 0;
+    display: grid;
+    justify-items: start;
+    gap: 0.625rem;
+  }
+
+  .an-ms__tick:last-child {
+    justify-items: end;
+    transform: translateX(-100%);
+  }
+
+  .an-ms__tick:last-child .an-ms__tick-node {
+    margin-left: auto;
+  }
+
+  .an-ms__tick-node {
+    width: var(--node);
+    height: var(--node);
+    background: var(--canvas);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition:
+      background-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .an-ms__tick-year {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    transition: color 200ms ease;
+  }
+
+  .an-ms__tick.is-on .an-ms__tick-node {
+    background: var(--ink);
+    box-shadow: none;
+  }
+
+  .an-ms__tick.is-on .an-ms__tick-year {
+    color: var(--ink);
+  }
+
+  .an-ms__tick.is-last.is-on .an-ms__tick-node {
+    background: var(--accent);
   }
 
   /* ---------- Rows (Europe, Independent, Trust) ---------- */
@@ -595,14 +816,36 @@ const last = a.milestones.items.length - 1;
     grid-area: text;
   }
 
-  /* ---------- Trust (dark) ---------- */
+  /* ---------- Independent pinned, Trust slides over (homepage Solutions pattern) ---------- */
+  .an-pin {
+    position: relative;
+  }
+
+  /* Sticks once its bottom reaches the bottom of the viewport (top set by the script). */
+  .an-pinned {
+    position: sticky;
+    top: var(--pin-top, 0px);
+    z-index: var(--z-stage);
+    background: var(--canvas);
+  }
+
   .an-trust {
     position: relative;
-    background: var(--grey-700);
+    z-index: var(--z-cover);
+    box-shadow: 0 -24px 48px -24px rgb(30 30 30 / 0.14);
+  }
+
+  .an-recog {
+    position: relative;
+    z-index: var(--z-cover);
   }
 
   .an-trust__inner {
-    padding-block: var(--section-y);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100svh;
+    padding-block: calc(var(--header-h) + 2rem) var(--section-y);
   }
 
   .an-seals {
@@ -643,7 +886,7 @@ const last = a.milestones.items.length - 1;
     grid-template-rows: auto 1fr;
     gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
     padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
-    background: var(--surface);
+    background: var(--card);
   }
 
   .an-card__brand {
@@ -657,7 +900,7 @@ const last = a.milestones.items.length - 1;
     width: auto;
     height: var(--h);
     max-width: 100%;
-    filter: brightness(0);
+    filter: brightness(0) invert(var(--dt, 0));
     opacity: 0.7;
   }
 
@@ -723,12 +966,11 @@ const last = a.milestones.items.length - 1;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
   }
 
-  /* Brief: black and white portraits. Multiply takes the white cut-out to the frame grey. */
+  /* Portraits are cut out on white: multiply takes the white to the frame grey. Always in colour. */
   .an-person__photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: grayscale(1);
     mix-blend-mode: multiply;
   }
 
@@ -756,7 +998,7 @@ const last = a.milestones.items.length - 1;
     display: grid;
     gap: 2rem var(--gutter);
     padding: clamp(1.5rem, 1rem + 2vw, 3rem);
-    background: var(--surface);
+    background: var(--card);
   }
 
   @media (min-width: 64rem) {
@@ -879,3 +1121,114 @@ const last = a.milestones.items.length - 1;
     transform: translateY(-50%);
   }
 </style>
+
+<script>
+  import { mountThemeScrub } from '../scripts/theme-scrub';
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+  const smooth = (t: number) => t * t * (3 - 2 * t);
+
+  /** Calls `fn` on scroll (one rAF per frame) only while `el` is near the viewport. */
+  function whileNear(el: Element, fn: () => void, margin = '25% 0px') {
+    let raf = 0;
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(() => ((raf = 0), fn()));
+    };
+    new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          window.addEventListener('scroll', onScroll, { passive: true });
+          fn();
+        } else window.removeEventListener('scroll', onScroll);
+      },
+      { rootMargin: margin },
+    ).observe(el);
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+
+  // Dark Trust section: light → dark → light, like the homepage.
+  mountThemeScrub();
+
+  // Independent sticks when its bottom meets the bottom of the viewport, so
+  // Trust slides over it instead of pushing it away.
+  const pinned = document.querySelector<HTMLElement>('[data-pinned]');
+  if (pinned) {
+    const setTop = () => pinned.style.setProperty('--pin-top', `${Math.min(0, window.innerHeight - pinned.offsetHeight)}px`);
+    setTop();
+    new ResizeObserver(setTop).observe(pinned);
+    window.addEventListener('resize', setTop, { passive: true });
+  }
+
+  if (!reduce) {
+    // Hero photo: slow drift inside its frame.
+    const fig = document.querySelector<HTMLElement>('.an-hero-media');
+    const img = fig?.querySelector<HTMLElement>('[data-parallax]');
+    if (fig && img) {
+      fig.classList.add('is-parallax');
+      whileNear(fig, () => {
+        const r = fig.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const p = clamp01((vh - r.top) / (vh + r.height));
+        img.style.setProperty('--py', `${(-p * 0.14 * r.height).toFixed(1)}px`);
+      });
+    }
+
+    // Mission statement: lit word by word as it scrolls in (homepage claim pattern).
+    const lit = document.querySelector<HTMLElement>('[data-lit]');
+    if (lit) {
+      const words = Array.from(lit.querySelectorAll<HTMLElement>('.w'));
+      lit.parentElement?.classList.add('lit-on');
+      whileNear(lit, () => {
+        const vh = window.innerHeight;
+        const top = lit.getBoundingClientRect().top;
+        const p = clamp01((vh * 0.92 - top) / (vh * 0.92 - vh * 0.45));
+        const on = p * words.length;
+        words.forEach((w, i) => w.style.setProperty('--o', Math.min(1, Math.max(0.16, on - i + 0.16)).toFixed(3)));
+      });
+    }
+
+    // Milestones: the stage pins and the years run sideways, one per screen.
+    const ms = document.querySelector<HTMLElement>('[data-ms]');
+    const track = ms?.querySelector<HTMLElement>('[data-ms-track]');
+    const viewport = ms?.querySelector<HTMLElement>('[data-ms-viewport]');
+    if (ms && track && viewport) {
+      const panels = Array.from(track.querySelectorAll<HTMLElement>('[data-ms-panel]'));
+      const ticks = Array.from(ms.querySelectorAll<HTMLElement>('[data-ms-tick]'));
+      const fillA = ms.querySelector<HTMLElement>('[data-ms-fill]');
+      const fillB = ms.querySelector<HTMLElement>('[data-ms-fill-last]');
+      const n = panels.length;
+      // Each year rests for the first part of its scroll segment, then slides on.
+      const DWELL = 0.3;
+      const SEGMENTS = n - 1 + 0.6; // extra rest on the last year before the page moves on
+      let seg = 0;
+
+      ms.classList.add('is-pinned');
+
+      const size = () => {
+        seg = window.innerHeight * 0.85;
+        ms.style.height = `${window.innerHeight + SEGMENTS * seg}px`;
+      };
+
+      const update = () => {
+        const travel = ms.offsetHeight - window.innerHeight;
+        const p = clamp01(-ms.getBoundingClientRect().top / Math.max(1, travel));
+        const raw = p * SEGMENTS;
+        const k = Math.min(n - 1, Math.floor(raw));
+        const pos = k >= n - 1 ? n - 1 : k + smooth(clamp01((raw - k - DWELL) / (1 - DWELL)));
+        const w = panels[0].offsetWidth; // content width (the viewport's clientWidth includes its padding)
+        track.style.transform = `translate3d(${(-pos * w).toFixed(1)}px, 0, 0)`;
+        panels.forEach((el, i) => el.style.setProperty('--t', clamp01(1 - Math.abs(pos - i) * 2.2).toFixed(3)));
+        fillA?.style.setProperty('--fa', clamp01(pos / Math.max(1, n - 2)).toFixed(4));
+        fillB?.style.setProperty('--fb', clamp01(pos - (n - 2)).toFixed(4));
+        const current = Math.round(pos);
+        ticks.forEach((t, i) => t.classList.toggle('is-on', i <= current));
+      };
+
+      size();
+      update();
+      window.addEventListener('resize', () => (size(), update()), { passive: true });
+      whileNear(ms, update, '10% 0px');
+    }
+  }
+</script>
