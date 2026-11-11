@@ -36,10 +36,6 @@ const wozaLogo = wozaLogoRaw
   .replace(/fill="#161616"/g, 'fill="currentColor"')
   .replace('<svg ', '<svg role="img" aria-label="Woza Labs" focusable="false" ');
 
-// OpenStreetMap embed around the office, with a marker on it.
-const { lat, lon } = a.where.map;
-const d = { lon: 0.009, lat: 0.0035 };
-const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d.lon}%2C${lat - d.lat}%2C${lon + d.lon}%2C${lat + d.lat}&layer=mapnik&marker=${lat}%2C${lon}`;
 ---
 
 <BaseLayout title={a.seo.title} description={a.seo.description} locale={locale} noindex>
@@ -236,23 +232,21 @@ const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d.l
     </div>
   </section>
 
-  <!-- 8. Built by Woza: dark -->
+  <!-- 8. Built by Woza: dark; the whole card is the link to wozalabs.com -->
   <section class="an-full an-woza-sec theme-dark" aria-labelledby="woza-title" data-header-dark>
     <div class="container an-full__inner">
-      <div class="an-woza" data-reveal>
-        <div class="an-woza__body">
-          <h2 id="woza-title" class="an-woza__title">{a.woza.title}</h2>
-          <p class="an-lead">{a.woza.text}</p>
-          <div class="an-woza__action">
-            <Button href={a.woza.link.href} label={a.woza.link.label} variant="secondary" external />
-          </div>
-        </div>
+      <a class="an-woza" href={a.woza.link.href} target="_blank" rel="noopener" data-btn-host data-reveal>
         <div class="an-woza__logo" set:html={wozaLogo} />
-      </div>
+        <h2 id="woza-title" class="an-woza__title">{a.woza.title}</h2>
+        <div class="an-woza__side">
+          <p class="an-woza__text">{a.woza.text}</p>
+          <Button label={a.woza.link.label} variant="secondary" />
+        </div>
+      </a>
     </div>
   </section>
 
-  <!-- 9. Where we are: details left, a live map of the office right -->
+  <!-- 9. Where we are: details left, the BAT tower right -->
   <section class="an-full" aria-labelledby="where-title">
     <div class="container an-full__inner">
       <NotchRule at={70} />
@@ -282,13 +276,18 @@ const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d.l
             </div>
           </dl>
           <div data-reveal>
-            <Button href={a.where.map.open.href} label={a.where.map.open.label} variant="secondary" external />
+            <Button href={a.where.open.href} label={a.where.open.label} variant="secondary" external />
           </div>
         </div>
-        <figure class="an-map" data-map data-reveal>
-          <iframe src={mapSrc} title={a.where.map.title} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-          <!-- The map takes the pointer only after a click, so the page keeps scrolling over it. -->
-          <span class="an-map__hint chip" aria-hidden="true">{a.where.map.hint}</span>
+        <figure class="an-where__photo" data-reveal>
+          <img
+            src={withBase(a.where.photo.src)}
+            alt={a.where.photo.alt}
+            width={a.where.photo.w}
+            height={a.where.photo.h}
+            loading="lazy"
+            decoding="async"
+          />
         </figure>
       </div>
     </div>
@@ -892,7 +891,9 @@ const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d.l
     color: var(--ink-2);
   }
 
-  /* ---------- Built by Woza: dark section, one large card filling it ---------- */
+  /* ---------- Built by Woza: dark section, one large card that is the link ----------
+     Logo at the top left; at the foot, the statement on the left and the text
+     with the button on the right (the same 4 : 8 rhythm, mirrored). */
   .an-woza-sec {
     background: var(--grey-700);
   }
@@ -900,47 +901,73 @@ const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d.l
   .an-woza {
     flex: 1;
     display: grid;
-    grid-template-rows: auto 1fr;
-    gap: 2rem;
+    grid-template-areas: 'logo' 'title' 'side';
+    grid-template-rows: auto 1fr auto;
+    gap: clamp(1.5rem, 1rem + 2vw, 3rem);
     padding: clamp(1.5rem, 1rem + 3vw, 4rem);
     background: var(--surface);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
-  }
-
-  .an-woza__body {
-    display: grid;
-    align-content: start;
-    gap: 1.5rem;
-    max-width: 44rem;
+    color: var(--ink);
+    transition: background-color 200ms ease;
+    -webkit-tap-highlight-color: transparent;
   }
 
   @media (min-width: 64rem) {
-    .an-woza__body {
-      margin-left: calc(100% * 4 / 12);
+    .an-woza {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+      grid-template-areas: 'logo .' 'title side';
+      grid-template-rows: 1fr auto;
+      column-gap: clamp(2.5rem, 1rem + 5vw, 7.5rem);
     }
   }
 
-  .an-woza__title {
-    font-size: var(--fs-h2);
-    line-height: 1;
-    letter-spacing: var(--track-heading);
-    text-wrap: balance;
+  @media (hover: hover) and (pointer: fine) {
+    .an-woza:hover {
+      background: #2c2c2c;
+    }
   }
 
-  .an-woza__action {
-    margin-top: 0.5rem;
+  /* Inset: the notched clip-path would cut an outside outline. */
+  .an-woza:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -6px;
   }
 
   .an-woza__logo {
-    align-self: end;
-    width: min(100%, clamp(16rem, 6rem + 36vw, 46rem));
-    color: var(--ink);
+    grid-area: logo;
+    align-self: start;
+    width: clamp(10rem, 6rem + 12vw, 20rem);
   }
 
   .an-woza__logo :global(svg) {
     display: block;
     width: 100%;
     height: auto;
+  }
+
+  .an-woza__title {
+    grid-area: title;
+    align-self: end;
+    max-width: 18ch;
+    font-size: var(--fs-display);
+    line-height: 0.98;
+    letter-spacing: var(--track-display);
+    text-wrap: balance;
+  }
+
+  .an-woza__side {
+    grid-area: side;
+    align-self: end;
+    display: grid;
+    justify-items: start;
+    gap: 1.5rem;
+  }
+
+  .an-woza__text {
+    max-width: 36ch;
+    font-size: var(--fs-lead);
+    line-height: 1.45;
+    color: var(--ink-2);
   }
 
   /* ---------- Where we are ---------- */
@@ -1011,7 +1038,8 @@ const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d.l
     gap: clamp(2rem, 1.5rem + 2vw, 3rem);
   }
 
-  .an-map {
+  /* The BAT tower in the notched frame, filling the section's height. */
+  .an-where__photo {
     position: relative;
     overflow: hidden;
     min-height: clamp(20rem, 58svh, 46rem);
@@ -1019,29 +1047,14 @@ const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d.l
     clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
   }
 
-  .an-map iframe {
+  .an-where__photo img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    border: 0;
-  }
-
-  /* Until clicked, the map lets wheel and touch scrolling pass to the page. */
-  .an-map:not(.is-live) iframe {
-    pointer-events: none;
-  }
-
-  .an-map__hint {
-    position: absolute;
-    left: 1rem;
-    top: 1rem;
-    background: var(--surface);
-    transition: opacity 160ms ease;
-  }
-
-  .an-map.is-live .an-map__hint {
-    opacity: 0;
+    object-fit: cover;
+    /* A different crop from the hero: the tower itself. */
+    object-position: 30% 40%;
   }
 
   /* ---------- CTA: a full viewport too ---------- */
@@ -1090,18 +1103,6 @@ const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d.l
     new ResizeObserver(setTop).observe(pinned);
     window.addEventListener('resize', setTop, { passive: true });
   }
-
-  // Map: live after a click, back to scroll-through once the pointer leaves it.
-  document.querySelectorAll<HTMLElement>('[data-map]').forEach((map) => {
-    map.addEventListener('click', () => map.classList.add('is-live'));
-    // Mouse: release when the pointer leaves. Touch: release once the map scrolls away.
-    map.addEventListener('pointerleave', (e) => {
-      if (e.pointerType === 'mouse') map.classList.remove('is-live');
-    });
-    new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) map.classList.remove('is-live');
-    }).observe(map);
-  });
 
   if (!reduce) {
     // Hero photo: slow drift inside its frame.

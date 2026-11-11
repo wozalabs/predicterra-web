@@ -307,6 +307,19 @@ ol {
   opacity: 1;
 }
 
+/* A button inside a clickable container (the container is the link). */
+@media (hover: hover) and (pointer: fine) {
+  [data-btn-host]:hover .btn::before,
+  [data-btn-host]:hover .btn::after {
+    opacity: 1;
+  }
+}
+
+[data-btn-host]:focus-visible .btn::before,
+[data-btn-host]:focus-visible .btn::after {
+  opacity: 1;
+}
+
 .btn__sq {
   display: grid;
   place-items: center;

@@ -112,14 +112,14 @@ export default {
         { label: 'USA', value: '+1 929-323-2391', href: 'tel:+19293232391' },
       ],
     },
-    // BAT (Torre Bizkaia), Plaza Circular, Bilbao. OpenStreetMap coordinates.
-    map: {
-      lat: 43.261,
-      lon: -2.92821,
-      title: 'Map: BAT Acceleration Tower, Gran Vía 1, Bilbao',
-      hint: 'Click to explore the map',
-      open: { label: 'Open in Google Maps', href: 'https://www.google.com/maps/search/?api=1&query=43.261%2C-2.92821' },
+    // The BAT tower again, so the office is easy to picture; the link opens it on a map.
+    photo: {
+      src: '/about/bilbao-1.webp',
+      w: 1200,
+      h: 800,
+      alt: 'BAT Acceleration Tower on Gran Vía, Bilbao, home of the Predicterra office',
     },
+    open: { label: 'Open in Google Maps', href: 'https://www.google.com/maps/search/?api=1&query=43.261%2C-2.92821' },
   },
 
   // The brief's "Get started" eyebrow is left out (no eyebrows on this page).

@@ -2,7 +2,9 @@
 import { icons } from '../data/icons';
 
 interface Props {
-  href: string;
+  /** Leave out inside a container that is itself the link: the button then
+      renders as a <span> and lights up when its [data-btn-host] is hovered. */
+  href?: string;
   label: string;
   size?: 'md' | 'lg';
   /** primary: orange. secondary: white on light, dark grey inside .theme-dark. */
@@ -13,13 +15,24 @@ interface Props {
 const { href, label, size = 'md', variant = 'primary', external = false, class: className } = Astro.props;
 ---
 
-<a
-  class:list={['btn', size === 'lg' && 'btn--lg', variant === 'secondary' && 'btn--secondary', className]}
-  href={href}
-  {...external ? { target: '_blank', rel: 'noopener' } : {}}
->
-  <span>{label}</span>
-  <span class="btn__sq" aria-hidden="true">
-    <svg class="btn__icon" viewBox="0 -960 960 960"><path d={icons.arrow_forward} /></svg>
-  </span>
-</a>
+{
+  href ? (
+    <a
+      class:list={['btn', size === 'lg' && 'btn--lg', variant === 'secondary' && 'btn--secondary', className]}
+      href={href}
+      {...(external ? { target: '_blank', rel: 'noopener' } : {})}
+    >
+      <span>{label}</span>
+      <span class="btn__sq" aria-hidden="true">
+        <svg class="btn__icon" viewBox="0 -960 960 960"><path d={icons.arrow_forward} /></svg>
+      </span>
+    </a>
+  ) : (
+    <span class:list={['btn', size === 'lg' && 'btn--lg', variant === 'secondary' && 'btn--secondary', className]}>
+      <span>{label}</span>
+      <span class="btn__sq" aria-hidden="true">
+        <svg class="btn__icon" viewBox="0 -960 960 960"><path d={icons.arrow_forward} /></svg>
+      </span>
+    </span>
+  )
+}
