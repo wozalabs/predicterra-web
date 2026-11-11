@@ -1,0 +1,881 @@
+---
+/**
+ * About, new draft (/about-new). Content from the "predicterra-about.md" brief,
+ * laid out in the site's current design language so it can be compared with
+ * /about. The brief's visual notes are interpreted, not copied:
+ * light canvas, notched rules, 4 : 8 grid, notched image frames, one dark
+ * section (Trust), the grey CTA card. Not indexed while it is a draft.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NotchRule from '../components/NotchRule.astro';
+import PageIntro from '../components/PageIntro.astro';
+import Icon from '../components/Icon.astro';
+import TextLink from '../components/TextLink.astro';
+import AboutCompare from '../components/AboutCompare.astro';
+import Cta from '../sections/home/Cta.astro';
+import { getCopy, withBase } from '../i18n/config';
+import type { IconName } from '../data/icons';
+
+const locale = 'en';
+const { aboutNew: a } = getCopy(locale);
+const pad = (n: number) => String(n).padStart(2, '0');
+const last = a.milestones.items.length - 1;
+---
+
+<BaseLayout title={a.seo.title} description={a.seo.description} locale={locale} noindex>
+  <!-- 1. Hero -->
+  <PageIntro id="about-title" eyebrow={a.hero.eyebrow} title={a.hero.title} text={a.hero.text} />
+  <div class="container">
+    <figure class="an-hero-media" data-reveal>
+      <img
+        src={withBase(a.hero.photo.src)}
+        alt={a.hero.photo.alt}
+        width={a.hero.photo.w}
+        height={a.hero.photo.h}
+        fetchpriority="high"
+        decoding="async"
+      />
+    </figure>
+  </div>
+
+  <!-- 2. Mission -->
+  <section class="an-sec" aria-labelledby="mission-title">
+    <div class="container">
+      <NotchRule at={70} />
+      <p class="label an-label">{a.mission.label}</p>
+      <h2 id="mission-title" class="an-statement" data-render>{a.mission.title}</h2>
+      <div class="an-grid an-grid--tight">
+        <div aria-hidden="true"></div>
+        <div class="an-mission" data-reveal-group>
+          <p class="an-lead" data-reveal>{a.mission.text}</p>
+          <div class="an-dfn" data-reveal>
+            <p class="label">{a.mission.definition.term}</p>
+            <p class="an-dfn__text"><dfn>{a.mission.definition.text}</dfn></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Story -->
+  <section class="an-sec" aria-labelledby="story-title">
+    <div class="container">
+      <NotchRule at={70} />
+      <div class="an-grid">
+        <div class="an-head">
+          <p class="label">{a.story.label}</p>
+          <h2 id="story-title" class="t-h2" data-render>{a.story.title}</h2>
+          <p class="an-quote" data-reveal>
+            {a.story.quote.text} <span class="accent nowrap">{a.story.quote.accent}</span>
+          </p>
+        </div>
+        <div class="an-prose" data-reveal-group>
+          {a.story.paragraphs.map((p) => <p data-reveal>{p}</p>)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Milestones -->
+  <section class="an-sec" aria-labelledby="milestones-title">
+    <div class="container">
+      <NotchRule at={70} />
+      <div class="an-grid">
+        <div class="an-head">
+          <p class="label">{a.milestones.label}</p>
+          <h2 id="milestones-title" class="t-h2" data-render>{a.milestones.title}</h2>
+        </div>
+      </div>
+      <ol class="an-time" data-reveal-group>
+        {
+          a.milestones.items.map((m, i) => (
+            <li class:list={['an-time__item', i === last && 'is-last']} data-reveal>
+              <span class="an-time__node" aria-hidden="true" />
+              <p class="an-time__year t-num">{m.year}</p>
+              <p class="an-time__text t-small">{m.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- 5. European by design -->
+  <section class="an-sec" aria-labelledby="europe-title">
+    <div class="container">
+      <NotchRule at={70} />
+      <div class="an-grid">
+        <div class="an-head">
+          <p class="label">{a.europe.label}</p>
+          <h2 id="europe-title" class="t-h2" data-render>{a.europe.title}</h2>
+          <p class="an-lead" data-reveal>{a.europe.text}</p>
+        </div>
+        <ul class="an-rows" data-reveal-group>
+          {
+            a.europe.items.map((it) => (
+              <li class="an-row an-row--icon" data-reveal>
+                <Icon name={it.icon as IconName} boxed size="2.75rem" />
+                <h3 class="an-row__title">{it.title}</h3>
+                <p class="an-row__text">{it.text}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Independent -->
+  <section class="an-sec" aria-labelledby="independent-title">
+    <div class="container">
+      <NotchRule at={70} />
+      <div class="an-grid">
+        <div class="an-head">
+          <p class="label">{a.independent.label}</p>
+          <h2 id="independent-title" class="t-h2" data-render>{a.independent.title}</h2>
+        </div>
+        <div class="an-indep">
+          <p class="an-lead" data-reveal>{a.independent.text}</p>
+          <ul class="an-rows" data-reveal-group>
+            {
+              a.independent.items.map((it) => (
+                <li class="an-row an-row--split" data-reveal>
+                  <h3 class="an-row__title">{it.title}</h3>
+                  <p class="an-row__text">{it.text}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Trust (dark) -->
+  <section class="an-trust theme-dark" aria-labelledby="trust-title" data-header-dark>
+    <div class="container an-trust__inner">
+      <div class="an-grid">
+        <div class="an-head">
+          <p class="label">{a.trust.label}</p>
+          <h2 id="trust-title" class="t-h2" data-render>{a.trust.title}</h2>
+          <p class="an-lead" data-reveal>{a.trust.text}</p>
+        </div>
+        <ol class="an-rows" data-reveal-group>
+          {
+            a.trust.items.map((it, i) => (
+              <li class="an-row an-row--num" data-reveal>
+                <span class="an-row__num t-num">{pad(i + 1)}</span>
+                <h3 class="an-row__title">{it.title}</h3>
+                <p class="an-row__text">{it.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <ul class="an-seals" aria-label="Certifications and hosting" data-reveal>
+        {a.trust.seals.map((s) => <li class="chip">{s}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- 8. Recognition -->
+  <section class="an-sec an-sec--first" aria-labelledby="recognition-title">
+    <div class="container">
+      <div class="an-grid">
+        <div class="an-head">
+          <p class="label">{a.recognition.label}</p>
+          <h2 id="recognition-title" class="t-h2" data-render>{a.recognition.title}</h2>
+        </div>
+      </div>
+      <ul class="an-cards" data-reveal-group>
+        {
+          a.recognition.items.map((it) => (
+            <li class="an-card" data-reveal>
+              <div class="an-card__brand">
+                {it.logo ? (
+                  <img
+                    src={withBase(it.logo.src)}
+                    alt={it.name}
+                    width={Math.round((it.logo.w / it.logo.h) * it.logo.h1)}
+                    height={it.logo.h1}
+                    style={`--h:${it.logo.h1}px`}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span class="an-card__wordmark">{it.name}</span>
+                )}
+              </div>
+              <div class="an-card__body">
+                {it.logo && <h3 class="an-card__name t-small">{it.name}</h3>}
+                <p class="an-card__text">
+                  <span class="an-dot" aria-hidden="true" />
+                  {it.text}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 9. Team -->
+  <section class="an-sec" aria-labelledby="team-title">
+    <div class="container">
+      <NotchRule at={70} />
+      <div class="an-grid">
+        <div class="an-head">
+          <p class="label">{a.team.label}</p>
+          <h2 id="team-title" class="t-h2" data-render>{a.team.title}</h2>
+        </div>
+        <p class="an-lead" data-reveal>{a.team.text}</p>
+      </div>
+      <ul class="an-team" data-reveal-group>
+        {
+          a.team.people.map((m, i) => (
+            <li class="an-person" data-reveal>
+              <div class="an-person__photo">
+                <img src={withBase(m.photo)} alt={m.name} width="600" height="600" loading="lazy" decoding="async" />
+              </div>
+              <p class="an-person__index t-caption t-num">{pad(i + 1)}</p>
+              <h3 class="an-person__name">{m.name}</h3>
+              <p class="an-person__role t-small">{m.role}</p>
+              {m.org && <p class="an-person__org t-small">{m.org}</p>}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 10. Built by Woza -->
+  <section class="an-sec" aria-labelledby="woza-title">
+    <div class="container">
+      <div class="an-woza" data-reveal>
+        <div class="an-woza__brand">
+          <p class="label">{a.woza.label}</p>
+          <p class="an-woza__mark" aria-hidden="true">Woza Labs</p>
+        </div>
+        <div class="an-woza__body">
+          <h2 id="woza-title" class="t-h3">{a.woza.title}</h2>
+          <p class="an-woza__text">{a.woza.text}</p>
+          <TextLink href={a.woza.link.href} label={`${a.woza.link.label} →`} external />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11. Where we are -->
+  <section class="an-sec" aria-labelledby="where-title">
+    <div class="container">
+      <NotchRule at={70} />
+      <div class="an-grid">
+        <div class="an-head">
+          <p class="label">{a.where.label}</p>
+          <h2 id="where-title" class="t-h2" data-render>{a.where.title}</h2>
+        </div>
+        <div class="an-where" data-reveal-group>
+          <address class="an-where__contact" data-reveal>
+            <span class="an-lead">{a.where.address}</span>
+            <a href={`mailto:${a.where.email}`}>{a.where.email}</a>
+            {
+              a.where.phones.map((p) => (
+                <a href={p.href}>
+                  <span class="t-muted">{p.label}</span> <span class="t-num">{p.value}</span>
+                </a>
+              ))
+            }
+          </address>
+          <p class="an-where__join t-small" data-reveal>
+            {a.where.join.text} <a href={`mailto:${a.where.join.email}`}>{a.where.join.email}</a>
+          </p>
+          <div class="an-map" role="img" aria-label={`${a.where.map.place}, ${a.where.map.city}`} data-reveal>
+            <span class="an-map__pin" aria-hidden="true" />
+            <span class="an-map__tag t-small" aria-hidden="true">
+              <span>{a.where.map.place}</span>
+              <span class="t-muted">{a.where.map.city}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. CTA -->
+  <Cta locale={locale} copy={a.cta} />
+
+  <AboutCompare locale={locale} current="draft" />
+</BaseLayout>
+
+<style>
+  /* ---------- Shared ---------- */
+  .an-sec {
+    position: relative;
+    padding-bottom: var(--section-y);
+  }
+
+  .an-sec--first {
+    padding-top: var(--section-y);
+  }
+
+  .an-grid {
+    display: grid;
+    gap: 2rem var(--gutter);
+    padding-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
+  }
+
+  .an-grid--tight {
+    padding-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+
+  @media (min-width: 64rem) {
+    .an-grid {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    }
+  }
+
+  .an-head {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    /* Head column wraps titles; keep them from running into the right column. */
+    max-width: 30rem;
+  }
+
+  .an-label {
+    margin-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
+  }
+
+  .an-lead {
+    max-width: 44ch;
+    font-size: var(--fs-lead);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Hero media ---------- */
+  .an-hero-media {
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    margin-bottom: var(--section-y);
+    background: #e4e4e4;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
+  }
+
+  @media (min-width: 48rem) {
+    .an-hero-media {
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .an-hero-media {
+      aspect-ratio: 21 / 9;
+    }
+  }
+
+  .an-hero-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Brief: photo treated in grey. */
+    filter: grayscale(1) contrast(1.05);
+  }
+
+  /* ---------- Mission ---------- */
+  .an-statement {
+    max-width: 22ch;
+    margin-top: 1.25rem;
+    font-size: var(--fs-display);
+    line-height: 0.98;
+    letter-spacing: var(--track-display);
+    text-wrap: balance;
+  }
+
+  .an-mission {
+    display: grid;
+    gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  }
+
+  .an-dfn {
+    display: grid;
+    gap: 0.875rem;
+    max-width: 40rem;
+    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    background: var(--surface);
+  }
+
+  .an-dfn__text dfn {
+    font-style: normal;
+    font-size: var(--fs-h4);
+    line-height: 1.35;
+    letter-spacing: var(--track-title);
+  }
+
+  /* ---------- Story ---------- */
+  .an-quote {
+    margin-top: clamp(0.5rem, 0.25rem + 1vw, 1.5rem);
+    font-size: var(--fs-h2);
+    line-height: 1.02;
+    letter-spacing: var(--track-heading);
+    text-wrap: balance;
+  }
+
+  .an-prose {
+    display: grid;
+    gap: 1.25em;
+    max-width: 40rem;
+    font-size: var(--fs-lead);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Milestones ---------- */
+  .an-time {
+    --node: 0.625rem;
+    display: grid;
+    gap: 0 var(--gutter);
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  .an-time__item {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 0 0 2rem 1.75rem;
+  }
+
+  /* The line: vertical on small screens, horizontal from 64rem. */
+  .an-time__item::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--node) / 2 - 0.5px);
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--line-strong);
+  }
+
+  .an-time__node {
+    position: absolute;
+    left: 0;
+    top: 0.25rem;
+    width: var(--node);
+    height: var(--node);
+    background: var(--ink);
+  }
+
+  .an-time__item.is-last::before {
+    background: var(--accent);
+  }
+
+  .an-time__item.is-last .an-time__node {
+    background: var(--accent);
+  }
+
+  .an-time__year {
+    font-size: var(--fs-h2);
+    line-height: 0.9;
+    letter-spacing: var(--track-display);
+  }
+
+  .an-time__text {
+    max-width: 30ch;
+    color: var(--ink-2);
+  }
+
+  @media (min-width: 64rem) {
+    .an-time {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .an-time__item {
+      padding: 2.25rem 0 0;
+    }
+
+    .an-time__item::before {
+      left: 0;
+      right: calc(-1 * var(--gutter));
+      top: calc(var(--node) / 2 - 0.5px);
+      bottom: auto;
+      width: auto;
+      height: 1px;
+    }
+
+    .an-time__item.is-last::before {
+      right: 0;
+      height: 2px;
+    }
+
+    .an-time__node {
+      top: 0;
+    }
+  }
+
+  /* ---------- Rows (Europe, Independent, Trust) ---------- */
+  .an-rows {
+    display: grid;
+  }
+
+  .an-row {
+    display: grid;
+    gap: 0.5rem 1.5rem;
+    padding-block: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .an-row:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .an-row__title {
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    letter-spacing: var(--track-title);
+  }
+
+  .an-row__text {
+    max-width: 52ch;
+    color: var(--ink-2);
+  }
+
+  .an-row--icon {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'icon title'
+      'icon text';
+  }
+
+  .an-row--icon :global(.ibox) {
+    grid-area: icon;
+  }
+
+  .an-row--icon .an-row__title {
+    grid-area: title;
+    align-self: center;
+  }
+
+  .an-row--icon .an-row__text {
+    grid-area: text;
+  }
+
+  .an-indep {
+    display: grid;
+    gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  @media (min-width: 48rem) {
+    .an-row--split {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    }
+  }
+
+  .an-row--num {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    grid-template-areas:
+      'num title'
+      'num text';
+  }
+
+  .an-row--num .an-row__num {
+    grid-area: num;
+    padding-top: 0.2rem;
+    font-size: var(--fs-small);
+    color: var(--accent);
+  }
+
+  .an-row--num .an-row__title {
+    grid-area: title;
+  }
+
+  .an-row--num .an-row__text {
+    grid-area: text;
+  }
+
+  /* ---------- Trust (dark) ---------- */
+  .an-trust {
+    position: relative;
+    background: var(--grey-700);
+  }
+
+  .an-trust__inner {
+    padding-block: var(--section-y);
+  }
+
+  .an-seals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4rem);
+  }
+
+  .an-seals :global(.chip) {
+    min-height: 2rem;
+    padding-inline: 0.75rem;
+    font-size: var(--fs-small);
+  }
+
+  /* ---------- Recognition ---------- */
+  .an-cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--gutter);
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  @media (min-width: 40rem) {
+    .an-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .an-cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .an-card {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    background: var(--surface);
+  }
+
+  .an-card__brand {
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+  }
+
+  /* Monochrome logos, as in the homepage strip. */
+  .an-card__brand img {
+    width: auto;
+    height: var(--h);
+    max-width: 100%;
+    filter: brightness(0);
+    opacity: 0.7;
+  }
+
+  .an-card__wordmark {
+    font-size: var(--fs-h3);
+    letter-spacing: var(--track-title);
+  }
+
+  .an-card__body {
+    display: grid;
+    align-content: end;
+    gap: 0.375rem;
+  }
+
+  .an-card__name {
+    color: var(--muted);
+  }
+
+  .an-card__text {
+    display: flex;
+    align-items: baseline;
+    gap: 0.625rem;
+  }
+
+  .an-dot {
+    flex: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--accent);
+    transform: translateY(-0.05em);
+  }
+
+  /* ---------- Team ---------- */
+  .an-team {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem var(--gutter);
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  @media (min-width: 48rem) {
+    .an-team {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .an-team {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .an-person {
+    display: grid;
+    align-content: start;
+  }
+
+  .an-person__photo {
+    overflow: hidden;
+    aspect-ratio: 1;
+    margin-bottom: 1rem;
+    background: #e4e4e4;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
+  }
+
+  /* Brief: black and white portraits. Multiply takes the white cut-out to the frame grey. */
+  .an-person__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1);
+    mix-blend-mode: multiply;
+  }
+
+  .an-person__index {
+    color: var(--muted);
+  }
+
+  .an-person__name {
+    margin-top: 0.25rem;
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .an-person__role {
+    margin-top: 0.25rem;
+    color: var(--ink-2);
+  }
+
+  .an-person__org {
+    color: var(--muted);
+  }
+
+  /* ---------- Woza ---------- */
+  .an-woza {
+    display: grid;
+    gap: 2rem var(--gutter);
+    padding: clamp(1.5rem, 1rem + 2vw, 3rem);
+    background: var(--surface);
+  }
+
+  @media (min-width: 64rem) {
+    .an-woza {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    }
+  }
+
+  .an-woza__brand {
+    display: grid;
+    align-content: space-between;
+    gap: 2rem;
+  }
+
+  .an-woza__mark {
+    font-size: var(--fs-h2);
+    line-height: 1;
+    letter-spacing: var(--track-heading);
+  }
+
+  .an-woza__body {
+    display: grid;
+    align-content: start;
+    gap: 1.25rem;
+    max-width: 44rem;
+  }
+
+  .an-woza__text {
+    color: var(--ink-2);
+  }
+
+  /* ---------- Where ---------- */
+  .an-where {
+    display: grid;
+    gap: 1.5rem;
+    min-width: 0;
+    align-content: start;
+  }
+
+  .an-where__contact {
+    display: grid;
+    gap: 0.375rem;
+    font-style: normal;
+  }
+
+  .an-where__contact .an-lead {
+    margin-bottom: 0.5rem;
+    color: var(--ink);
+  }
+
+  .an-where a {
+    width: fit-content;
+    transition: color 160ms ease;
+  }
+
+  .an-where__join {
+    color: var(--ink-2);
+  }
+
+  .an-where__join a {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--line-strong);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .an-where a:hover {
+      color: var(--accent);
+    }
+  }
+
+  /* Schematic map: grey dot field, orange square on the office. */
+  .an-map {
+    --px: 34%;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3 / 2;
+    margin-top: 1rem;
+    background-color: #e4e4e4;
+    background-image: radial-gradient(circle, rgb(30 30 30 / 0.22) 1px, transparent 1.5px);
+    background-size: 14px 14px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
+  }
+
+  .an-map::after {
+    /* Soften the field towards the edges. */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at var(--px) 46%, transparent 30%, #e4e4e4 85%);
+  }
+
+  @media (min-width: 48rem) {
+    .an-map {
+      --px: 52%;
+      aspect-ratio: 21 / 9;
+    }
+  }
+
+  .an-map__pin {
+    position: absolute;
+    z-index: 1;
+    left: var(--px);
+    top: 46%;
+    width: 0.875rem;
+    height: 0.875rem;
+    background: var(--accent);
+    box-shadow: 0 0 0 0.5rem rgb(255 55 0 / 0.14);
+    transform: translate(-50%, -50%);
+  }
+
+  .an-map__tag {
+    position: absolute;
+    z-index: 1;
+    left: calc(var(--px) + 1.25rem);
+    top: 46%;
+    display: grid;
+    padding: 0.5rem 0.75rem;
+    background: var(--surface);
+    transform: translateY(-50%);
+  }
+</style>

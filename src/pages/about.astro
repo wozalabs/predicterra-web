@@ -9,6 +9,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import NotchRule from '../components/NotchRule.astro';
 import PageIntro from '../components/PageIntro.astro';
 import Cta from '../sections/home/Cta.astro';
+import AboutCompare from '../components/AboutCompare.astro';
 import { getCopy, withBase } from '../i18n/config';
 
 const locale = 'en';
@@ -89,6 +90,8 @@ const aboutJsonLd = {
   </section>
 
   <Cta locale={locale} copy={about.cta} />
+
+  <AboutCompare locale={locale} current="current" />
 </BaseLayout>
 
 <style>

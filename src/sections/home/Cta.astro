@@ -3,13 +3,14 @@ import Button from '../../components/Button.astro';
 import { getCopy, localizePath, type Locale } from '../../i18n/config';
 
 interface CtaCopy {
-  label: string;
+  /** Optional: pages whose brief has no label above the title leave it out. */
+  label?: string;
   titleLine1: string;
   titleLine2: string;
   titleAccent: string;
   text: string;
   primary: { label: string; href: string };
-  secondary?: { label: string; href: string };
+  secondary?: { label: string; href: string; external?: boolean };
 }
 interface Props {
   locale?: Locale;
@@ -30,7 +31,7 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
     <div class="cta__veil" aria-hidden="true"></div>
 
     <div class="cta__content">
-      <p class="label cta__label" data-render>{cta.label}</p>
+      {cta.label && <p class="label cta__label" data-render>{cta.label}</p>}
       <h2 id="cta-title" class="t-h2 cta__title" data-render>
         <span class="cta__line">{cta.titleLine1}</span>
         <span class="cta__line">{cta.titleLine2} <span class="accent">{cta.titleAccent}</span></span>
@@ -38,7 +39,17 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
       <p class="cta__text">{cta.text}</p>
       <div class="cta__actions">
         <Button href={localizePath(cta.primary.href, locale)} label={cta.primary.label} size="lg" />
-        {cta.secondary && <Button href={cta.secondary.href} label={cta.secondary.label} variant="secondary" size="lg" external />}
+        {
+          cta.secondary && (
+            <Button
+              href={cta.secondary.external === false ? localizePath(cta.secondary.href, locale) : cta.secondary.href}
+              label={cta.secondary.label}
+              variant="secondary"
+              size="lg"
+              external={cta.secondary.external !== false}
+            />
+          )
+        }
       </div>
     </div>
   </div>

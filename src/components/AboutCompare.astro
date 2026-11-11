@@ -1,0 +1,96 @@
+---
+/**
+ * Review aid: a small switch pinned to the bottom of /about and /about-new so
+ * the current page and the draft from the new brief can be compared quickly.
+ * Remove it (and /about-new) once the brief is decided.
+ */
+import { getCopy, localizePath, type Locale } from '../i18n/config';
+import { routes } from '../data/routes';
+
+interface Props {
+  locale?: Locale;
+  current: 'current' | 'draft';
+}
+const { locale = 'en', current } = Astro.props;
+const { compare } = getCopy(locale).aboutNew;
+const links = [
+  { key: 'current', label: compare.current, href: localizePath(routes.about, locale) },
+  { key: 'draft', label: compare.draft, href: localizePath('/about-new', locale) },
+] as const;
+---
+
+<nav class="cmp" aria-label={compare.label}>
+  <span class="cmp__label t-caption">{compare.label}</span>
+  {
+    links.map((l) => (
+      <a class="cmp__link t-small" href={l.href} aria-current={l.key === current ? 'page' : undefined}>
+        {l.label}
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .cmp {
+    position: fixed;
+    z-index: var(--z-menu);
+    left: 50%;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.25rem 0.25rem 0.875rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow:
+      0 1px 2px rgb(30 30 30 / 0.06),
+      0 8px 24px rgb(30 30 30 / 0.1);
+    transform: translateX(-50%);
+    color: var(--ink);
+  }
+
+  .cmp__label {
+    margin-right: 0.5rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .cmp__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0 0.875rem;
+    white-space: nowrap;
+    transition:
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 160ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .cmp__link[aria-current='page'] {
+    background: var(--ink);
+    color: var(--canvas);
+  }
+
+  .cmp__link:active {
+    transform: scale(0.97);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cmp__link:not([aria-current='page']):hover {
+      background: var(--chip-bg);
+    }
+  }
+
+  .cmp__link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media print {
+    .cmp {
+      display: none;
+    }
+  }
+</style>
