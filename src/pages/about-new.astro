@@ -86,48 +86,48 @@ const missionAccentFrom = missionWords.length - 2;
     </div>
   </section>
 
-  <!-- 4. Milestones: pinned, one year at a time, moving sideways with the scroll -->
+  <!-- 4. Milestones: pinned; the years turn on a dial at the left, the year's
+       milestone reads on the right, the title stays in view throughout. -->
   <section class="an-ms" aria-labelledby="milestones-title" data-ms style={`--n:${a.milestones.items.length}`}>
     <div class="an-ms__stage" data-ms-stage>
-      <div class="container an-ms__head">
+      <div class="container">
         <NotchRule at={70} />
-        <div class="an-grid">
-          <div class="an-head">
+      </div>
+      <div class="container an-ms__grid">
+        <!-- Decorative dial (the same years are in the list for screen readers) -->
+        <div class="an-ms__wheel" aria-hidden="true" data-ms-wheel>
+          <span class="an-ms__mark" data-ms-mark />
+          {
+            a.milestones.items.map((m, i) => (
+              <span class:list={['an-ms__wy t-num', i === last && 'is-last']} data-ms-wy>
+                {m.year}
+              </span>
+            ))
+          }
+        </div>
+
+        <div class="an-ms__side">
+          <div class="an-head an-ms__head">
             <p class="label">{a.milestones.label}</p>
             <h2 id="milestones-title" class="t-h2" data-render>{a.milestones.title}</h2>
           </div>
+          <ol class="an-ms__track" data-ms-track>
+            {
+              a.milestones.items.map((m, i) => (
+                <li class:list={['an-ms__panel', i === last && 'is-last']} data-ms-panel>
+                  <span class="an-ms__node" aria-hidden="true" />
+                  <p class="an-ms__year t-num">
+                    {m.year}
+                    <span class="an-ms__count" aria-hidden="true">
+                      {pad(i + 1)} / {pad(a.milestones.items.length)}
+                    </span>
+                  </p>
+                  <p class="an-ms__text">{m.text}</p>
+                </li>
+              ))
+            }
+          </ol>
         </div>
-      </div>
-
-      <div class="container an-ms__viewport" data-ms-viewport>
-        <ol class="an-ms__track" data-ms-track>
-          {
-            a.milestones.items.map((m, i) => (
-              <li class:list={['an-ms__panel', i === last && 'is-last']} data-ms-panel>
-                <span class="an-ms__node" aria-hidden="true" />
-                <p class="an-ms__year t-num">{m.year}</p>
-                <p class="an-ms__text">{m.text}</p>
-              </li>
-            ))
-          }
-        </ol>
-      </div>
-
-      <div class="container an-ms__rail" aria-hidden="true">
-        <div class="an-ms__line">
-          <span class="an-ms__fill" data-ms-fill />
-          <span class="an-ms__fill an-ms__fill--last" data-ms-fill-last />
-        </div>
-        <ol class="an-ms__ticks">
-          {
-            a.milestones.items.map((m, i) => (
-              <li class:list={['an-ms__tick', i === last && 'is-last']} style={`--i:${i}`} data-ms-tick>
-                <span class="an-ms__tick-node" />
-                <span class="an-ms__tick-year t-num">{m.year}</span>
-              </li>
-            ))
-          }
-        </ol>
       </div>
     </div>
   </section>
@@ -477,12 +477,26 @@ const missionAccentFrom = missionWords.length - 2;
 
   /* ---------- Milestones ----------
    Static by default (no JS, reduced motion): a vertical list on phones and a
-   five-column timeline on wide screens. With JS, .is-pinned turns it into a
-   sticky stage whose track moves sideways with the scroll, one year per screen. */
+   five-column timeline on wide screens, the dial hidden. With JS, .is-pinned
+   pins the stage: a dial of years turns at the left (its centre sits off-screen,
+   so the arc overflows the left edge), the current year's milestone reads on the
+   right, and the title stays in view. */
   .an-ms {
     --node: 0.625rem;
     position: relative;
     padding-bottom: var(--section-y);
+  }
+
+  .an-ms__grid {
+    padding-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
+  }
+
+  .an-ms__wheel {
+    display: none;
+  }
+
+  .an-ms__count {
+    display: none;
   }
 
   .an-ms__track {
@@ -536,10 +550,6 @@ const missionAccentFrom = missionWords.length - 2;
     color: var(--ink-2);
   }
 
-  .an-ms__rail {
-    display: none;
-  }
-
   @media (min-width: 64rem) {
     .an-ms:not(.is-pinned) .an-ms__track {
       grid-template-columns: repeat(var(--n), minmax(0, 1fr));
@@ -568,8 +578,7 @@ const missionAccentFrom = missionWords.length - 2;
     }
   }
 
-  /* Pinned: the section is as tall as its scroll distance (set by the script);
-     the stage sticks for that distance and the track slides. */
+  /* ----- Pinned dial ----- */
   .an-ms.is-pinned {
     padding-bottom: 0;
   }
@@ -585,29 +594,101 @@ const missionAccentFrom = missionWords.length - 2;
     padding-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
   }
 
-  .an-ms.is-pinned .an-ms__viewport {
+  .an-ms.is-pinned .an-ms__grid {
     flex: 1;
-    display: flex;
-    align-items: center;
     min-height: 0;
-    /* Clip to the content box, so only the current year shows, never the next one peeking in the gutter. */
-    clip-path: inset(0 var(--gutter));
+    display: grid;
+    grid-template-areas: 'head' 'wheel' 'info';
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 1.5rem var(--gutter);
   }
 
+  /* Phones: title, dial, milestone stacked. Wide: dial left, title and milestone right. */
+  .an-ms.is-pinned .an-ms__side {
+    display: contents;
+  }
+
+  @media (min-width: 64rem) {
+    .an-ms.is-pinned .an-ms__grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      grid-template-areas: 'wheel head' 'wheel info';
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+  }
+
+  .an-ms.is-pinned .an-ms__head {
+    grid-area: head;
+  }
+
+  .an-ms.is-pinned .an-ms__wheel {
+    grid-area: wheel;
+    display: block;
+    position: relative;
+    min-height: 0;
+    /* Clip above and below (never over the title or the milestone), but let the
+       dial run off the left edge of the page. */
+    clip-path: inset(0 -100vw 0 -100vw);
+  }
+
+  /* Years sit on the dial: placed at the dial centre, turned by their angle and
+     pushed out along the radius (the script writes --a, --r, --fs, --o). */
+  .an-ms__wy {
+    position: absolute;
+    left: var(--cx);
+    top: var(--cy);
+    font-size: var(--fs, 5rem);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    white-space: nowrap;
+    color: var(--ink);
+    opacity: var(--o, 0);
+    transform-origin: 0 50%;
+    transform: rotate(var(--a, 0rad)) translateX(var(--r, 0px)) translateY(-50%);
+    will-change: transform, opacity;
+  }
+
+  .an-ms__wy.is-last {
+    color: var(--accent);
+  }
+
+  /* Marker on the centre line, just before the current year (like a pointer). */
+  .an-ms__mark {
+    position: absolute;
+    left: var(--mx);
+    top: var(--cy);
+    width: 0.75rem;
+    height: 0.75rem;
+    background: var(--accent);
+    transform: translate(-50%, -50%);
+  }
+
+  /* Ticks along the dial, drawn by the script. */
+  :global(.an-ms__tick) {
+    position: absolute;
+    left: var(--cx);
+    top: var(--cy);
+    width: var(--tl, 0.75rem);
+    height: 1px;
+    background: var(--line-strong);
+    transform-origin: 0 50%;
+    transform: rotate(var(--a, 0rad)) translateX(var(--r, 0px));
+  }
+
+  /* Milestone of the current year, stacked and crossfaded. */
   .an-ms.is-pinned .an-ms__track {
-    display: flex;
-    width: 100%;
+    grid-area: info;
+    display: grid;
+    align-self: end;
     margin: 0;
-    gap: 0;
-    will-change: transform;
   }
 
   .an-ms.is-pinned .an-ms__panel {
-    flex: 0 0 100%;
-    display: grid;
-    align-items: end;
-    gap: 1.5rem var(--gutter);
+    grid-area: 1 / 1;
+    gap: 1rem;
     padding: 0;
+    opacity: var(--t, 0);
+    transform: translate3d(0, calc((1 - var(--t, 0)) * var(--dir, 1) * 0.75rem), 0);
+    visibility: var(--vis, hidden);
   }
 
   .an-ms.is-pinned .an-ms__panel::before,
@@ -616,123 +697,33 @@ const missionAccentFrom = missionWords.length - 2;
   }
 
   .an-ms.is-pinned .an-ms__year {
-    font-size: clamp(6rem, 2.5rem + 17vw, 19rem);
-    line-height: 0.8;
-    letter-spacing: -0.06em;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: var(--fs-h3);
+    letter-spacing: var(--track-title);
   }
 
-  .an-ms.is-pinned .an-ms__panel.is-last .an-ms__year {
-    color: var(--accent);
+  .an-ms.is-pinned .an-ms__count {
+    display: inline;
+    font-size: var(--fs-small);
+    letter-spacing: 0;
+    color: var(--muted);
   }
 
   .an-ms.is-pinned .an-ms__text {
-    max-width: 34ch;
+    max-width: 36ch;
     font-size: var(--fs-h4);
     line-height: 1.35;
     letter-spacing: var(--track-title);
-    color: var(--ink);
-    /* Fades in as its year settles (set by the script). */
-    opacity: var(--t, 1);
+    color: var(--ink-2);
   }
 
-  @media (min-width: 64rem) {
-    .an-ms.is-pinned .an-ms__panel {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    }
+  @media (max-width: 63.99rem) {
     .an-ms.is-pinned .an-ms__text {
-      padding-bottom: 0.75rem;
+      font-size: var(--fs-lead);
     }
-  }
-
-  /* Rail: every year on one line, progress filled up to the current one; the
-     last segment and node are orange. */
-  .an-ms.is-pinned .an-ms__rail {
-    display: block;
-    position: relative;
-    padding-top: 1.25rem;
-  }
-
-  .an-ms__line {
-    position: absolute;
-    left: var(--gutter);
-    right: var(--gutter);
-    top: calc(1.25rem + var(--node) / 2);
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      var(--line-strong) calc((var(--n) - 2) / (var(--n) - 1) * 100%),
-      rgb(255 55 0 / 0.3) 0
-    );
-  }
-
-  .an-ms__fill {
-    position: absolute;
-    left: 0;
-    top: -0.5px;
-    height: 2px;
-    width: calc((var(--n) - 2) / (var(--n) - 1) * 100%);
-    background: var(--ink);
-    transform-origin: left center;
-    transform: scaleX(var(--fa, 0));
-  }
-
-  .an-ms__fill--last {
-    left: calc((var(--n) - 2) / (var(--n) - 1) * 100%);
-    width: calc(100% / (var(--n) - 1));
-    background: var(--accent);
-    transform: scaleX(var(--fb, 0));
-  }
-
-  .an-ms__ticks {
-    position: relative;
-    height: 2.75rem;
-  }
-
-  .an-ms__tick {
-    position: absolute;
-    left: calc(var(--i) / (var(--n) - 1) * 100%);
-    top: 0;
-    display: grid;
-    justify-items: start;
-    gap: 0.625rem;
-  }
-
-  .an-ms__tick:last-child {
-    justify-items: end;
-    transform: translateX(-100%);
-  }
-
-  .an-ms__tick:last-child .an-ms__tick-node {
-    margin-left: auto;
-  }
-
-  .an-ms__tick-node {
-    width: var(--node);
-    height: var(--node);
-    background: var(--canvas);
-    box-shadow: inset 0 0 0 1px var(--line-strong);
-    transition:
-      background-color 200ms ease,
-      box-shadow 200ms ease;
-  }
-
-  .an-ms__tick-year {
-    font-size: var(--fs-small);
-    color: var(--muted);
-    transition: color 200ms ease;
-  }
-
-  .an-ms__tick.is-on .an-ms__tick-node {
-    background: var(--ink);
-    box-shadow: none;
-  }
-
-  .an-ms__tick.is-on .an-ms__tick-year {
-    color: var(--ink);
-  }
-
-  .an-ms__tick.is-last.is-on .an-ms__tick-node {
-    background: var(--accent);
   }
 
   /* ---------- Rows (Europe, Independent, Trust) ---------- */
@@ -1188,47 +1179,94 @@ const missionAccentFrom = missionWords.length - 2;
       });
     }
 
-    // Milestones: the stage pins and the years run sideways, one per screen.
+    // Milestones: the stage pins; the years turn on a dial at the left.
     const ms = document.querySelector<HTMLElement>('[data-ms]');
-    const track = ms?.querySelector<HTMLElement>('[data-ms-track]');
-    const viewport = ms?.querySelector<HTMLElement>('[data-ms-viewport]');
-    if (ms && track && viewport) {
-      const panels = Array.from(track.querySelectorAll<HTMLElement>('[data-ms-panel]'));
-      const ticks = Array.from(ms.querySelectorAll<HTMLElement>('[data-ms-tick]'));
-      const fillA = ms.querySelector<HTMLElement>('[data-ms-fill]');
-      const fillB = ms.querySelector<HTMLElement>('[data-ms-fill-last]');
-      const n = panels.length;
-      // Each year rests for the first part of its scroll segment, then slides on.
-      const DWELL = 0.3;
-      const SEGMENTS = n - 1 + 0.6; // extra rest on the last year before the page moves on
-      let seg = 0;
+    const wheel = ms?.querySelector<HTMLElement>('[data-ms-wheel]');
+    if (ms && wheel) {
+      const panels = Array.from(ms.querySelectorAll<HTMLElement>('[data-ms-panel]'));
+      const years = Array.from(wheel.querySelectorAll<HTMLElement>('[data-ms-wy]'));
+      const n = years.length;
+      // Each year rests for the first part of its scroll segment, then turns on.
+      const DWELL = 0.35;
+      const SEGMENTS = n - 1 + 0.6;
+      const TICKS = 72;
+      const ticks: HTMLElement[] = [];
+      for (let i = 0; i < TICKS; i++) {
+        const t = document.createElement('span');
+        t.className = 'an-ms__tick';
+        wheel.prepend(t);
+        ticks.push(t);
+      }
 
+      let geo = { R: 0, step: 0, tickStep: 0, ringR: 0, maxA: 0, H: 0, fs: 0 };
+      // Fades a year out as it nears the top or bottom of the dial area.
+      const edge = (a: number) => clamp01((geo.H / 2 - Math.abs(Math.sin(a) * geo.R) - geo.fs * 0.6) / (geo.fs * 0.8));
       ms.classList.add('is-pinned');
 
+      // Dial geometry from the space the dial has, so it always fits the viewport.
       const size = () => {
-        seg = window.innerHeight * 0.85;
-        ms.style.height = `${window.innerHeight + SEGMENTS * seg}px`;
+        ms.style.height = `${window.innerHeight * (1 + SEGMENTS * 0.85)}px`;
+        const W = wheel.clientWidth;
+        const H = wheel.clientHeight;
+        // Year size: as large as the height allows, and narrow enough that the
+        // current year fits beside the marker (a 4-digit year is ~2.3em wide).
+        const fs = Math.max(40, Math.min(H * 0.17, (W - 48) / 2.45, 210));
+        const R = Math.max(H * 0.95, fs * 4.2); // dial radius: the centre sits far left, off-screen
+        const startX = Math.min(48, W * 0.08) + 24; // where the current year starts
+        const cx = startX - R;
+        const cy = H / 2;
+        const ringR = R - 30;
+        geo = { R, step: (fs * 1.18) / R, tickStep: (fs * 1.18) / R / 4, ringR, maxA: Math.asin(Math.min(1, (H / 2 + fs) / R)), H, fs };
+        wheel.style.setProperty('--cx', `${cx}px`);
+        wheel.style.setProperty('--cy', `${cy}px`);
+        wheel.style.setProperty('--mx', `${cx + ringR}px`);
+        years.forEach((y) => {
+          y.style.setProperty('--fs', `${fs}px`);
+          y.style.setProperty('--r', `${R}px`);
+        });
+        ticks.forEach((t, i) => {
+          t.style.setProperty('--r', `${ringR - (i % 4 === 0 ? 14 : 8)}px`);
+          t.style.setProperty('--tl', `${i % 4 === 0 ? 14 : 8}px`);
+        });
       };
 
+      let lastPos = 0;
       const update = () => {
         const travel = ms.offsetHeight - window.innerHeight;
         const p = clamp01(-ms.getBoundingClientRect().top / Math.max(1, travel));
         const raw = p * SEGMENTS;
         const k = Math.min(n - 1, Math.floor(raw));
         const pos = k >= n - 1 ? n - 1 : k + smooth(clamp01((raw - k - DWELL) / (1 - DWELL)));
-        const w = panels[0].offsetWidth; // content width (the viewport's clientWidth includes its padding)
-        track.style.transform = `translate3d(${(-pos * w).toFixed(1)}px, 0, 0)`;
-        panels.forEach((el, i) => el.style.setProperty('--t', clamp01(1 - Math.abs(pos - i) * 2.2).toFixed(3)));
-        fillA?.style.setProperty('--fa', clamp01(pos / Math.max(1, n - 2)).toFixed(4));
-        fillB?.style.setProperty('--fb', clamp01(pos - (n - 2)).toFixed(4));
-        const current = Math.round(pos);
-        ticks.forEach((t, i) => t.classList.toggle('is-on', i <= current));
+        const dir = pos >= lastPos ? 1 : -1;
+        lastPos = pos;
+
+        years.forEach((y, i) => {
+          const a = (i - pos) * geo.step;
+          const d = Math.abs(i - pos);
+          y.style.setProperty('--a', `${a.toFixed(4)}rad`);
+          y.style.setProperty('--o', Math.abs(a) > geo.maxA ? '0' : ((1 - Math.min(1, d) * 0.72) * edge(a)).toFixed(3));
+        });
+        // Ticks turn with the years (four per year), centred on the current one.
+        const half = TICKS / 2;
+        ticks.forEach((t, i) => {
+          const a = (i - half - (pos * 4) % 1) * geo.tickStep;
+          t.style.setProperty('--a', `${a.toFixed(4)}rad`);
+          t.style.opacity = Math.abs(a) > geo.maxA ? '0' : edge(a).toFixed(3);
+        });
+        panels.forEach((el, i) => {
+          const t = clamp01(1 - Math.abs(pos - i) * 2.5);
+          el.style.setProperty('--t', t.toFixed(3));
+          el.style.setProperty('--dir', String(i > pos ? dir : -dir));
+          el.style.setProperty('--vis', t > 0 ? 'visible' : 'hidden');
+        });
       };
 
       size();
       update();
       window.addEventListener('resize', () => (size(), update()), { passive: true });
+      new ResizeObserver(() => (size(), update())).observe(wheel);
       whileNear(ms, update, '10% 0px');
     }
   }
 </script>
+
