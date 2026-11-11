@@ -1,18 +1,17 @@
 ---
 /**
- * About, new draft (/about-new). Content from the "predicterra-about.md" brief,
- * laid out in the site's current design language so it can be compared with
- * /about. The brief's visual notes are interpreted, not copied:
- * light canvas, notched rules, 4 : 8 grid, notched image frames, the grey CTA
- * card. Like the homepage it mixes a classic reading layout with a few
+ * About, new draft (/about-new). Copy from "predicterra-about-textos.md".
+ *
+ * Site design language (near-white canvas, notched rules, 4 : 8 grid, notched
+ * image frames, grey CTA card), with no eyebrows and every section at least one
+ * viewport tall. Like the homepage it mixes a classic reading layout with a few
  * scroll-driven moments: the mission statement lights up word by word, the
- * milestones pin and run sideways, and the dark Trust section slides over the
- * pinned Independent section while the page theme turns dark. Reduced motion
- * gets the static layout. Not indexed while it is a draft.
+ * milestones turn on a dial with each year's text beside it, and the dark Trust
+ * section slides over the pinned sovereignty section while the page turns dark.
+ * Reduced motion gets the static layout. Not indexed while it is a draft.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import NotchRule from '../components/NotchRule.astro';
-import PageIntro from '../components/PageIntro.astro';
 import Icon from '../components/Icon.astro';
 import TextLink from '../components/TextLink.astro';
 import AboutCompare from '../components/AboutCompare.astro';
@@ -23,106 +22,87 @@ import type { IconName } from '../data/icons';
 const locale = 'en';
 const { aboutNew: a } = getCopy(locale);
 const pad = (n: number) => String(n).padStart(2, '0');
-const last = a.milestones.items.length - 1;
-const missionWords = a.mission.title.split(' ');
-// The payoff of the statement, in orange (one accent per statement).
-const missionAccentFrom = missionWords.length - 2;
+const n = a.milestones.items.length;
+const last = n - 1;
+
+// Mission statement split in words for the scroll highlight; the payoff in orange.
+const missionHead = a.mission.title.slice(0, a.mission.title.length - a.mission.accent.length).trim().split(' ');
+const missionAccent = a.mission.accent.split(' ');
 ---
 
 <BaseLayout title={a.seo.title} description={a.seo.description} locale={locale} noindex>
   <!-- 1. Hero -->
-  <PageIntro id="about-title" eyebrow={a.hero.eyebrow} title={a.hero.title} text={a.hero.text} />
-  <div class="container">
-    <figure class="an-hero-media" data-reveal>
-      <img
-        data-parallax
-        src={withBase(a.hero.photo.src)}
-        alt={a.hero.photo.alt}
-        width={a.hero.photo.w}
-        height={a.hero.photo.h}
-        fetchpriority="high"
-        decoding="async"
-      />
-    </figure>
-  </div>
-
-  <!-- 2. Mission -->
-  <section class="an-sec" aria-labelledby="mission-title">
-    <div class="container">
-      <NotchRule at={70} />
-      <p class="label an-label">{a.mission.label}</p>
-      <h2 id="mission-title" class="an-statement" data-lit>
-        {missionWords.map((w, i) => <span class:list={['w', i >= missionAccentFrom && 'accent']}>{w} </span>)}
-      </h2>
-      <div class="an-grid an-grid--tight">
+  <section class="an-full an-hero" aria-labelledby="about-title">
+    <div class="container an-hero__inner">
+      <h1 id="about-title" class="an-hero__title" data-render>{a.hero.title.replace('deep-tech', 'deep\u2011tech')}</h1>
+      <div class="an-grid an-hero__copy">
         <div aria-hidden="true"></div>
-        <div class="an-mission" data-reveal-group>
-          <p class="an-lead" data-reveal>{a.mission.text}</p>
-          <div class="an-dfn" data-reveal>
-            <p class="label">{a.mission.definition.term}</p>
-            <p class="an-dfn__text"><dfn>{a.mission.definition.text}</dfn></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. Story -->
-  <section class="an-sec" aria-labelledby="story-title">
-    <div class="container">
-      <NotchRule at={70} />
-      <div class="an-grid">
-        <div class="an-head">
-          <p class="label">{a.story.label}</p>
-          <h2 id="story-title" class="t-h2" data-render>{a.story.title}</h2>
-          <p class="an-quote" data-reveal>
-            {a.story.quote.text} <span class="accent nowrap">{a.story.quote.accent}</span>
+        <div class="an-hero__text" data-reveal-group>
+          <p class="an-lead" data-reveal>{a.hero.text}</p>
+          <p class="an-hero__proof" data-reveal>
+            <span>{a.hero.place}</span>
+            <span class="t-muted">{a.hero.proof}</span>
           </p>
         </div>
-        <div class="an-prose" data-reveal-group>
-          {a.story.paragraphs.map((p) => <p data-reveal>{p}</p>)}
+      </div>
+      <figure class="an-hero-media" data-reveal>
+        <img
+          data-parallax
+          src={withBase(a.hero.photo.src)}
+          alt={a.hero.photo.alt}
+          width={a.hero.photo.w}
+          height={a.hero.photo.h}
+          fetchpriority="high"
+          decoding="async"
+        />
+      </figure>
+    </div>
+  </section>
+
+  <!-- 2. Mission -->
+  <section class="an-full" aria-labelledby="mission-title">
+    <div class="container an-full__inner">
+      <NotchRule at={70} />
+      <div class="an-body">
+        <h2 id="mission-title" class="an-statement" data-lit>
+          {missionHead.map((w) => <span class="w">{w} </span>)}
+          <span class="accent nowrap">{missionAccent.map((w) => <span class="w">{w} </span>)}</span>
+        </h2>
+        <div class="an-grid an-grid--tight">
+          <div aria-hidden="true"></div>
+          <p class="an-lead an-lead--lg" data-reveal>{a.mission.text}</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 4. Milestones: pinned; the years turn on a dial at the left, the year's
-       milestone reads on the right, the title stays in view throughout. -->
-  <section class="an-ms" aria-labelledby="milestones-title" data-ms style={`--n:${a.milestones.items.length}`}>
-    <div class="an-ms__stage" data-ms-stage>
+  <!-- 3. Milestones: pinned; the years turn on a dial at the left and each
+       year's milestone reads right beside it, on the same line. -->
+  <section class="an-ms" aria-labelledby="milestones-title" data-ms style={`--n:${n}`}>
+    <div class="an-ms__stage">
       <div class="container">
         <NotchRule at={70} />
+        <h2 id="milestones-title" class="t-h2 an-ms__title" data-render>{a.milestones.title}</h2>
       </div>
-      <div class="container an-ms__grid">
-        <!-- Decorative dial (the same years are in the list for screen readers) -->
-        <div class="an-ms__wheel" aria-hidden="true" data-ms-wheel>
-          <span class="an-ms__mark" data-ms-mark />
+      <div class="container an-ms__body">
+        <div class="an-ms__wheel" data-ms-wheel>
+          <span class="an-ms__mark" aria-hidden="true"></span>
+          <span class="an-ms__lead" aria-hidden="true"></span>
           {
             a.milestones.items.map((m, i) => (
-              <span class:list={['an-ms__wy t-num', i === last && 'is-last']} data-ms-wy>
+              <span class:list={['an-ms__wy t-num', i === last && 'is-last']} aria-hidden="true" data-ms-wy>
                 {m.year}
               </span>
             ))
           }
-        </div>
-
-        <div class="an-ms__side">
-          <div class="an-head an-ms__head">
-            <p class="label">{a.milestones.label}</p>
-            <h2 id="milestones-title" class="t-h2" data-render>{a.milestones.title}</h2>
-          </div>
-          <ol class="an-ms__track" data-ms-track>
+          <ol class="an-ms__list" data-ms-list>
             {
               a.milestones.items.map((m, i) => (
-                <li class:list={['an-ms__panel', i === last && 'is-last']} data-ms-panel>
+                <li class:list={['an-ms__item', i === last && 'is-last']} data-ms-item>
                   <span class="an-ms__node" aria-hidden="true" />
-                  <p class="an-ms__year t-num">
-                    {m.year}
-                    <span class="an-ms__count" aria-hidden="true">
-                      {pad(i + 1)} / {pad(a.milestones.items.length)}
-                    </span>
-                  </p>
-                  <p class="an-ms__text">{m.text}</p>
+                  <p class="an-ms__year t-num">{m.year}</p>
+                  <p class="an-ms__text">{m.text.replace(/(\w)-(\w)/g, '$1\u2011$2')}</p>
+                  <p class="an-ms__count t-num" aria-hidden="true">{pad(i + 1)} / {pad(n)}</p>
                 </li>
               ))
             }
@@ -132,23 +112,83 @@ const missionAccentFrom = missionWords.length - 2;
     </div>
   </section>
 
-  <!-- 5. European by design -->
-  <section class="an-sec" aria-labelledby="europe-title">
-    <div class="container">
-      <NotchRule at={70} />
-      <div class="an-grid">
-        <div class="an-head">
-          <p class="label">{a.europe.label}</p>
-          <h2 id="europe-title" class="t-h2" data-render>{a.europe.title}</h2>
-          <p class="an-lead" data-reveal>{a.europe.text}</p>
+  <!-- 4–5. The sovereignty section stays pinned while the dark Trust section slides over it -->
+  <div class="an-pin">
+    <section class="an-full an-pinned" aria-labelledby="sovereign-title" data-pinned>
+      <div class="container an-full__inner">
+        <NotchRule at={70} />
+        <div class="an-body">
+          <div class="an-grid">
+            <h2 id="sovereign-title" class="t-h2 an-head" data-render>{a.sovereign.title}</h2>
+            <ul class="an-rows" data-reveal-group>
+              {
+                a.sovereign.items.map((it) => (
+                  <li class="an-row an-row--icon" data-reveal>
+                    <Icon name={it.icon as IconName} boxed size="2.75rem" />
+                    <h3 class="an-row__title">{it.title}</h3>
+                    <p class="an-row__text">{it.text}</p>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
         </div>
-        <ul class="an-rows" data-reveal-group>
+      </div>
+    </section>
+
+    <section class="an-full an-trust theme-scrub" aria-labelledby="trust-title" data-theme-dark data-header-dark="scrub">
+      <div class="container an-full__inner">
+        <div class="an-body">
+          <div class="an-grid">
+            <h2 id="trust-title" class="t-h2 an-head" data-render>{a.trust.title}</h2>
+            <ol class="an-rows" data-reveal-group>
+              {
+                a.trust.items.map((it, i) => (
+                  <li class="an-row an-row--num" data-reveal>
+                    <span class="an-row__num t-num">{pad(i + 1)}</span>
+                    <h3 class="an-row__title">{it.title}</h3>
+                    <p class="an-row__text">{it.text}</p>
+                  </li>
+                ))
+              }
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 6. Recognition: scrubbed back from dark to light as it comes in -->
+  <section class="an-full an-recog theme-scrub" aria-labelledby="recognition-title" data-theme-next>
+    <div class="container an-full__inner">
+      <div class="an-body">
+        <h2 id="recognition-title" class="t-h2 an-head" data-render>{a.recognition.title}</h2>
+        <ul class="an-cards" data-reveal-group>
           {
-            a.europe.items.map((it) => (
-              <li class="an-row an-row--icon" data-reveal>
-                <Icon name={it.icon as IconName} boxed size="2.75rem" />
-                <h3 class="an-row__title">{it.title}</h3>
-                <p class="an-row__text">{it.text}</p>
+            a.recognition.items.map((it) => (
+              <li class="an-card" data-reveal>
+                <div class="an-card__brand">
+                  {it.logo ? (
+                    <img
+                      src={withBase(it.logo.src)}
+                      alt={it.name}
+                      width={Math.round((it.logo.w / it.logo.h) * it.logo.h1)}
+                      height={it.logo.h1}
+                      style={`--h:${it.logo.h1}px`}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <span class="an-card__wordmark">{it.name}</span>
+                  )}
+                </div>
+                <div class="an-card__body">
+                  {it.logo && <h3 class="an-card__name t-small">{it.name}</h3>}
+                  <p class="an-card__text">
+                    <span class="an-dot" aria-hidden="true" />
+                    {it.text}
+                  </p>
+                </div>
               </li>
             ))
           }
@@ -157,210 +197,127 @@ const missionAccentFrom = missionWords.length - 2;
     </div>
   </section>
 
-  <!-- 6–7. Independent stays pinned while the dark Trust section slides over it -->
-  <div class="an-pin">
-  <section class="an-sec an-pinned" aria-labelledby="independent-title" data-pinned>
-    <div class="container">
+  <!-- 7. Team -->
+  <section class="an-full" aria-labelledby="team-title">
+    <div class="container an-full__inner">
       <NotchRule at={70} />
-      <div class="an-grid">
-        <div class="an-head">
-          <p class="label">{a.independent.label}</p>
-          <h2 id="independent-title" class="t-h2" data-render>{a.independent.title}</h2>
+      <div class="an-body">
+        <div class="an-grid">
+          <h2 id="team-title" class="t-h2 an-head" data-render>{a.team.title}</h2>
+          <p class="an-lead an-lead--lg" data-reveal>{a.team.text}</p>
         </div>
-        <div class="an-indep">
-          <p class="an-lead" data-reveal>{a.independent.text}</p>
-          <ul class="an-rows" data-reveal-group>
-            {
-              a.independent.items.map((it) => (
-                <li class="an-row an-row--split" data-reveal>
-                  <h3 class="an-row__title">{it.title}</h3>
-                  <p class="an-row__text">{it.text}</p>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 7. Trust: dark, scrubbed from light to dark as it covers the pinned section -->
-  <section class="an-trust theme-scrub" aria-labelledby="trust-title" data-theme-dark data-header-dark="scrub">
-    <div class="container an-trust__inner">
-      <div class="an-grid">
-        <div class="an-head">
-          <p class="label">{a.trust.label}</p>
-          <h2 id="trust-title" class="t-h2" data-render>{a.trust.title}</h2>
-          <p class="an-lead" data-reveal>{a.trust.text}</p>
-        </div>
-        <ol class="an-rows" data-reveal-group>
+        <ul class="an-team" data-reveal-group>
           {
-            a.trust.items.map((it, i) => (
-              <li class="an-row an-row--num" data-reveal>
-                <span class="an-row__num t-num">{pad(i + 1)}</span>
-                <h3 class="an-row__title">{it.title}</h3>
-                <p class="an-row__text">{it.text}</p>
+            a.team.people.map((m, i) => (
+              <li class="an-person" data-reveal>
+                <div class="an-person__photo">
+                  <img src={withBase(m.photo)} alt={m.name} width="600" height="600" loading="lazy" decoding="async" />
+                </div>
+                <p class="an-person__index t-caption t-num">{pad(i + 1)}</p>
+                <h3 class="an-person__name">{m.name}</h3>
+                <p class="an-person__role t-small">{m.role}</p>
               </li>
             ))
           }
-        </ol>
+        </ul>
       </div>
-      <ul class="an-seals" aria-label="Certifications and hosting" data-reveal>
-        {a.trust.seals.map((s) => <li class="chip">{s}</li>)}
-      </ul>
-    </div>
-  </section>
-  </div>
-
-  <!-- 8. Recognition: scrubbed back from dark to light as it comes in -->
-  <section class="an-sec an-sec--first an-recog theme-scrub" aria-labelledby="recognition-title" data-theme-next>
-    <div class="container">
-      <div class="an-grid">
-        <div class="an-head">
-          <p class="label">{a.recognition.label}</p>
-          <h2 id="recognition-title" class="t-h2" data-render>{a.recognition.title}</h2>
-        </div>
-      </div>
-      <ul class="an-cards" data-reveal-group>
-        {
-          a.recognition.items.map((it) => (
-            <li class="an-card" data-reveal>
-              <div class="an-card__brand">
-                {it.logo ? (
-                  <img
-                    src={withBase(it.logo.src)}
-                    alt={it.name}
-                    width={Math.round((it.logo.w / it.logo.h) * it.logo.h1)}
-                    height={it.logo.h1}
-                    style={`--h:${it.logo.h1}px`}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : (
-                  <span class="an-card__wordmark">{it.name}</span>
-                )}
-              </div>
-              <div class="an-card__body">
-                {it.logo && <h3 class="an-card__name t-small">{it.name}</h3>}
-                <p class="an-card__text">
-                  <span class="an-dot" aria-hidden="true" />
-                  {it.text}
-                </p>
-              </div>
-            </li>
-          ))
-        }
-      </ul>
     </div>
   </section>
 
-  <!-- 9. Team -->
-  <section class="an-sec" aria-labelledby="team-title">
-    <div class="container">
-      <NotchRule at={70} />
-      <div class="an-grid">
-        <div class="an-head">
-          <p class="label">{a.team.label}</p>
-          <h2 id="team-title" class="t-h2" data-render>{a.team.title}</h2>
-        </div>
-        <p class="an-lead" data-reveal>{a.team.text}</p>
-      </div>
-      <ul class="an-team" data-reveal-group>
-        {
-          a.team.people.map((m, i) => (
-            <li class="an-person" data-reveal>
-              <div class="an-person__photo">
-                <img src={withBase(m.photo)} alt={m.name} width="600" height="600" loading="lazy" decoding="async" />
-              </div>
-              <p class="an-person__index t-caption t-num">{pad(i + 1)}</p>
-              <h3 class="an-person__name">{m.name}</h3>
-              <p class="an-person__role t-small">{m.role}</p>
-              {m.org && <p class="an-person__org t-small">{m.org}</p>}
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
-
-  <!-- 10. Built by Woza -->
-  <section class="an-sec" aria-labelledby="woza-title">
-    <div class="container">
+  <!-- 8. Built by Woza -->
+  <section class="an-full" aria-labelledby="woza-title">
+    <div class="container an-full__inner">
       <div class="an-woza" data-reveal>
-        <div class="an-woza__brand">
-          <p class="label">{a.woza.label}</p>
-          <p class="an-woza__mark" aria-hidden="true">Woza Labs</p>
-        </div>
         <div class="an-woza__body">
-          <h2 id="woza-title" class="t-h3">{a.woza.title}</h2>
-          <p class="an-woza__text">{a.woza.text}</p>
+          <h2 id="woza-title" class="an-woza__title">{a.woza.title}</h2>
+          <p class="an-lead">{a.woza.text}</p>
           <TextLink href={a.woza.link.href} label={`${a.woza.link.label} →`} external />
         </div>
+        <p class="an-woza__mark" aria-hidden="true">Woza Labs</p>
       </div>
     </div>
   </section>
 
-  <!-- 11. Where we are -->
-  <section class="an-sec" aria-labelledby="where-title">
-    <div class="container">
+  <!-- 9. Where we are -->
+  <section class="an-full" aria-labelledby="where-title">
+    <div class="container an-full__inner">
       <NotchRule at={70} />
-      <div class="an-grid">
-        <div class="an-head">
-          <p class="label">{a.where.label}</p>
-          <h2 id="where-title" class="t-h2" data-render>{a.where.title}</h2>
+      <div class="an-body an-where">
+        <div class="an-grid">
+          <h2 id="where-title" class="t-h2 an-head" data-render>{a.where.title}</h2>
+          <dl class="an-facts" data-reveal-group>
+            <div class="an-fact" data-reveal>
+              <dt class="t-small">{a.where.office.label}</dt>
+              <dd>{a.where.office.value}</dd>
+            </div>
+            <div class="an-fact" data-reveal>
+              <dt class="t-small">{a.where.email.label}</dt>
+              <dd><a href={`mailto:${a.where.email.value}`}>{a.where.email.value}</a></dd>
+            </div>
+            <div class="an-fact" data-reveal>
+              <dt class="t-small">{a.where.phone.label}</dt>
+              <dd class="an-fact__phones">
+                {
+                  a.where.phone.items.map((p) => (
+                    <a href={p.href}>
+                      <span class="t-muted">{p.label}</span> <span class="t-num">{p.value}</span>
+                    </a>
+                  ))
+                }
+              </dd>
+            </div>
+          </dl>
         </div>
-        <div class="an-where" data-reveal-group>
-          <address class="an-where__contact" data-reveal>
-            <span class="an-lead">{a.where.address}</span>
-            <a href={`mailto:${a.where.email}`}>{a.where.email}</a>
-            {
-              a.where.phones.map((p) => (
-                <a href={p.href}>
-                  <span class="t-muted">{p.label}</span> <span class="t-num">{p.value}</span>
-                </a>
-              ))
-            }
-          </address>
-          <p class="an-where__join t-small" data-reveal>
-            {a.where.join.text} <a href={`mailto:${a.where.join.email}`}>{a.where.join.email}</a>
-          </p>
-          <div class="an-map" role="img" aria-label={`${a.where.map.place}, ${a.where.map.city}`} data-reveal>
-            <span class="an-map__pin" aria-hidden="true" />
-            <span class="an-map__tag t-small" aria-hidden="true">
-              <span>{a.where.map.place}</span>
-              <span class="t-muted">{a.where.map.city}</span>
-            </span>
-          </div>
+        <div class="an-map" role="img" aria-label={`${a.where.map.place}, ${a.where.map.city}`} data-reveal>
+          <span class="an-map__pin" aria-hidden="true"></span>
+          <span class="an-map__tag t-small" aria-hidden="true">
+            <span>{a.where.map.place}</span>
+            <span class="t-muted">{a.where.map.city}</span>
+          </span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 12. CTA -->
-  <Cta locale={locale} copy={a.cta} />
+  <!-- 10. CTA -->
+  <div class="an-cta">
+    <Cta locale={locale} copy={a.cta} />
+  </div>
 
   <AboutCompare locale={locale} current="draft" />
 </BaseLayout>
 
 <style>
-  /* ---------- Shared ---------- */
-  .an-sec {
+  /* ---------- Section frame: at least one viewport tall ---------- */
+  .an-full {
     position: relative;
-    padding-bottom: var(--section-y);
+    display: flex;
+    min-height: 100svh;
   }
 
-  .an-sec--first {
-    padding-top: var(--section-y);
+  .an-full__inner {
+    display: flex;
+    flex-direction: column;
+    padding-top: calc(var(--header-h) + 1rem);
+    padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  /* Content centred in the space under the rule. */
+  .an-body {
+    flex: 1;
+    display: grid;
+    align-content: center;
+    gap: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+    padding-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
   }
 
   .an-grid {
     display: grid;
     gap: 2rem var(--gutter);
-    padding-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
   }
 
   .an-grid--tight {
-    padding-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+    gap: 0 var(--gutter);
   }
 
   @media (min-width: 64rem) {
@@ -370,15 +327,9 @@ const missionAccentFrom = missionWords.length - 2;
   }
 
   .an-head {
-    display: grid;
-    align-content: start;
-    gap: 1rem;
-    /* Head column wraps titles; keep them from running into the right column. */
+    align-self: start;
     max-width: 30rem;
-  }
-
-  .an-label {
-    margin-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
+    text-wrap: balance;
   }
 
   .an-lead {
@@ -388,44 +339,74 @@ const missionAccentFrom = missionWords.length - 2;
     color: var(--ink-2);
   }
 
-  /* ---------- Hero media ---------- */
+  .an-lead--lg {
+    max-width: 36ch;
+    font-size: var(--fs-h4);
+    line-height: 1.4;
+    letter-spacing: var(--track-title);
+  }
+
+  /* ---------- 1. Hero ---------- */
+  .an-hero__inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    padding-top: calc(var(--header-h) + clamp(2.5rem, 1rem + 6vh, 6rem));
+    padding-bottom: clamp(1rem, 0.5rem + 1vw, 2rem);
+  }
+
+  .an-hero__title {
+    max-width: 16ch;
+    font-size: clamp(2.75rem, 1rem + 4.6vw, 6rem);
+    line-height: 0.96;
+    letter-spacing: var(--track-display);
+    text-wrap: balance;
+  }
+
+  .an-hero__copy {
+    margin-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+
+  .an-hero__text {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .an-hero__proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.4em;
+    font-size: var(--fs-small);
+  }
+
+  /* The photo takes whatever the viewport has left (never less than a band). */
   .an-hero-media {
+    position: relative;
+    flex: 1 1 0;
+    min-height: clamp(12rem, 30svh, 26rem);
     overflow: hidden;
-    aspect-ratio: 4 / 3;
-    margin-bottom: var(--section-y);
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
     background: #e4e4e4;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
   }
 
-  @media (min-width: 48rem) {
-    .an-hero-media {
-      aspect-ratio: 16 / 9;
-    }
-  }
-
-  @media (min-width: 80rem) {
-    .an-hero-media {
-      aspect-ratio: 21 / 9;
-    }
-  }
-
   .an-hero-media img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  /* Slow drift while the photo scrolls past (scripts below); never with reduced motion. */
   .an-hero-media.is-parallax img {
     height: 116%;
     transform: translate3d(0, var(--py, 0px), 0);
     will-change: transform;
   }
 
-  /* ---------- Mission ---------- */
+  /* ---------- 2. Mission ---------- */
   .an-statement {
-    max-width: 22ch;
-    margin-top: 1.25rem;
+    max-width: 20ch;
     font-size: var(--fs-display);
     line-height: 0.98;
     letter-spacing: var(--track-display);
@@ -437,75 +418,50 @@ const missionAccentFrom = missionWords.length - 2;
     transition: opacity 200ms linear;
   }
 
-  .an-mission {
-    display: grid;
-    gap: clamp(1.5rem, 1rem + 2vw, 2.5rem);
-  }
-
-  .an-dfn {
-    display: grid;
-    gap: 0.875rem;
-    max-width: 40rem;
-    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
-    background: var(--card);
-  }
-
-  .an-dfn__text dfn {
-    font-style: normal;
-    font-size: var(--fs-h4);
-    line-height: 1.35;
-    letter-spacing: var(--track-title);
-  }
-
-  /* ---------- Story ---------- */
-  .an-quote {
-    margin-top: clamp(0.5rem, 0.25rem + 1vw, 1.5rem);
-    font-size: var(--fs-h2);
-    line-height: 1.02;
-    letter-spacing: var(--track-heading);
-    text-wrap: balance;
-  }
-
-  .an-prose {
-    display: grid;
-    gap: 1.25em;
-    max-width: 40rem;
-    font-size: var(--fs-lead);
-    line-height: 1.55;
-    color: var(--ink-2);
-  }
-
-  /* ---------- Milestones ----------
-   Static by default (no JS, reduced motion): a vertical list on phones and a
-   five-column timeline on wide screens, the dial hidden. With JS, .is-pinned
-   pins the stage: a dial of years turns at the left (its centre sits off-screen,
-   so the arc overflows the left edge), the current year's milestone reads on the
-   right, and the title stays in view. */
+  /* ---------- 3. Milestones ----------
+     Static by default (no JS, reduced motion): a list with a line and a node per
+     year (vertical on phones, five columns on wide screens). With JS, .is-pinned
+     pins the stage and turns it into the dial. */
   .an-ms {
     --node: 0.625rem;
     position: relative;
-    padding-bottom: var(--section-y);
   }
 
-  .an-ms__grid {
-    padding-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
+  .an-ms__stage {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    padding-top: calc(var(--header-h) + 1rem);
+    padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
   }
 
-  .an-ms__wheel {
-    display: none;
+  .an-ms__title {
+    max-width: 30rem;
+    margin-top: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    text-wrap: balance;
   }
 
+  .an-ms__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .an-ms__mark,
+  .an-ms__lead,
+  .an-ms__wy,
   .an-ms__count {
     display: none;
   }
 
-  .an-ms__track {
+  .an-ms__list {
     display: grid;
     gap: 0 var(--gutter);
     margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
   }
 
-  .an-ms__panel {
+  .an-ms__item {
     position: relative;
     display: grid;
     align-content: start;
@@ -513,8 +469,7 @@ const missionAccentFrom = missionWords.length - 2;
     padding: 0 0 2rem 1.75rem;
   }
 
-  /* The line: vertical on small screens, horizontal from 64rem. */
-  .an-ms__panel::before {
+  .an-ms__item::before {
     content: '';
     position: absolute;
     left: calc(var(--node) / 2 - 0.5px);
@@ -533,8 +488,8 @@ const missionAccentFrom = missionWords.length - 2;
     background: var(--ink);
   }
 
-  .an-ms__panel.is-last::before,
-  .an-ms__panel.is-last .an-ms__node {
+  .an-ms__item.is-last::before,
+  .an-ms__item.is-last .an-ms__node {
     background: var(--accent);
   }
 
@@ -546,20 +501,19 @@ const missionAccentFrom = missionWords.length - 2;
 
   .an-ms__text {
     max-width: 30ch;
-    font-size: var(--fs-small);
     color: var(--ink-2);
   }
 
   @media (min-width: 64rem) {
-    .an-ms:not(.is-pinned) .an-ms__track {
+    .an-ms:not(.is-pinned) .an-ms__list {
       grid-template-columns: repeat(var(--n), minmax(0, 1fr));
     }
 
-    .an-ms:not(.is-pinned) .an-ms__panel {
+    .an-ms:not(.is-pinned) .an-ms__item {
       padding: 2.25rem 0 0;
     }
 
-    .an-ms:not(.is-pinned) .an-ms__panel::before {
+    .an-ms:not(.is-pinned) .an-ms__item::before {
       left: 0;
       right: calc(-1 * var(--gutter));
       top: calc(var(--node) / 2 - 0.5px);
@@ -568,7 +522,7 @@ const missionAccentFrom = missionWords.length - 2;
       height: 1px;
     }
 
-    .an-ms:not(.is-pinned) .an-ms__panel.is-last::before {
+    .an-ms:not(.is-pinned) .an-ms__item.is-last::before {
       right: 0;
       height: 2px;
     }
@@ -579,60 +533,31 @@ const missionAccentFrom = missionWords.length - 2;
   }
 
   /* ----- Pinned dial ----- */
-  .an-ms.is-pinned {
-    padding-bottom: 0;
-  }
-
   .an-ms.is-pinned .an-ms__stage {
     position: sticky;
     top: 0;
-    display: flex;
-    flex-direction: column;
     height: 100svh;
     overflow: clip;
-    padding-top: calc(var(--header-h) + 0.5rem);
-    padding-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
   }
 
-  .an-ms.is-pinned .an-ms__grid {
-    flex: 1;
+  .an-ms.is-pinned .an-ms__body {
     min-height: 0;
-    display: grid;
-    grid-template-areas: 'head' 'wheel' 'info';
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    gap: 1.5rem var(--gutter);
-  }
-
-  /* Phones: title, dial, milestone stacked. Wide: dial left, title and milestone right. */
-  .an-ms.is-pinned .an-ms__side {
-    display: contents;
-  }
-
-  @media (min-width: 64rem) {
-    .an-ms.is-pinned .an-ms__grid {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      grid-template-areas: 'wheel head' 'wheel info';
-      grid-template-rows: auto minmax(0, 1fr);
-    }
-  }
-
-  .an-ms.is-pinned .an-ms__head {
-    grid-area: head;
+    padding-top: 1rem;
   }
 
   .an-ms.is-pinned .an-ms__wheel {
-    grid-area: wheel;
-    display: block;
+    flex: 1;
     position: relative;
     min-height: 0;
-    /* Clip above and below (never over the title or the milestone), but let the
-       dial run off the left edge of the page. */
+    /* Clip above and below (never over the title), but let the dial run off the
+       left edge of the page. */
     clip-path: inset(0 -100vw 0 -100vw);
   }
 
-  /* Years sit on the dial: placed at the dial centre, turned by their angle and
-     pushed out along the radius (the script writes --a, --r, --fs, --o). */
-  .an-ms__wy {
+  /* Years on the dial: placed at its centre, turned by their angle and pushed
+     out along the radius (the script writes --a, --o and the geometry). */
+  .an-ms.is-pinned .an-ms__wy {
+    display: block;
     position: absolute;
     left: var(--cx);
     top: var(--cy);
@@ -647,12 +572,13 @@ const missionAccentFrom = missionWords.length - 2;
     will-change: transform, opacity;
   }
 
-  .an-ms__wy.is-last {
+  .an-ms.is-pinned .an-ms__wy.is-last {
     color: var(--accent);
   }
 
-  /* Marker on the centre line, just before the current year (like a pointer). */
-  .an-ms__mark {
+  /* Pointer on the centre line, just before the current year. */
+  .an-ms.is-pinned .an-ms__mark {
+    display: block;
     position: absolute;
     left: var(--mx);
     top: var(--cy);
@@ -662,7 +588,17 @@ const missionAccentFrom = missionWords.length - 2;
     transform: translate(-50%, -50%);
   }
 
-  /* Ticks along the dial, drawn by the script. */
+  /* Leader line from the current year to its milestone (wide screens). */
+  .an-ms.is-pinned .an-ms__lead {
+    display: block;
+    position: absolute;
+    left: var(--lx);
+    top: var(--cy);
+    width: var(--lw, 0px);
+    height: 1px;
+    background: var(--line-strong);
+  }
+
   :global(.an-ms__tick) {
     position: absolute;
     left: var(--cx);
@@ -674,59 +610,55 @@ const missionAccentFrom = missionWords.length - 2;
     transform: rotate(var(--a, 0rad)) translateX(var(--r, 0px));
   }
 
-  /* Milestone of the current year, stacked and crossfaded. */
-  .an-ms.is-pinned .an-ms__track {
-    grid-area: info;
-    display: grid;
-    align-self: end;
+  /* The current year's milestone, beside it on the same line (below it on
+     phones), crossfaded as the dial turns. */
+  .an-ms.is-pinned .an-ms__list {
+    position: absolute;
+    left: var(--tx);
+    top: var(--ty);
+    width: var(--tw);
     margin: 0;
+    display: grid;
   }
 
-  .an-ms.is-pinned .an-ms__panel {
+  .an-ms.is-pinned .an-ms__item {
     grid-area: 1 / 1;
-    gap: 1rem;
+    align-self: var(--align, center);
+    gap: 0.75rem;
     padding: 0;
     opacity: var(--t, 0);
-    transform: translate3d(0, calc((1 - var(--t, 0)) * var(--dir, 1) * 0.75rem), 0);
+    transform: translate3d(0, calc((1 - var(--t, 0)) * var(--dir, 1) * 0.5rem), 0);
     visibility: var(--vis, hidden);
   }
 
-  .an-ms.is-pinned .an-ms__panel::before,
-  .an-ms.is-pinned .an-ms__node {
+  .an-ms.is-pinned .an-ms__item::before,
+  .an-ms.is-pinned .an-ms__node,
+  .an-ms.is-pinned .an-ms__year {
     display: none;
   }
 
-  .an-ms.is-pinned .an-ms__year {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
+  .an-ms.is-pinned .an-ms__text {
+    max-width: 24ch;
     font-size: var(--fs-h3);
+    line-height: 1.15;
     letter-spacing: var(--track-title);
+    color: var(--ink);
+    text-wrap: balance;
   }
 
   .an-ms.is-pinned .an-ms__count {
-    display: inline;
+    display: block;
     font-size: var(--fs-small);
-    letter-spacing: 0;
     color: var(--muted);
   }
 
-  .an-ms.is-pinned .an-ms__text {
-    max-width: 36ch;
-    font-size: var(--fs-h4);
-    line-height: 1.35;
-    letter-spacing: var(--track-title);
-    color: var(--ink-2);
-  }
-
-  @media (max-width: 63.99rem) {
+  @media (max-width: 47.99rem) {
     .an-ms.is-pinned .an-ms__text {
-      font-size: var(--fs-lead);
+      font-size: var(--fs-h4);
     }
   }
 
-  /* ---------- Rows (Europe, Independent, Trust) ---------- */
+  /* ---------- Rows (sovereignty, Trust) ---------- */
   .an-rows {
     display: grid;
   }
@@ -744,13 +676,15 @@ const missionAccentFrom = missionWords.length - 2;
   }
 
   .an-row__title {
-    font-size: var(--fs-h4);
-    line-height: 1.2;
+    font-size: var(--fs-h3);
+    line-height: 1.1;
     letter-spacing: var(--track-title);
   }
 
   .an-row__text {
-    max-width: 52ch;
+    max-width: 48ch;
+    font-size: var(--fs-lead);
+    line-height: 1.4;
     color: var(--ink-2);
   }
 
@@ -774,19 +708,8 @@ const missionAccentFrom = missionWords.length - 2;
     grid-area: text;
   }
 
-  .an-indep {
-    display: grid;
-    gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
-  }
-
-  @media (min-width: 48rem) {
-    .an-row--split {
-      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-    }
-  }
-
   .an-row--num {
-    grid-template-columns: 2.5rem minmax(0, 1fr);
+    grid-template-columns: 2.75rem minmax(0, 1fr);
     grid-template-areas:
       'num title'
       'num text';
@@ -794,7 +717,7 @@ const missionAccentFrom = missionWords.length - 2;
 
   .an-row--num .an-row__num {
     grid-area: num;
-    padding-top: 0.2rem;
+    padding-top: 0.45rem;
     font-size: var(--fs-small);
     color: var(--accent);
   }
@@ -807,7 +730,7 @@ const missionAccentFrom = missionWords.length - 2;
     grid-area: text;
   }
 
-  /* ---------- Independent pinned, Trust slides over (homepage Solutions pattern) ---------- */
+  /* ---------- Pinned section + Trust slides over (homepage Solutions pattern) ---------- */
   .an-pin {
     position: relative;
   }
@@ -820,36 +743,13 @@ const missionAccentFrom = missionWords.length - 2;
     background: var(--canvas);
   }
 
-  .an-trust {
-    position: relative;
-    z-index: var(--z-cover);
-    box-shadow: 0 -24px 48px -24px rgb(30 30 30 / 0.14);
-  }
-
+  .an-trust,
   .an-recog {
-    position: relative;
     z-index: var(--z-cover);
   }
 
-  .an-trust__inner {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 100svh;
-    padding-block: calc(var(--header-h) + 2rem) var(--section-y);
-  }
-
-  .an-seals {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4rem);
-  }
-
-  .an-seals :global(.chip) {
-    min-height: 2rem;
-    padding-inline: 0.75rem;
-    font-size: var(--fs-small);
+  .an-trust {
+    box-shadow: 0 -24px 48px -24px rgb(30 30 30 / 0.14);
   }
 
   /* ---------- Recognition ---------- */
@@ -857,7 +757,6 @@ const missionAccentFrom = missionWords.length - 2;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--gutter);
-    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
   }
 
   @media (min-width: 40rem) {
@@ -886,7 +785,6 @@ const missionAccentFrom = missionWords.length - 2;
     height: 2.5rem;
   }
 
-  /* Monochrome logos, as in the homepage strip. */
   .an-card__brand img {
     width: auto;
     height: var(--h);
@@ -921,7 +819,6 @@ const missionAccentFrom = missionWords.length - 2;
     width: 0.5rem;
     height: 0.5rem;
     background: var(--accent);
-    transform: translateY(-0.05em);
   }
 
   /* ---------- Team ---------- */
@@ -929,7 +826,6 @@ const missionAccentFrom = missionWords.length - 2;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2.5rem var(--gutter);
-    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
   }
 
   @media (min-width: 48rem) {
@@ -980,83 +876,91 @@ const missionAccentFrom = missionWords.length - 2;
     color: var(--ink-2);
   }
 
-  .an-person__org {
-    color: var(--muted);
-  }
-
-  /* ---------- Woza ---------- */
+  /* ---------- Built by Woza: one large card filling the section ---------- */
   .an-woza {
+    flex: 1;
     display: grid;
-    gap: 2rem var(--gutter);
-    padding: clamp(1.5rem, 1rem + 2vw, 3rem);
-    background: var(--card);
-  }
-
-  @media (min-width: 64rem) {
-    .an-woza {
-      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    }
-  }
-
-  .an-woza__brand {
-    display: grid;
-    align-content: space-between;
+    grid-template-rows: auto 1fr;
     gap: 2rem;
-  }
-
-  .an-woza__mark {
-    font-size: var(--fs-h2);
-    line-height: 1;
-    letter-spacing: var(--track-heading);
+    padding: clamp(1.5rem, 1rem + 3vw, 4rem);
+    background: var(--card);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
   }
 
   .an-woza__body {
     display: grid;
     align-content: start;
-    gap: 1.25rem;
+    gap: 1.5rem;
     max-width: 44rem;
   }
 
-  .an-woza__text {
-    color: var(--ink-2);
+  @media (min-width: 64rem) {
+    .an-woza__body {
+      margin-left: calc(100% * 4 / 12);
+    }
   }
 
-  /* ---------- Where ---------- */
-  .an-where {
-    display: grid;
-    gap: 1.5rem;
-    min-width: 0;
-    align-content: start;
+  .an-woza__title {
+    font-size: var(--fs-h2);
+    line-height: 1;
+    letter-spacing: var(--track-heading);
+    text-wrap: balance;
   }
 
-  .an-where__contact {
-    display: grid;
-    gap: 0.375rem;
-    font-style: normal;
-  }
-
-  .an-where__contact .an-lead {
-    margin-bottom: 0.5rem;
+  .an-woza__mark {
+    align-self: end;
+    font-size: clamp(3.5rem, 1rem + 11vw, 12rem);
+    line-height: 0.85;
+    letter-spacing: -0.05em;
     color: var(--ink);
   }
 
-  .an-where a {
+  /* ---------- Where we are ---------- */
+  .an-facts {
+    display: grid;
+  }
+
+  .an-fact {
+    display: grid;
+    gap: 0.375rem 1.5rem;
+    padding-block: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .an-fact:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  @media (min-width: 48rem) {
+    .an-fact {
+      grid-template-columns: 8rem minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+
+  .an-fact dt {
+    color: var(--muted);
+  }
+
+  .an-fact dd {
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .an-fact__phones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+  }
+
+  .an-facts a {
     width: fit-content;
     transition: color 160ms ease;
   }
 
-  .an-where__join {
-    color: var(--ink-2);
-  }
-
-  .an-where__join a {
-    text-decoration: underline;
-    text-underline-offset: 0.2em;
-    text-decoration-color: var(--line-strong);
-  }
-
   @media (hover: hover) and (pointer: fine) {
-    .an-where a:hover {
+    .an-facts a:hover {
       color: var(--accent);
     }
   }
@@ -1066,27 +970,24 @@ const missionAccentFrom = missionWords.length - 2;
     --px: 34%;
     position: relative;
     overflow: hidden;
-    aspect-ratio: 3 / 2;
-    margin-top: 1rem;
+    min-height: clamp(14rem, 32svh, 26rem);
     background-color: #e4e4e4;
     background-image: radial-gradient(circle, rgb(30 30 30 / 0.22) 1px, transparent 1.5px);
     background-size: 14px 14px;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
   }
 
+  @media (min-width: 48rem) {
+    .an-map {
+      --px: 52%;
+    }
+  }
+
   .an-map::after {
-    /* Soften the field towards the edges. */
     content: '';
     position: absolute;
     inset: 0;
     background: radial-gradient(ellipse at var(--px) 46%, transparent 30%, #e4e4e4 85%);
-  }
-
-  @media (min-width: 48rem) {
-    .an-map {
-      --px: 52%;
-      aspect-ratio: 21 / 9;
-    }
   }
 
   .an-map__pin {
@@ -1110,6 +1011,14 @@ const missionAccentFrom = missionWords.length - 2;
     padding: 0.5rem 0.75rem;
     background: var(--surface);
     transform: translateY(-50%);
+  }
+
+  /* ---------- CTA: a full viewport too ---------- */
+  .an-cta {
+    display: grid;
+    align-content: center;
+    min-height: 100svh;
+    background: var(--canvas);
   }
 </style>
 
@@ -1141,8 +1050,8 @@ const missionAccentFrom = missionWords.length - 2;
   // Dark Trust section: light → dark → light, like the homepage.
   mountThemeScrub();
 
-  // Independent sticks when its bottom meets the bottom of the viewport, so
-  // Trust slides over it instead of pushing it away.
+  // The sovereignty section sticks when its bottom meets the bottom of the
+  // viewport, so Trust slides over it instead of pushing it away.
   const pinned = document.querySelector<HTMLElement>('[data-pinned]');
   if (pinned) {
     const setTop = () => pinned.style.setProperty('--pin-top', `${Math.min(0, window.innerHeight - pinned.offsetHeight)}px`);
@@ -1173,60 +1082,95 @@ const missionAccentFrom = missionWords.length - 2;
       whileNear(lit, () => {
         const vh = window.innerHeight;
         const top = lit.getBoundingClientRect().top;
-        const p = clamp01((vh * 0.92 - top) / (vh * 0.92 - vh * 0.45));
+        const p = clamp01((vh * 0.9 - top) / (vh * 0.9 - vh * 0.35));
         const on = p * words.length;
         words.forEach((w, i) => w.style.setProperty('--o', Math.min(1, Math.max(0.16, on - i + 0.16)).toFixed(3)));
       });
     }
 
-    // Milestones: the stage pins; the years turn on a dial at the left.
+    // Milestones: the stage pins; the years turn on a dial at the left and the
+    // current year's milestone sits beside it on the centre line.
     const ms = document.querySelector<HTMLElement>('[data-ms]');
     const wheel = ms?.querySelector<HTMLElement>('[data-ms-wheel]');
     if (ms && wheel) {
-      const panels = Array.from(ms.querySelectorAll<HTMLElement>('[data-ms-panel]'));
       const years = Array.from(wheel.querySelectorAll<HTMLElement>('[data-ms-wy]'));
+      const items = Array.from(wheel.querySelectorAll<HTMLElement>('[data-ms-item]'));
+      const list = wheel.querySelector<HTMLElement>('[data-ms-list]')!;
       const n = years.length;
-      // Each year rests for the first part of its scroll segment, then turns on.
-      const DWELL = 0.35;
+      const DWELL = 0.35; // each year rests for this part of its scroll segment
       const SEGMENTS = n - 1 + 0.6;
       const TICKS = 72;
       const ticks: HTMLElement[] = [];
       for (let i = 0; i < TICKS; i++) {
         const t = document.createElement('span');
         t.className = 'an-ms__tick';
+        t.setAttribute('aria-hidden', 'true');
         wheel.prepend(t);
         ticks.push(t);
       }
 
-      let geo = { R: 0, step: 0, tickStep: 0, ringR: 0, maxA: 0, H: 0, fs: 0 };
-      // Fades a year out as it nears the top or bottom of the dial area.
-      const edge = (a: number) => clamp01((geo.H / 2 - Math.abs(Math.sin(a) * geo.R) - geo.fs * 0.6) / (geo.fs * 0.8));
+      let g = { R: 0, H: 0, fs: 0, step: 0, gap: 0, tickStep: 0, maxA: 0 };
+      // Fades a year out before it reaches the top or bottom of the dial area.
+      const edge = (a: number) => clamp01((g.H / 2 - Math.abs(Math.sin(a) * g.R) - g.fs * 0.6) / (g.fs * 0.8));
+      // Angle of a year at signed distance d from the current one: an even step,
+      // plus extra room on either side of the current year for its milestone.
+      const angle = (d: number) => d * g.step + Math.max(-1, Math.min(1, d)) * g.gap;
+
       ms.classList.add('is-pinned');
 
-      // Dial geometry from the space the dial has, so it always fits the viewport.
+      // Geometry from the space the dial has, so it always fits the viewport.
       const size = () => {
         ms.style.height = `${window.innerHeight * (1 + SEGMENTS * 0.85)}px`;
         const W = wheel.clientWidth;
         const H = wheel.clientHeight;
-        // Year size: as large as the height allows, and narrow enough that the
-        // current year fits beside the marker (a 4-digit year is ~2.3em wide).
-        const fs = Math.max(40, Math.min(H * 0.17, (W - 48) / 2.45, 210));
-        const R = Math.max(H * 0.95, fs * 4.2); // dial radius: the centre sits far left, off-screen
-        const startX = Math.min(48, W * 0.08) + 24; // where the current year starts
+        const wide = W >= 720;
+        // Year size: large, but leaving room beside it (wide) or under it (phones) for the text.
+        const fs = Math.max(44, Math.min(H * (wide ? 0.2 : 0.14), W * (wide ? 0.17 : 0.26), 200));
+        const R = Math.max(H * 0.95, fs * 4.2); // the dial centre sits far left, off-screen
+        const markX = 6;
+        const startX = markX + 22; // where the current year starts
         const cx = startX - R;
         const cy = H / 2;
-        const ringR = R - 30;
-        geo = { R, step: (fs * 1.18) / R, tickStep: (fs * 1.18) / R / 4, ringR, maxA: Math.asin(Math.min(1, (H / 2 + fs) / R)), H, fs };
-        wheel.style.setProperty('--cx', `${cx}px`);
-        wheel.style.setProperty('--cy', `${cy}px`);
-        wheel.style.setProperty('--mx', `${cx + ringR}px`);
         years.forEach((y) => {
           y.style.setProperty('--fs', `${fs}px`);
           y.style.setProperty('--r', `${R}px`);
         });
+        // Widest year, measured unrotated.
+        const yearW = Math.max(...years.map((y) => y.scrollWidth));
+        wheel.style.setProperty('--cx', `${cx}px`);
+        wheel.style.setProperty('--cy', `${cy}px`);
+        wheel.style.setProperty('--mx', `${markX}px`);
+
+        let gap = 0;
+        if (wide) {
+          // Text on the same line, after a short leader line.
+          const lx = startX + yearW + 16;
+          const tx = lx + Math.min(96, W * 0.07) + 16;
+          wheel.style.setProperty('--lx', `${lx}px`);
+          wheel.style.setProperty('--lw', `${tx - lx - 16}px`);
+          wheel.style.setProperty('--tx', `${tx}px`);
+          wheel.style.setProperty('--tw', `${Math.max(200, W - tx)}px`);
+          wheel.style.setProperty('--ty', `${cy}px`);
+          list.style.transform = 'translateY(-50%)';
+          items.forEach((el) => el.style.setProperty('--align', 'center'));
+          gap = (fs * 0.25) / R;
+        } else {
+          // Phones: text directly under the current year; the dial opens up around it.
+          wheel.style.setProperty('--lw', '0px');
+          wheel.style.setProperty('--tx', `${startX}px`);
+          wheel.style.setProperty('--tw', `${W - startX}px`);
+          wheel.style.setProperty('--ty', `${cy + fs * 0.55 + 10}px`);
+          list.style.transform = 'none';
+          items.forEach((el) => el.style.setProperty('--align', 'start'));
+          const textH = Math.max(...items.map((el) => el.scrollHeight));
+          gap = (textH + 24) / R;
+        }
+        const step = (fs * 1.15) / R;
+        g = { R, H, fs, step, gap, tickStep: step / 4, maxA: Math.asin(Math.min(1, (H / 2 + fs) / R)) };
         ticks.forEach((t, i) => {
-          t.style.setProperty('--r', `${ringR - (i % 4 === 0 ? 14 : 8)}px`);
-          t.style.setProperty('--tl', `${i % 4 === 0 ? 14 : 8}px`);
+          const long = i % 4 === 0;
+          t.style.setProperty('--r', `${R - 34 - (long ? 14 : 8)}px`);
+          t.style.setProperty('--tl', `${long ? 14 : 8}px`);
         });
       };
 
@@ -1241,19 +1185,18 @@ const missionAccentFrom = missionWords.length - 2;
         lastPos = pos;
 
         years.forEach((y, i) => {
-          const a = (i - pos) * geo.step;
-          const d = Math.abs(i - pos);
+          const d = i - pos;
+          const a = angle(d);
           y.style.setProperty('--a', `${a.toFixed(4)}rad`);
-          y.style.setProperty('--o', Math.abs(a) > geo.maxA ? '0' : ((1 - Math.min(1, d) * 0.72) * edge(a)).toFixed(3));
+          y.style.setProperty('--o', Math.abs(a) > g.maxA ? '0' : ((1 - Math.min(1, Math.abs(d)) * 0.75) * edge(a)).toFixed(3));
         });
-        // Ticks turn with the years (four per year), centred on the current one.
         const half = TICKS / 2;
         ticks.forEach((t, i) => {
-          const a = (i - half - (pos * 4) % 1) * geo.tickStep;
+          const a = (i - half - ((pos * 4) % 1)) * g.tickStep;
           t.style.setProperty('--a', `${a.toFixed(4)}rad`);
-          t.style.opacity = Math.abs(a) > geo.maxA ? '0' : edge(a).toFixed(3);
+          t.style.opacity = Math.abs(a) > g.maxA ? '0' : edge(a).toFixed(3);
         });
-        panels.forEach((el, i) => {
+        items.forEach((el, i) => {
           const t = clamp01(1 - Math.abs(pos - i) * 2.5);
           el.style.setProperty('--t', t.toFixed(3));
           el.style.setProperty('--dir', String(i > pos ? dir : -dir));
@@ -1261,12 +1204,12 @@ const missionAccentFrom = missionWords.length - 2;
         });
       };
 
-      size();
-      update();
-      window.addEventListener('resize', () => (size(), update()), { passive: true });
-      new ResizeObserver(() => (size(), update())).observe(wheel);
+      const refresh = () => (size(), update());
+      document.fonts?.ready.then(refresh);
+      refresh();
+      window.addEventListener('resize', refresh, { passive: true });
+      new ResizeObserver(refresh).observe(wheel);
       whileNear(ms, update, '10% 0px');
     }
   }
 </script>
-
