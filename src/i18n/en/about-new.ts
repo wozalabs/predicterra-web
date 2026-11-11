@@ -112,7 +112,14 @@ export default {
         { label: 'USA', value: '+1 929-323-2391', href: 'tel:+19293232391' },
       ],
     },
-    map: { place: 'BAT Acceleration Tower', city: 'Bilbao' },
+    // BAT (Torre Bizkaia), Plaza Circular, Bilbao. OpenStreetMap coordinates.
+    map: {
+      lat: 43.261,
+      lon: -2.92821,
+      title: 'Map: BAT Acceleration Tower, Gran Vía 1, Bilbao',
+      hint: 'Click to explore the map',
+      open: { label: 'Open in Google Maps', href: 'https://www.google.com/maps/search/?api=1&query=43.261%2C-2.92821' },
+    },
   },
 
   // The brief's "Get started" eyebrow is left out (no eyebrows on this page).
