@@ -1,0 +1,168 @@
+---
+/**
+ * Climate & Resilience (/climate-resilience), from the brief of November 2026.
+ * A cross-sector page: hero with the decade / scenario control over the
+ * territory · quick proof · why now · from exposure to an investment case
+ * (pinned stepper) · outputs · not a score (dark comparison) · every sector ·
+ * how to start · CTA.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import PageHero from '../sections/pages/PageHero.astro';
+import Stats from '../sections/pages/Stats.astro';
+import Context from '../sections/pages/Context.astro';
+import PinnedSteps from '../sections/pages/PinnedSteps.astro';
+import Cards from '../sections/pages/Cards.astro';
+import Compare from '../sections/pages/Compare.astro';
+import SectorCards from '../sections/pages/SectorCards.astro';
+import Steps from '../sections/pages/Steps.astro';
+import Placeholder from '../components/Placeholder.astro';
+import Cta from '../sections/home/Cta.astro';
+import { getCopy } from '../i18n/config';
+
+const locale = 'en';
+const { climate: c } = getCopy(locale);
+---
+
+<PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
+  <PageHero locale={locale} {...c.hero} layout="stack" logos={c.logos}>
+    <div slot="visual" class="cl-hero">
+      <Placeholder kind="Animation" text={c.hero.visual} notch />
+      <!-- Time and scenario control, as it will sit over the animation. -->
+      <div class="cl-ctrl" data-cl-ctrl>
+        <div class="cl-ctrl__group" role="group" aria-label="Decade">
+          {
+            c.hero.decades.map((d, i) => (
+              <button class="cl-ctrl__btn t-num" type="button" aria-pressed={i === 1 ? 'true' : 'false'} data-decade={d}>
+                {d}
+              </button>
+            ))
+          }
+        </div>
+        <div class="cl-ctrl__group" role="group" aria-label="Climate scenario">
+          {
+            c.hero.scenarios.map((s, i) => (
+              <button class="cl-ctrl__btn" type="button" aria-pressed={i === 1 ? 'true' : 'false'} data-scenario={s}>
+                {s}
+              </button>
+            ))
+          }
+        </div>
+        <p class="cl-ctrl__read t-small" aria-live="polite" data-cl-read>
+          Exposure in <span class="t-num">2050</span>, intermediate scenario
+        </p>
+      </div>
+    </div>
+  </PageHero>
+
+  <Stats locale={locale} items={[...c.proof.items]} />
+  <Context id="ahead-title" {...c.ahead} figures={[...c.ahead.figures]} side="left" />
+  <PinnedSteps id="how-title" title={c.how.title} steps={c.how.steps} />
+  <Cards id="outputs-title" title={c.outputs.title} items={c.outputs.items} rule={22} />
+  <Compare id="score-title" title={c.score.title} text={c.score.text} columns={c.score.columns} rows={c.score.rows} dark />
+  <SectorCards locale={locale} id="sectors-title" title={c.sectors.title} items={c.sectors.items} />
+  <Steps locale={locale} id="start-title" {...c.start} />
+  <Cta locale={locale} copy={c.cta} />
+</PageLayout>
+
+<style>
+  .cl-hero {
+    position: relative;
+    height: 100%;
+  }
+
+  .cl-ctrl {
+    position: absolute;
+    top: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    right: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    display: grid;
+    justify-items: end;
+    gap: 0.5rem;
+  }
+
+  .cl-ctrl__group {
+    display: flex;
+    padding: 0.25rem;
+    gap: 0.25rem;
+    background: var(--surface);
+    box-shadow:
+      0 0 0 1px var(--line),
+      0 4px 16px rgb(30 30 30 / 0.06);
+  }
+
+  .cl-ctrl__btn {
+    min-width: 2.75rem;
+    min-height: 2.25rem;
+    padding: 0 0.75rem;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    transition:
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 160ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (pointer: coarse) {
+    .cl-ctrl__btn {
+      min-height: 2.75rem;
+    }
+  }
+
+  .cl-ctrl__btn[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--canvas-mix);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cl-ctrl__btn[aria-pressed='false']:hover {
+      background: var(--chip-bg);
+    }
+  }
+
+  .cl-ctrl__btn:active {
+    transform: scale(0.96);
+  }
+
+  .cl-ctrl__btn:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .cl-ctrl__read {
+    padding: 0.25rem 0.625rem;
+    background: var(--surface);
+    color: var(--ink-2);
+  }
+
+  /* Phones: the control sits under the visual instead of over it. */
+  @media (max-width: 39.99rem) {
+    .cl-hero {
+      display: grid;
+      gap: 0.5rem;
+    }
+    .cl-hero > :global(.ph) {
+      min-height: 14rem;
+    }
+    .cl-ctrl {
+      position: static;
+      justify-items: start;
+    }
+  }
+</style>
+
+<script>
+  // Decade and scenario switches: one pressed per group, and the readout follows.
+  const ctrl = document.querySelector<HTMLElement>('[data-cl-ctrl]');
+  if (ctrl) {
+    const read = ctrl.querySelector<HTMLElement>('[data-cl-read]')!;
+    const state = { decade: '2050', scenario: 'Intermediate' };
+    ctrl.querySelectorAll<HTMLButtonElement>('button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const group = btn.parentElement!;
+        group.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        if (btn.dataset.decade) state.decade = btn.dataset.decade;
+        if (btn.dataset.scenario) state.scenario = btn.dataset.scenario;
+        read.innerHTML = `Exposure in <span class="t-num">${state.decade}</span>, ${state.scenario.toLowerCase()} scenario`;
+      });
+    });
+  }
+</script>

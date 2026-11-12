@@ -1,0 +1,117 @@
+---
+/**
+ * Four sector cards in a row (smaller versions of the homepage sector cards).
+ * The whole card is the link; its button lights up on hover.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import Icon from '../../components/Icon.astro';
+import Button from '../../components/Button.astro';
+import { localizePath, type Locale } from '../../i18n/config';
+import type { IconName } from '../../data/icons';
+
+interface Props {
+  locale?: Locale;
+  id: string;
+  title: string;
+  items: readonly { name: string; icon: string; text: string; href: string }[];
+}
+const { locale = 'en', id, title, items } = Astro.props;
+---
+
+<section class="sc pg-sec pg-sec--full" aria-labelledby={id}>
+  <div class="container">
+    <NotchRule at={30} />
+    <div class="pg-body">
+      <h2 id={id} class="t-h2 pg-title pg-title--wide" data-render>{title}</h2>
+      <ul class="sc__list" data-reveal-group>
+        {
+          items.map((s) => (
+            <li data-reveal>
+              <a class="sc__card" href={localizePath(s.href, locale)} data-btn-host>
+                <Icon name={s.icon as IconName} boxed size="3rem" />
+                <span class="sc__field" aria-hidden="true" />
+                <h3 class="sc__name">{s.name}</h3>
+                <p class="sc__text">{s.text}</p>
+                <Button label={`Predicterra for ${s.name}`} variant="secondary" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sc__list {
+    display: grid;
+    gap: var(--gutter);
+  }
+
+  @media (min-width: 40rem) {
+    .sc__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 72rem) {
+    .sc__list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .sc__card {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto auto auto;
+    gap: 1rem;
+    height: 100%;
+    min-height: clamp(22rem, 18rem + 10vw, 28rem);
+    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    background: var(--card);
+    clip-path: var(--notch);
+    padding-bottom: calc(clamp(1.25rem, 1rem + 1vw, 1.75rem) + 18px);
+    transition: background-color 200ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Dot field that thickens towards the corner, the homepage's terrain in miniature. */
+  .sc__field {
+    pointer-events: none;
+    margin-inline: calc(-1 * clamp(1.25rem, 1rem + 1vw, 1.75rem));
+    background-image: radial-gradient(circle at center, var(--line-strong) 1px, transparent 1.4px);
+    background-size: 14px 14px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 90% at 100% 0%, #000, transparent 70%);
+    mask-image: radial-gradient(ellipse 80% 90% at 100% 0%, #000, transparent 70%);
+  }
+
+  .sc__name {
+    font-size: var(--fs-h3);
+    line-height: 1.1;
+    letter-spacing: var(--track-title);
+  }
+
+  .sc__text {
+    color: var(--ink-2);
+  }
+
+  .sc__card :global(.btn) {
+    justify-self: start;
+    margin-top: 0.5rem;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .sc__card:hover {
+      background: color-mix(in oklab, var(--card) 92%, #000);
+    }
+  }
+
+  .sc__card:active :global(.btn) {
+    transform: scale(0.97);
+  }
+
+  .sc__card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -6px;
+  }
+</style>

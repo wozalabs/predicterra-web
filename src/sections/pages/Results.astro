@@ -1,0 +1,131 @@
+---
+/**
+ * "Measured in the numbers you report": a clean two-column table. Results that
+ * start with a figure show it large in orange; the others carry the orange point.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import type { ResultRow } from './types';
+
+interface Props {
+  id: string;
+  title: string;
+  text: string;
+  rows: ResultRow[];
+}
+const { id, title, text, rows } = Astro.props;
+// "73% faster at i-DE" → ["73%", "faster at i-DE"]; "€2.1M a year avoided" → ["€2.1M", "a year avoided"].
+const split = (s: string) => {
+  const m = s.match(/^([€$]?\d[\d.,]*\s?(?:%|[MKk]\b|M)?)\s+(.*)$/);
+  return m ? { big: m[1], rest: m[2].replace(/(\w)-(\w)/g, '$1‑$2') } : null;
+};
+---
+
+<section class="rs pg-sec pg-sec--full" aria-labelledby={id}>
+  <div class="container">
+    <NotchRule at={58} direction="down" />
+    <div class="pg-body">
+      <div class="pg-grid">
+        <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+        <p class="pg-lead" data-reveal>{text}</p>
+      </div>
+
+      <table class="rs__table">
+        <thead class="visually-hidden">
+          <tr>
+            <th scope="col">What you report</th>
+            <th scope="col">What Predicterra changes</th>
+          </tr>
+        </thead>
+        <tbody data-reveal-group>
+          {
+            rows.map((r) => {
+              const s = split(r.change);
+              return (
+                <tr class="rs__row" data-reveal>
+                  <th scope="row" class="rs__report">
+                    {r.report}
+                  </th>
+                  <td class="rs__change">
+                    {s ? (
+                      <>
+                        <span class="rs__big t-num">{s.big}</span>
+                        <span class="rs__rest">{s.rest}</span>
+                      </>
+                    ) : (
+                      <span class="rs__plain">
+                        <span class="pg-dot" aria-hidden="true" />
+                        {r.change}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<style>
+  .rs__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .rs__row {
+    display: grid;
+    gap: 0.5rem 2rem;
+    padding-block: clamp(1.25rem, 1rem + 1vw, 2rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .rs__row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (min-width: 64rem) {
+    .rs__row {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      align-items: center;
+      column-gap: clamp(2.5rem, 1rem + 5vw, 7.5rem);
+    }
+  }
+
+  .rs__report {
+    font-weight: 400;
+    text-align: left;
+    font-size: var(--fs-h4);
+    line-height: 1.25;
+    letter-spacing: var(--track-title);
+  }
+
+  .rs__change {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 1rem;
+  }
+
+  /* Orange only at display size (contrast). */
+  .rs__big {
+    font-size: clamp(2.75rem, 2rem + 2.4vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+  }
+
+  .rs__rest {
+    font-size: var(--fs-lead);
+    color: var(--ink-2);
+  }
+
+  .rs__plain {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: var(--fs-lead);
+    color: var(--ink-2);
+  }
+</style>

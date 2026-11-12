@@ -1,0 +1,325 @@
+---
+/**
+ * Comparison with Predicterra's column highlighted as a dark block with the
+ * brand's orange corners.
+ *  - table: rows of criteria across 2–3 columns (stacked per column on phones)
+ *  - steps: the columns as cards that grow left to right, joined by arrows
+ *    (descriptive → physical → cognitive twin)
+ * The closing line, if any, is lit word by word under it.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import Icon from '../../components/Icon.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  text?: string | string[];
+  columns: readonly string[];
+  rows: readonly { label: string; cells: readonly string[] }[];
+  closing?: string;
+  support?: string;
+  variant?: 'table' | 'steps';
+  dark?: boolean;
+  rule?: number;
+}
+const { id, title, text, columns, rows, closing, support, variant = 'table', dark = false, rule = 70 } = Astro.props;
+const hi = columns.length - 1;
+const texts = text ? (Array.isArray(text) ? text : [text]) : [];
+---
+
+<section class:list={['cp pg-sec pg-sec--full', `cp--${variant}`]} aria-labelledby={id} data-dark={dark ? '' : undefined}>
+  <div class="container">
+    <NotchRule at={rule} />
+    <div class="pg-body">
+      <div class="pg-grid">
+        <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+        {
+          texts.length > 0 && (
+            <div class="cp__text" data-reveal-group>
+              {texts.map((t) => (
+                <p class="pg-lead" data-reveal>
+                  {t}
+                </p>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      {
+        variant === 'table' ? (
+          <>
+            {/* Wide screens: one grid; the highlight block sits behind the last column. */}
+            <div class="cp__grid" role="table" aria-label={title} style={`--cols:${columns.length}`} data-reveal>
+              <span class="cp__hi o-corners" aria-hidden="true" style={`grid-column:${hi + 2};grid-row:1 / ${rows.length + 2}`} />
+              <div role="row" class="cp__row cp__row--head">
+                <span role="columnheader" class="cp__corner" style="grid-area:1 / 1" />
+                {columns.map((c, ci) => (
+                  <span role="columnheader" class:list={['cp__head', ci === hi && 'is-hi']} style={`grid-area:1 / ${ci + 2}`}>
+                    {c}
+                  </span>
+                ))}
+              </div>
+              {rows.map((r, ri) => (
+                <div role="row" class="cp__row">
+                  <span role="rowheader" class="cp__label t-small" style={`grid-area:${ri + 2} / 1`}>
+                    {r.label}
+                  </span>
+                  {r.cells.map((cell, ci) => (
+                    <span role="cell" class:list={['cp__cell', ci === hi && 'is-hi']} style={`grid-area:${ri + 2} / ${ci + 2}`}>
+                      {cell}
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* Phones: one block per column. */}
+            <div class="cp__stack">
+              {columns.map((c, ci) => (
+                <div class:list={['cp__card', ci === hi && 'is-hi o-corners']}>
+                  <h3 class="cp__head">{c}</h3>
+                  <dl>
+                    {rows.map((r) => (
+                      <div class="cp__pair">
+                        <dt class="t-small">{r.label}</dt>
+                        <dd>{r.cells[ci]}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <ol class="cp__steps" data-reveal-group>
+            {columns.map((c, ci) => (
+              <li class:list={['cp__card', 'cp__gen', ci === hi && 'is-hi o-corners']} style={`--i:${ci}`} data-reveal>
+                <h3 class="cp__head">{c}</h3>
+                <dl>
+                  {rows.map((r) => (
+                    <div class="cp__pair">
+                      <dt class="t-small">{r.label}</dt>
+                      <dd>{r.cells[ci]}</dd>
+                    </div>
+                  ))}
+                </dl>
+                {ci < hi && (
+                  <span class="cp__arrow" aria-hidden="true">
+                    <Icon name="arrow_forward" />
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        )
+      }
+
+      {
+        (closing || support) && (
+          <div class="cp__close">
+            {closing && (
+              <p class:list={['pg-statement cp__closing', closing.length > 140 && 'cp__closing--long']} data-lit>
+                {closing.split(' ').map((w) => (
+                  <span class="w">{w} </span>
+                ))}
+              </p>
+            )}
+            {support && (
+              <p class="cp__support" data-reveal>
+                <span class="pg-dot" aria-hidden="true" />
+                {support}
+              </p>
+            )}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .cp__text {
+    display: grid;
+    gap: 1rem;
+  }
+
+  /* ---------- table ---------- */
+  .cp__grid {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .cp__grid {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      grid-template-columns: minmax(7rem, 2fr) repeat(var(--cols), minmax(0, 3fr));
+    }
+  }
+
+  /* Rows are flattened into the grid so the highlight block can span them. */
+  .cp__row {
+    display: contents;
+  }
+
+  .cp__hi {
+    z-index: -1;
+    margin-inline: -0.25rem;
+  }
+
+  .cp__head,
+  .cp__cell,
+  .cp__label,
+  .cp__corner {
+    padding: 1.125rem 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .cp__row--head > * {
+    border-top: 0;
+    padding-top: 1.75rem;
+  }
+
+  .cp__head {
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    letter-spacing: var(--track-title);
+  }
+
+  .cp__label {
+    padding-left: 0;
+    color: var(--muted);
+  }
+
+  .cp__cell {
+    color: var(--ink-2);
+  }
+
+  .cp__grid .is-hi {
+    color: #f1f1f1;
+    border-top-color: rgb(241 241 241 / 0.14);
+  }
+
+  .cp__grid .cp__cell.is-hi {
+    color: #e8e8e8;
+  }
+
+  .cp__grid .cp__row:last-child > * {
+    padding-bottom: 1.75rem;
+  }
+
+  /* ---------- phones / steps: cards ---------- */
+  .cp__stack {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 48rem) {
+    .cp__stack {
+      display: none;
+    }
+  }
+
+  .cp__card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 1px solid var(--line);
+  }
+
+  .cp__card.is-hi {
+    border-color: transparent;
+  }
+
+  .cp__card .cp__head {
+    padding: 0;
+    border: 0;
+  }
+
+  .cp__pair {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .cp__card.is-hi .cp__pair {
+    border-top-color: rgb(241 241 241 / 0.14);
+  }
+
+  .cp__pair dt {
+    color: var(--muted);
+  }
+
+  .cp__card.is-hi dt {
+    color: #a7a7a7;
+  }
+
+  /* ---------- steps (generations) ---------- */
+  .cp__steps {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    .cp__steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: end;
+      gap: clamp(2.5rem, 1.5rem + 2vw, 4rem);
+    }
+    /* Each generation a step taller than the last. */
+    .cp__gen {
+      min-height: calc(22rem + var(--i) * 4.5rem);
+      align-content: space-between;
+    }
+    .cp__gen .cp__head {
+      align-self: start;
+    }
+    .cp__arrow {
+      position: absolute;
+      top: 50%;
+      left: calc(100% + 0.5rem);
+      width: calc(clamp(2.5rem, 1.5rem + 2vw, 4rem) - 1rem);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+    }
+  }
+
+  .cp__arrow {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .cp__arrow {
+      display: grid;
+    }
+  }
+
+  .cp__gen.is-hi .cp__head {
+    font-size: var(--fs-h3);
+  }
+
+  /* ---------- closing ---------- */
+  .cp__close {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .cp__closing--long {
+    max-width: 40ch;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+  }
+
+  .cp__support {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    max-width: 60ch;
+    color: var(--ink-2);
+  }
+</style>

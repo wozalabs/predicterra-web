@@ -1,0 +1,44 @@
+---
+/**
+ * The four sector pages (Grid, Solar, Wind, Oil & Gas) share one structure from
+ * the briefs; each brings its own copy, hero layout and the side its context
+ * photo sits on, so they don't read as copies of each other.
+ *
+ * hero · quick proof · the decade ahead · what it models (sticky chain) · four
+ * teams (pinned, sideways) · works with what you have (dark, slides over) ·
+ * results · one system · how to start · CTA
+ */
+import PageLayout from '../../layouts/PageLayout.astro';
+import PageHero from './PageHero.astro';
+import Stats from './Stats.astro';
+import Context from './Context.astro';
+import Models from './Models.astro';
+import Teams from './Teams.astro';
+import WorksWith from './WorksWith.astro';
+import Results from './Results.astro';
+import OneSystem from './OneSystem.astro';
+import Steps from './Steps.astro';
+import Cta from '../home/Cta.astro';
+import type { SectorCopy } from './types';
+import type { Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+  copy: SectorCopy;
+  contextSide?: 'right' | 'left';
+}
+const { locale = 'en', copy: c, contextSide = 'right' } = Astro.props;
+---
+
+<PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
+  <PageHero locale={locale} {...c.hero} logos={c.logos} />
+  <Stats locale={locale} items={c.proof.items} backing={c.proof.backing} />
+  <Context id="ahead-title" {...c.ahead} side={contextSide} />
+  <Models id="models-title" {...c.models} />
+  <Teams id="teams-title" title={c.teams.title} items={c.teams.items} cover />
+  <WorksWith id="works-title" {...c.works} cover />
+  <Results id="results-title" {...c.results} />
+  <OneSystem locale={locale} id="system-title" {...c.system} />
+  <Steps locale={locale} id="start-title" {...c.start} />
+  <Cta locale={locale} copy={c.cta} />
+</PageLayout>

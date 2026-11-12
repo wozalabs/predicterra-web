@@ -1,0 +1,773 @@
+---
+/**
+ * Solutions (/solutions), from the brief of November 2026: not products, one
+ * model read by four teams, each at its own horizon.
+ * hero (the four horizons on one timeline) · four teams, one model · the four
+ * teams in turn, with a sticky rail that follows you · one heatwave, four teams
+ * (pinned timeline) · every sector × every team (matrix) · how to start · CTA.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import PageHero from '../sections/pages/PageHero.astro';
+import Steps from '../sections/pages/Steps.astro';
+import NotchRule from '../components/NotchRule.astro';
+import Placeholder from '../components/Placeholder.astro';
+import Horizons from '../components/Horizons.astro';
+import Icon from '../components/Icon.astro';
+import Cta from '../sections/home/Cta.astro';
+import { getCopy, localizePath } from '../i18n/config';
+import type { IconName } from '../data/icons';
+
+const locale = 'en';
+const { solutions: c } = getCopy(locale);
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
+  <PageHero locale={locale} {...c.hero} layout="split-reverse">
+    <div slot="visual" class="so-hero">
+      <Placeholder kind="Animation" text={c.hero.visual} notch />
+      <div class="so-hero__hz">
+        <Horizons teams={c.four.teams} compact />
+      </div>
+    </div>
+  </PageHero>
+
+  <!-- 2. Four teams, one model: four columns joined by the line of the model underneath. -->
+  <section class="so-four pg-sec pg-sec--full" aria-labelledby="four-title">
+    <div class="container">
+      <NotchRule at={64} />
+      <div class="pg-body">
+        <h2 id="four-title" class="t-h2 pg-title pg-title--wide" data-render>{c.four.title}</h2>
+        <ol class="so-four__cols" data-reveal-group>
+          {
+            c.four.teams.map((t, i) => (
+              <li class="so-four__col" data-reveal>
+                <a class="so-four__link" href={`#${c.teams[i].id}`}>
+                  <span class="so-four__num t-num t-small">{pad(i + 1)}</span>
+                  <span class="so-four__name">{t.name}</span>
+                  <span class="so-four__h t-small">{t.horizon}</span>
+                  <span class="so-four__q">{t.question}</span>
+                  <span class="so-four__go" aria-hidden="true">
+                    <Icon name="arrow_forward" />
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="so-four__model" aria-hidden="true" data-progress>
+          <span class="so-four__line"></span>
+          <span class="so-four__tag t-caption">One model</span>
+        </div>
+        <p class="pg-statement so-four__close" data-lit>
+          {c.four.closing.split(' ').map((w) => <span class="w">{w} </span>)}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3–6. The four teams; a rail on the left keeps your place. -->
+  <section class="so-teams pg-sec" aria-label="Solutions by team" data-spy>
+    <div class="container so-teams__grid">
+      <nav class="so-rail" aria-label="Teams">
+        <ol class="so-rail__list">
+          {
+            c.teams.map((t, i) => (
+              <li data-spy-node data-on={i === 0 ? '' : undefined}>
+                <a class="so-rail__link" href={`#${t.id}`}>
+                  <span class="so-rail__num t-num t-caption">{pad(i + 1)}</span>
+                  <span class="so-rail__name">{t.name}</span>
+                  <span class="so-rail__h t-caption">{t.horizon}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      <div class="so-teams__list">
+        {
+          c.teams.map((t, i) => (
+            <article class="so-team" id={t.id} aria-labelledby={`${t.id}-title`} data-spy-item>
+              <NotchRule at={i % 2 ? 30 : 70} />
+              <p class="so-team__meta t-small">
+                <span class="pg-dot" aria-hidden="true" />
+                {t.name} · {t.horizon}
+              </p>
+              <div class="so-team__grid">
+                <div class="so-team__copy">
+                  <h2 id={`${t.id}-title`} class="t-h2 pg-title" data-render>
+                    {t.title}
+                  </h2>
+                  <p class="pg-lead" data-reveal>
+                    {t.text}
+                  </p>
+                  <Placeholder kind="Platform capture" text={t.shot} ratio="16 / 10" notch />
+                </div>
+                <div class="so-team__side">
+                  <ul class="so-sols" data-reveal-group>
+                    {t.solutions.map((s) => (
+                      <li class="so-sol" data-reveal>
+                        <h3 class="so-sol__title">{s.title}</h3>
+                        <p class="so-sol__text">{s.text}</p>
+                      </li>
+                    ))}
+                  </ul>
+                  <dl class="so-facts" data-reveal>
+                    <div>
+                      <dt class="t-caption">Connects with</dt>
+                      <dd>{t.connects}</dd>
+                    </div>
+                    <div>
+                      <dt class="t-caption">Measured in</dt>
+                      <dd>{t.measured}</dd>
+                    </div>
+                  </dl>
+                </div>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. One heatwave: a pinned timeline that walks through the four moments. -->
+  <section class="so-ev" aria-labelledby="event-title" data-stepper="(min-width: 64rem) and (min-height: 40rem)" data-dark>
+    <div class="so-ev__stage">
+      <div class="container so-ev__inner">
+        <NotchRule at={46} />
+        <h2 id="event-title" class="t-h2 pg-title so-ev__title" data-render>{c.event.title}</h2>
+        <div class="so-ev__line" aria-hidden="true"><span class="so-ev__fill"></span></div>
+        <ol class="so-ev__list">
+          {
+            c.event.steps.map((s, i) => (
+              <li class:list={['so-ev__step', i === c.event.steps.length - 1 && 'is-last']} data-step-item>
+                <span class="so-ev__node" aria-hidden="true" />
+                <p class="so-ev__when t-num">{s.when}</p>
+                <p class="so-ev__team t-small">{s.team}</p>
+                <p class="so-ev__text">{s.text}</p>
+                <Placeholder kind="Platform capture" text={`${s.team}, ${s.when}`} ratio="16 / 10" compact class="so-ev__shot" />
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Matrix: hover a cell to light its sector and its team. -->
+  <section class="so-mx pg-sec pg-sec--full" aria-labelledby="matrix-title">
+    <div class="container">
+      <NotchRule at={30} />
+      <div class="pg-body">
+        <h2 id="matrix-title" class="t-h2 pg-title pg-title--wide" data-render>{c.matrix.title}</h2>
+        <div class="so-mx__scroll" data-reveal>
+          <table class="so-mx__table" data-matrix>
+            <thead>
+              <tr>
+                <td class="so-mx__corner"></td>
+                {c.matrix.teams.map((t, ci) => <th scope="col" class="so-mx__th" data-c={ci}>{t}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {
+                c.matrix.rows.map((r, ri) => (
+                  <tr>
+                    <th scope="row" class="so-mx__sector" data-r={ri}>
+                      <a href={localizePath(r.href, locale)} class="so-mx__sector-link">
+                        <Icon name={r.icon as IconName} boxed size="2.25rem" />
+                        <span>{r.sector}</span>
+                        <Icon name="arrow_forward" class="so-mx__go" />
+                      </a>
+                    </th>
+                    {r.cells.map((cell, ci) => (
+                      <td class="so-mx__cell" data-r={ri} data-c={ci}>
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Steps locale={locale} id="start-title" {...c.start} />
+  <Cta locale={locale} copy={c.cta} />
+</PageLayout>
+
+<style>
+  /* ---------- Hero: the four horizons over the territory ---------- */
+  .so-hero {
+    position: relative;
+    height: 100%;
+  }
+
+  .so-hero__hz {
+    position: absolute;
+    left: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    right: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    top: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    padding: 0.75rem 1rem 0.25rem;
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  /* ---------- Four teams ---------- */
+  .so-four__cols {
+    display: grid;
+    gap: var(--gutter);
+  }
+
+  @media (min-width: 40rem) {
+    .so-four__cols {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .so-four__cols {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .so-four__link {
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: 0.5rem;
+    height: 100%;
+    min-height: 15rem;
+    padding: 1.25rem;
+    background: var(--card);
+    transition: background-color 200ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .so-four__num {
+    color: var(--accent);
+  }
+
+  .so-four__name {
+    font-size: var(--fs-h3);
+    line-height: 1.1;
+    letter-spacing: var(--track-title);
+  }
+
+  .so-four__h {
+    color: var(--muted);
+  }
+
+  .so-four__q {
+    align-self: end;
+    padding-top: 1.5rem;
+    font-size: var(--fs-lead);
+    line-height: 1.35;
+    letter-spacing: var(--track-title);
+  }
+
+  .so-four__go {
+    justify-self: end;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    background: var(--ink);
+    color: var(--canvas-mix);
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .so-four__go :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .so-four__link:hover {
+      background: color-mix(in oklab, var(--card) 92%, #000);
+    }
+    .so-four__link:hover .so-four__go {
+      transform: translateX(2px);
+    }
+  }
+
+  .so-four__link:active {
+    transform: scale(0.99);
+  }
+
+  /* The model under the four: a line that draws in, labelled. */
+  .so-four__model {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: calc(-1 * clamp(1.5rem, 1rem + 2vw, 3rem));
+  }
+
+  .so-four__line {
+    flex: 1;
+    height: 3px;
+    background: var(--ink);
+    transform-origin: left;
+    transform: scaleX(var(--p, 1));
+  }
+
+  .so-four__tag {
+    color: var(--ink-2);
+  }
+
+  .so-four__close {
+    max-width: 34ch;
+  }
+
+  /* ---------- Teams + rail ---------- */
+  .so-teams {
+    padding-top: 0;
+  }
+
+  .so-teams__grid {
+    display: grid;
+    gap: 0 var(--gutter);
+  }
+
+  .so-rail {
+    display: none;
+  }
+
+  @media (min-width: 72rem) {
+    .so-teams__grid {
+      grid-template-columns: 13rem minmax(0, 1fr);
+    }
+    .so-rail {
+      display: block;
+    }
+    .so-rail__list {
+      position: sticky;
+      top: calc(var(--header-h) + 2.5rem);
+      display: grid;
+      gap: 0.25rem;
+      padding-top: 6rem;
+    }
+  }
+
+  .so-rail__link {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    gap: 0 0.5rem;
+    padding: 0.625rem 0.75rem 0.625rem 0;
+    color: var(--muted);
+    transition: color 200ms ease;
+  }
+
+  .so-rail__link::before {
+    content: '';
+    position: absolute;
+    left: -0.75rem;
+    top: 0.75rem;
+    bottom: 0.75rem;
+    width: 2px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 300ms var(--ease-out);
+  }
+
+  .so-rail__num {
+    padding-top: 0.15rem;
+  }
+
+  .so-rail__h {
+    grid-column: 2;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      max-height 300ms var(--ease-out),
+      opacity 200ms ease;
+  }
+
+  [data-on] > .so-rail__link {
+    color: var(--ink);
+  }
+
+  [data-on] > .so-rail__link::before {
+    transform: scaleY(1);
+  }
+
+  [data-on] > .so-rail__link .so-rail__h {
+    max-height: 2rem;
+    opacity: 1;
+    color: var(--muted);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .so-rail__link:hover {
+      color: var(--ink);
+    }
+  }
+
+  .so-team {
+    display: grid;
+    gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+    min-height: 100svh;
+    align-content: center;
+    padding-block: clamp(4rem, 2.5rem + 4vw, 7rem);
+    scroll-margin-top: 0;
+  }
+
+  .so-team__meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--ink-2);
+  }
+
+  .so-team__grid {
+    display: grid;
+    gap: 2.5rem clamp(2.5rem, 1rem + 4vw, 6rem);
+  }
+
+  @media (min-width: 64rem) {
+    .so-team__grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+    /* Alternate sides, so the four don't read as one long form. */
+    .so-team:nth-child(even) .so-team__side {
+      order: -1;
+    }
+    .so-team:nth-child(even) .so-team__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+  }
+
+  .so-team__copy {
+    display: grid;
+    align-content: start;
+    gap: 1.5rem;
+  }
+
+  .so-team__side {
+    display: grid;
+    align-content: start;
+    gap: 2rem;
+  }
+
+  .so-sols {
+    display: grid;
+  }
+
+  .so-sol {
+    display: grid;
+    gap: 0.25rem;
+    padding-block: 0.875rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .so-sol:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .so-sol__title {
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    letter-spacing: var(--track-title);
+  }
+
+  .so-sol__text {
+    color: var(--ink-2);
+  }
+
+  .so-facts {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .so-facts dt {
+    color: var(--muted);
+  }
+
+  .so-facts dd {
+    margin-top: 0.125rem;
+  }
+
+  /* ---------- One heatwave ---------- */
+  .so-ev {
+    position: relative;
+    padding-block: clamp(4rem, 2.5rem + 4vw, 7rem);
+  }
+
+  .so-ev__title {
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+
+  .so-ev__line {
+    position: relative;
+    height: 1px;
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4rem);
+    background: var(--line-strong);
+  }
+
+  .so-ev__fill {
+    position: absolute;
+    left: 0;
+    top: -1px;
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(90deg, var(--ink) 0 75%, var(--accent) 75%);
+    transform-origin: left;
+    transform: scaleX(var(--p, 1));
+  }
+
+  .so-ev__list {
+    display: grid;
+    gap: 2.5rem var(--gutter);
+  }
+
+  @media (min-width: 48rem) {
+    .so-ev__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .so-ev__list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .so-ev__step {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding-top: 1.75rem;
+  }
+
+  .so-ev__node {
+    position: absolute;
+    left: 0;
+    top: -0.4375rem;
+    width: 0.875rem;
+    height: 0.875rem;
+    background: var(--ink);
+    transition: transform 300ms var(--ease-out);
+  }
+
+  .so-ev__step.is-last .so-ev__node {
+    background: var(--accent);
+  }
+
+  .so-ev__when {
+    font-size: var(--fs-h2);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .so-ev__team {
+    color: var(--accent);
+  }
+
+  .so-ev__text {
+    max-width: 34ch;
+    color: var(--ink-2);
+  }
+
+  .so-ev__step :global(.so-ev__shot) {
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 47.99rem) {
+    .so-ev__line {
+      display: none;
+    }
+    .so-ev__step {
+      padding-top: 0;
+      padding-left: 1.75rem;
+      border-left: 1px solid var(--line-strong);
+    }
+    .so-ev__node {
+      left: -0.4375rem;
+      top: 0.5rem;
+    }
+  }
+
+  /* Pinned: one moment at a time reads full strength. */
+  .so-ev:global(.is-pinned) {
+    padding-block: 0;
+  }
+
+  .so-ev:global(.is-pinned) .so-ev__stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+  }
+
+  .so-ev:global(.is-pinned) .so-ev__inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-top: calc(var(--header-h) + 1rem);
+    padding-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+
+  .so-ev:global(.is-pinned) .so-ev__line {
+    margin-top: auto;
+  }
+
+  .so-ev:global(.is-pinned) .so-ev__list {
+    margin-bottom: auto;
+  }
+
+  .so-ev:global(.is-pinned) .so-ev__step {
+    transition: opacity 400ms ease;
+  }
+
+  .so-ev:global(.is-pinned) .so-ev__step:not([data-on]):not([data-past]) {
+    opacity: 0.25;
+  }
+
+  .so-ev:global(.is-pinned) .so-ev__step[data-past] {
+    opacity: 0.55;
+  }
+
+  .so-ev:global(.is-pinned) .so-ev__step[data-on] .so-ev__node {
+    transform: scale(1.4);
+  }
+
+  /* ---------- Matrix ---------- */
+  .so-mx__scroll {
+    overflow-x: auto;
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+  }
+
+  .so-mx__table {
+    width: 100%;
+    min-width: 52rem;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .so-mx__corner {
+    width: 13rem;
+  }
+
+  .so-mx__th {
+    padding: 0 1rem 1rem;
+    font-weight: 400;
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+    text-align: left;
+    transition: color 200ms ease;
+  }
+
+  .so-mx__sector {
+    padding: 0;
+    font-weight: 400;
+    text-align: left;
+    border-top: 1px solid var(--line);
+  }
+
+  .so-mx__sector-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 5.5rem;
+    padding-right: 1rem;
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .so-mx__sector-link :global(.so-mx__go) {
+    width: 1rem;
+    height: 1rem;
+    margin-left: auto;
+    color: var(--accent);
+    opacity: 0;
+    transition:
+      opacity 200ms ease,
+      transform 200ms var(--ease-out);
+  }
+
+  .so-mx__cell {
+    padding: 1rem;
+    border-top: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+    color: var(--ink-2);
+    vertical-align: top;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+
+  /* Hover: the cell's sector and team light up; the cell itself turns dark. */
+  .so-mx__table:global([data-r]) .so-mx__cell,
+  .so-mx__table:global([data-c]) .so-mx__cell {
+    color: var(--muted);
+  }
+
+  .so-mx__cell:global(.is-row),
+  .so-mx__cell:global(.is-col) {
+    background: var(--card);
+    color: var(--ink) !important;
+  }
+
+  .so-mx__cell:global(.is-here) {
+    background: var(--ink);
+    color: var(--canvas-mix) !important;
+  }
+
+  .so-mx__th:global(.is-col),
+  .so-mx__sector:global(.is-row) {
+    color: var(--accent);
+  }
+
+  .so-mx__sector:global(.is-row) .so-mx__sector-link {
+    color: var(--ink);
+  }
+
+  .so-mx__sector:global(.is-row) :global(.so-mx__go) {
+    opacity: 1;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .so-mx__sector-link:hover :global(.so-mx__go) {
+      opacity: 1;
+      transform: translateX(2px);
+    }
+  }
+</style>
+
+<script>
+  // Matrix: hovering a cell lights its row (sector) and column (team).
+  const table = document.querySelector<HTMLElement>('[data-matrix]');
+  if (table) {
+    const all = Array.from(table.querySelectorAll<HTMLElement>('[data-r], [data-c]'));
+    const clear = () => {
+      table.removeAttribute('data-r');
+      table.removeAttribute('data-c');
+      all.forEach((el) => el.classList.remove('is-row', 'is-col', 'is-here'));
+    };
+    table.querySelectorAll<HTMLElement>('td[data-r]').forEach((cell) => {
+      cell.addEventListener('pointerenter', () => {
+        clear();
+        const r = cell.dataset.r!;
+        const c = cell.dataset.c!;
+        table.dataset.r = r;
+        table.dataset.c = c;
+        all.forEach((el) => {
+          if (el.dataset.r === r && el.tagName === 'TD') el.classList.add('is-row');
+          if (el.dataset.c === c && el.tagName === 'TD') el.classList.add('is-col');
+          if (el.tagName === 'TH' && el.dataset.r === r) el.classList.add('is-row');
+          if (el.tagName === 'TH' && el.dataset.c === c) el.classList.add('is-col');
+        });
+        cell.classList.add('is-here');
+      });
+    });
+    table.addEventListener('pointerleave', clear);
+  }
+</script>

@@ -1,0 +1,113 @@
+---
+/**
+ * "48 vs 14": six asset types and eight use cases wired one by one (a tangle of
+ * 48 lines) next to the same pieces on one ontology (14 lines through one hub).
+ * The lines draw in as the drawing scrolls into view (--p from page-motion).
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+const W = 320;
+const H = 220;
+const ys = (n: number) => Array.from({ length: n }, (_, i) => 20 + (i * (H - 40)) / (n - 1));
+const a = ys(6);
+const u = ys(8);
+const L = 18;
+const R = W - 18;
+const hub = { x: W / 2, y: H / 2 };
+---
+
+<div class:list={['ig', className]} data-progress>
+  <figure class="ig__panel">
+    <svg viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
+      {a.map((y1) => u.map((y2) => <line class="ig__l" x1={L} y1={y1} x2={R} y2={y2} pathLength="1" />))}
+      {a.map((y) => <rect class="ig__n" x={L - 4} y={y - 4} width="8" height="8" />)}
+      {u.map((y) => <rect class="ig__n" x={R - 4} y={y - 4} width="8" height="8" />)}
+    </svg>
+    <figcaption class="ig__cap">
+      <span class="ig__num t-num">48</span>
+      <span class="ig__what">integrations, built one by one</span>
+    </figcaption>
+  </figure>
+  <figure class="ig__panel">
+    <svg viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
+      {a.map((y) => <line class="ig__l ig__l--hub" x1={L} y1={y} x2={hub.x} y2={hub.y} pathLength="1" />)}
+      {u.map((y) => <line class="ig__l ig__l--hub" x1={hub.x} y1={hub.y} x2={R} y2={y} pathLength="1" />)}
+      {a.map((y) => <rect class="ig__n" x={L - 4} y={y - 4} width="8" height="8" />)}
+      {u.map((y) => <rect class="ig__n" x={R - 4} y={y - 4} width="8" height="8" />)}
+      <rect class="ig__hub" x={hub.x - 11} y={hub.y - 11} width="22" height="22" />
+    </svg>
+    <figcaption class="ig__cap">
+      <span class="ig__num ig__num--hi t-num">14</span>
+      <span class="ig__what">on one ontology</span>
+    </figcaption>
+  </figure>
+  <p class="ig__legend t-caption">Six asset types · eight use cases</p>
+</div>
+
+<style>
+  .ig {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem clamp(1rem, 0.5rem + 2vw, 2.5rem);
+  }
+
+  .ig__panel {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1rem, 0.75rem + 1vw, 1.5rem);
+    border: 1px solid var(--line);
+  }
+
+  .ig__panel svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .ig__l {
+    stroke: var(--line-strong);
+    stroke-width: 0.75;
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc(1 - var(--p, 1));
+  }
+
+  .ig__l--hub {
+    stroke: var(--ink-2);
+    stroke-width: 1;
+  }
+
+  .ig__n {
+    fill: var(--ink);
+  }
+
+  .ig__hub {
+    fill: var(--accent);
+  }
+
+  .ig__cap {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .ig__num {
+    font-size: clamp(2.75rem, 2rem + 2.4vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+  }
+
+  .ig__num--hi {
+    color: var(--accent);
+  }
+
+  .ig__what {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .ig__legend {
+    grid-column: 1 / -1;
+    color: var(--muted);
+  }
+</style>

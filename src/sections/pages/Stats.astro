@@ -1,0 +1,112 @@
+---
+/**
+ * Quick proof: four large figures in a row, split by hairlines (the homepage
+ * sub-hero rhythm). Optional links under single figures and a backing line.
+ */
+import TextLink from '../../components/TextLink.astro';
+import { localizePath, type Locale } from '../../i18n/config';
+import type { Stat, Link } from './types';
+
+interface Props {
+  locale?: Locale;
+  items: Stat[];
+  backing?: { text: string; link: Link };
+  label?: string;
+}
+const { locale = 'en', items, backing, label = 'Key figures' } = Astro.props;
+---
+
+<section class="st pg-sec" aria-label={label}>
+  <div class="container">
+    <ul class="st__list" data-reveal-group>
+      {
+        items.map((s) => (
+          <li class="st__item" data-reveal>
+            <p class="st__value t-num">{s.value}</p>
+            <p class="st__text">{s.text}</p>
+            {s.link && <TextLink href={localizePath(s.link.href, locale)} label={s.link.label} class="st__link" />}
+          </li>
+        ))
+      }
+    </ul>
+    {
+      backing && (
+        <div class="st__backing" data-reveal>
+          <p class="st__backing-text">
+            <span class="pg-dot" aria-hidden="true" />
+            {backing.text}
+          </p>
+          <TextLink href={localizePath(backing.link.href, locale)} label={backing.link.label} />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .st {
+    padding-block: clamp(3rem, 2rem + 3vw, 5rem);
+  }
+
+  .st__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 0;
+  }
+
+  @media (min-width: 64rem) {
+    .st__list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .st__item {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    align-content: start;
+    gap: 0.625rem;
+    padding: 0 clamp(1rem, 0.5rem + 1.5vw, 2rem);
+    border-left: 1px solid var(--line);
+  }
+
+  .st__value {
+    font-size: clamp(2rem, 1.5rem + 1.6vw, 3.25rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .st__text {
+    max-width: 24ch;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .st__item :global(.st__link) {
+    align-self: end;
+    margin-top: 0.75rem;
+    min-width: 0;
+  }
+
+  .st__backing {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem 3rem;
+    margin-top: clamp(2.5rem, 1.5rem + 2vw, 3.5rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .st__backing-text {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    max-width: 62ch;
+    font-size: var(--fs-lead);
+    line-height: 1.45;
+    letter-spacing: var(--track-title);
+    color: var(--ink-2);
+  }
+</style>

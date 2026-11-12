@@ -1,0 +1,195 @@
+---
+/**
+ * "Works with what you have": dark section (the page turns dark around it).
+ * What Predicterra reads on the left, the Predicterra block in the middle
+ * (orange corners), what it returns on the right, then the closing line lit
+ * word by word. With `cover` it slides over the pinned section before it.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import Logo from '../../components/Logo.astro';
+import Icon from '../../components/Icon.astro';
+import type { Works } from './types';
+
+interface Props extends Works {
+  id: string;
+  cover?: boolean;
+}
+const { id, title, text, extra, reads, returns, closing, cover = false } = Astro.props;
+const words = closing.split(' ');
+---
+
+<section class:list={['ww pg-sec pg-sec--full', cover && 'pg-cover']} aria-labelledby={id} data-dark>
+  <div class="container">
+    <NotchRule at={70} />
+    <div class="pg-body">
+      <div class="pg-grid">
+        <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+        <div class="ww__copy" data-reveal-group>
+          <p class="pg-lead" data-reveal>{text}</p>
+          {extra && <p class="ww__extra" data-reveal>{extra}</p>}
+        </div>
+      </div>
+
+      <div class="ww__flow" data-progress>
+        <div class="ww__side">
+          <p class="ww__dir t-small"><span>Reads</span><Icon name="arrow_forward" /></p>
+          <ul class="ww__list" data-reveal-group>
+            {reads.map((r) => <li class="ww__item" data-reveal>{r}</li>)}
+          </ul>
+        </div>
+
+        <div class="ww__core o-corners" data-reveal>
+          <span class="ww__wire ww__wire--in" aria-hidden="true"></span>
+          <span class="ww__wire ww__wire--out" aria-hidden="true"></span>
+          <Logo class="ww__logo" />
+          <p class="ww__core-text t-small">The Cognitive Twin</p>
+        </div>
+
+        <div class="ww__side ww__side--out">
+          <p class="ww__dir ww__dir--out t-small"><span>Returns</span><Icon name="arrow_forward" /></p>
+          <ul class="ww__list" data-reveal-group>
+            {returns.map((r) => <li class="ww__item ww__item--out" data-reveal>{r}</li>)}
+          </ul>
+        </div>
+      </div>
+
+      <p class="pg-statement ww__closing" data-lit>
+        {words.map((w) => <span class="w">{w} </span>)}
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ww__copy {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .ww__extra {
+    max-width: 46ch;
+    padding-left: 1rem;
+    border-left: 2px solid var(--accent);
+    color: var(--ink);
+  }
+
+  .ww__flow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    .ww__flow {
+      grid-template-columns: minmax(0, 1fr) minmax(12rem, 0.6fr) minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(2rem, 1rem + 3vw, 4.5rem);
+    }
+  }
+
+  .ww__dir {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--muted);
+  }
+
+  .ww__dir--out {
+    color: var(--ink);
+  }
+
+  .ww__dir--out :global(.icon) {
+    color: var(--accent);
+  }
+
+  .ww__list {
+    display: grid;
+  }
+
+  .ww__item {
+    position: relative;
+    padding: 0.875rem 0 0.875rem 1.5rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+  }
+
+  .ww__item:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* Grey dash for what comes in, orange square for what goes out. */
+  .ww__item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0.75rem;
+    height: 1px;
+    background: var(--line-strong);
+  }
+
+  .ww__item--out {
+    color: var(--ink);
+  }
+
+  .ww__item--out::before {
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-top: -0.25rem;
+    background: var(--accent);
+  }
+
+  /* The core: dark block with orange corners and the wordmark. */
+  .ww__core {
+    --block: #2a2a2a;
+    position: relative;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.75rem;
+    min-height: 12rem;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+
+  .ww__core :global(.ww__logo) {
+    width: 9rem;
+    height: auto;
+    color: #f1f1f1;
+  }
+
+  .ww__core-text {
+    color: #a7a7a7;
+  }
+
+  /* Wires in and out, drawn as the flow scrolls in. */
+  .ww__wire {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .ww__wire {
+      display: block;
+      position: absolute;
+      top: 50%;
+      width: clamp(2rem, 1rem + 3vw, 4.5rem);
+      height: 1px;
+      background: var(--line-strong);
+      transform-origin: left center;
+      transform: scaleX(var(--p, 1));
+    }
+    .ww__wire--in {
+      right: 100%;
+    }
+    .ww__wire--out {
+      left: 100%;
+      height: 2px;
+      background: var(--accent);
+    }
+  }
+
+  .ww__closing {
+    max-width: 30ch;
+  }
+</style>

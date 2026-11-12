@@ -1,0 +1,110 @@
+---
+/**
+ * A JSON object in a dark panel (risk_event.json), indented and coloured by
+ * role. Set in the brand face with tabular figures: the brand has no monospace.
+ */
+interface Props {
+  label: string;
+  json: Record<string, unknown>;
+  class?: string;
+}
+const { label, json, class: className } = Astro.props;
+const entries = Object.entries(json);
+const kind = (v: unknown) => (typeof v === 'number' ? 'num' : typeof v === 'string' ? 'str' : 'arr');
+const show = (v: unknown) =>
+  typeof v === 'string' ? `"${v}"` : Array.isArray(v) ? `[${v.map((x) => `"${x}"`).join(', ')}]` : String(v);
+---
+
+<figure class:list={['code', className]}>
+  <figcaption class="code__bar t-caption">
+    <span class="code__live" aria-hidden="true"></span>
+    {label}
+  </figcaption>
+  <pre class="code__body" aria-label={label}><span class="code__p">&#123;</span>
+{entries.map(([k, v], i) => (
+  <span class="code__line"><span class="code__k">"{k}"</span><span class="code__p">: </span><span class:list={['code__v', `code__v--${kind(v)}`]}>{show(v)}</span>{i < entries.length - 1 && <span class="code__p">,</span>}</span>
+))}<span class="code__p">&#125;</span></pre>
+</figure>
+
+<style>
+  .code {
+    overflow: hidden;
+    background: #1e1e1e;
+    color: #f1f1f1;
+    box-shadow: inset 0 0 0 1px rgb(241 241 241 / 0.08);
+  }
+
+  .code__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid rgb(241 241 241 / 0.1);
+    color: #a7a7a7;
+  }
+
+  .code__live {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--accent);
+    animation: code-live 2.4s ease-in-out infinite;
+  }
+
+  @keyframes code-live {
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .code__live {
+      animation: none;
+    }
+  }
+
+  .code__body {
+    overflow-x: auto;
+    margin: 0;
+    padding: 1.25rem 1.25rem 1.5rem;
+    font-family: var(--font-sans);
+    font-size: var(--fs-small);
+    line-height: 1.75;
+    font-variant-numeric: tabular-nums;
+    white-space: pre;
+    tab-size: 2;
+  }
+
+  .code__line {
+    display: block;
+    padding-left: 1.25rem;
+  }
+
+  .code__p {
+    color: #818181;
+  }
+
+  .code__k {
+    color: #cecece;
+  }
+
+  .code__v--str {
+    color: #ffffff;
+  }
+
+  .code__v--num {
+    color: var(--accent);
+  }
+
+  .code__v--arr {
+    color: #e0e0e0;
+  }
+
+  .code__body::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .code__body::-webkit-scrollbar-thumb {
+    background: rgb(255 255 255 / 0.2);
+    border-radius: 4px;
+  }
+</style>

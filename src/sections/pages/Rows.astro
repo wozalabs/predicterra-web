@@ -1,0 +1,156 @@
+---
+/**
+ * Title on the left, rows (icon or number, title, text) on the right; a "side"
+ * slot puts a visual next to the rows instead (diagram, code panel). Used for
+ * the "how it's built", "AI-ready", "architecture fit" and trust sections.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import Icon from '../../components/Icon.astro';
+import type { IconName } from '../../data/icons';
+
+interface Props {
+  id: string;
+  title: string;
+  text?: string;
+  items: readonly { icon?: IconName | string; title: string; text: string }[];
+  marker?: 'icon' | 'num';
+  dark?: boolean;
+  rule?: number;
+  /** Layout when there is a side visual: title + rows on the left, visual right. */
+  sideFirst?: boolean;
+}
+const { id, title, text, items, marker = 'icon', dark = false, rule = 70, sideFirst = false } = Astro.props;
+const hasSide = Astro.slots.has('side');
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<section class:list={['rw pg-sec pg-sec--full', hasSide && 'rw--side', sideFirst && 'rw--side-first']} aria-labelledby={id} data-dark={dark ? '' : undefined}>
+  <div class="container">
+    <NotchRule at={rule} />
+    <div class="pg-body">
+      <div class="rw__grid">
+        <div class="rw__head">
+          <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+          {text && <p class="pg-lead" data-reveal>{text}</p>}
+          <slot name="head" />
+        </div>
+        <ol class:list={['rw__list', `rw__list--${marker}`]} data-reveal-group>
+          {
+            items.map((it, i) => (
+              <li class="rw__row" data-reveal>
+                {marker === 'icon' && it.icon ? (
+                  <Icon name={it.icon as IconName} boxed size="2.75rem" />
+                ) : (
+                  <span class="rw__num t-num">{pad(i + 1)}</span>
+                )}
+                <h3 class="rw__title">{it.title}</h3>
+                <p class="rw__text">{it.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+        {
+          hasSide && (
+            <div class="rw__side" data-reveal>
+              <slot name="side" />
+            </div>
+          )
+        }
+      </div>
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .rw__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
+  }
+
+  .rw__head {
+    display: grid;
+    align-content: start;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 64rem) {
+    .rw__grid {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    }
+
+    /* With a side visual: head and rows share the left, the visual takes the right. */
+    .rw--side .rw__grid {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+      grid-template-areas:
+        'head side'
+        'list side';
+      row-gap: 2.5rem;
+    }
+    .rw--side .rw__head {
+      grid-area: head;
+    }
+    .rw--side .rw__list {
+      grid-area: list;
+    }
+    .rw--side .rw__side {
+      grid-area: side;
+      align-self: center;
+    }
+    .rw--side-first .rw__grid {
+      grid-template-areas:
+        'side head'
+        'side list';
+    }
+  }
+
+  .rw__list {
+    display: grid;
+  }
+
+  .rw__row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'm title'
+      'm text';
+    gap: 0.375rem 1.5rem;
+    padding-block: clamp(1.125rem, 1rem + 0.75vw, 1.625rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .rw__row:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .rw__row > :global(.ibox),
+  .rw__num {
+    grid-area: m;
+  }
+
+  .rw__list--num .rw__row {
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+  }
+
+  .rw__num {
+    padding-top: 0.4rem;
+    font-size: var(--fs-small);
+    color: var(--accent);
+  }
+
+  .rw__title {
+    grid-area: title;
+    align-self: center;
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    letter-spacing: var(--track-title);
+  }
+
+  .rw__text {
+    grid-area: text;
+    max-width: 52ch;
+    color: var(--ink-2);
+  }
+</style>

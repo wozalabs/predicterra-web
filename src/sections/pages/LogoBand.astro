@@ -1,0 +1,90 @@
+---
+/** Logo strip under the heroes, in two labelled groups (clients in operation, recognition). */
+import { withBase } from '../../i18n/config';
+import type { LogoGroup } from '../../i18n/en/pages-shared';
+
+interface Props {
+  groups: LogoGroup[];
+  class?: string;
+}
+const { groups, class: className } = Astro.props;
+---
+
+<div class:list={['lb', className]}>
+  {
+    groups.map((g) => (
+      <div class="lb__group">
+        <p class="lb__label t-caption">{g.label}</p>
+        <ul class="lb__list">
+          {g.items.map((it) => (
+            <li class="lb__item">
+              {it.src ? (
+                <img
+                  src={withBase(it.src)}
+                  alt={it.name}
+                  width={Math.round(((it.w ?? 1) / (it.h0 ?? 1)) * (it.h ?? 20))}
+                  height={it.h}
+                  style={`--h:${it.h}px`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <span class="lb__word">{it.name}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .lb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem clamp(2rem, 1rem + 4vw, 5rem);
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .lb__group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem clamp(1.25rem, 0.75rem + 1.5vw, 2.5rem);
+  }
+
+  .lb__label {
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .lb__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem clamp(1.25rem, 0.75rem + 1.5vw, 2.25rem);
+  }
+
+  .lb__item {
+    display: flex;
+    align-items: center;
+    height: 2.25rem;
+  }
+
+  /* Monochrome, and white while the page is dark. */
+  .lb__item img {
+    width: auto;
+    height: var(--h);
+    filter: brightness(0) invert(var(--dt, 0));
+    opacity: 0.6;
+  }
+
+  .lb__word {
+    font-size: 1.125rem;
+    letter-spacing: var(--track-title);
+    color: var(--ink);
+    opacity: 0.6;
+  }
+</style>

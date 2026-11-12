@@ -1,0 +1,159 @@
+/*
+ * Inner pages (Platform, Solutions, sectors, Climate, Digitalization).
+ * Same calmer type scale as the About draft, a shared section frame and a few
+ * utilities used across src/sections/pages. The whole page is one .theme-scrub
+ * surface: it turns dark while a [data-dark] section is in view
+ * (scripts/page-scrub.ts), like the homepage does around Solutions.
+ */
+.pg {
+  --pg-hero: clamp(2.25rem, 1.2rem + 2.9vw, 4rem);
+  --pg-statement: clamp(1.75rem, 1.25rem + 1.5vw, 2.75rem);
+  --fs-h2: clamp(1.75rem, 1.35rem + 1.1vw, 2.5rem);
+  --track-heading: -0.025em;
+  --notch: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
+  position: relative;
+}
+
+.pg .t-h2 {
+  line-height: 1.08;
+}
+
+/* ---------- Section frame ---------- */
+.pg-sec {
+  position: relative;
+  padding-block: clamp(4rem, 2.5rem + 4vw, 7rem);
+}
+
+/* At least one viewport tall, content centred under the rule. */
+.pg-sec--full {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.pg-sec--full > .container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.pg-body {
+  display: grid;
+  gap: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  padding-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+}
+
+.pg-sec--full .pg-body {
+  flex: 1;
+  align-content: center;
+}
+
+/* Title column and content column, the site's 4 : 8 rhythm. */
+.pg-grid {
+  display: grid;
+  gap: 2rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
+}
+
+@media (min-width: 64rem) {
+  .pg-grid {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  }
+  .pg-grid--half {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .pg-grid--wide {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+
+.pg-title {
+  max-width: 30rem;
+  text-wrap: balance;
+}
+
+.pg-title--wide {
+  max-width: 44rem;
+}
+
+.pg-lead {
+  max-width: 46ch;
+  font-size: var(--fs-lead);
+  line-height: 1.45;
+  letter-spacing: var(--track-title);
+  color: var(--ink-2);
+}
+
+.pg-text {
+  max-width: 52ch;
+  color: var(--ink-2);
+}
+
+.pg-statement {
+  max-width: 28ch;
+  font-size: var(--pg-statement);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.pg-source {
+  max-width: 60ch;
+  font-size: var(--fs-caption);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+/* Words lit one by one as the statement scrolls in (scripts/page-motion.ts). */
+.lit-on [data-lit] .w {
+  opacity: var(--o, 0.16);
+  transition: opacity 200ms linear;
+}
+
+/* ---------- Dark block with the brand's orange corners ----------
+   A step lighter than the page while the page itself is dark, so it still reads. */
+.o-corners {
+  --c: var(--accent);
+  --cl: 14px;
+  --cw: 2px;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / var(--cl) var(--cw) no-repeat,
+    linear-gradient(var(--c), var(--c)) top left / var(--cw) var(--cl) no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / var(--cl) var(--cw) no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / var(--cw) var(--cl) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / var(--cl) var(--cw) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / var(--cw) var(--cl) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / var(--cl) var(--cw) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / var(--cw) var(--cl) no-repeat,
+    var(--block, color-mix(in oklab, #2e2e2e var(--pct, 0%), #1e1e1e));
+  color: #f1f1f1;
+}
+
+/* Small orange square, the brand's point. */
+.pg-dot {
+  flex: none;
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--accent);
+}
+
+/* Section that slides over a pinned neighbour (homepage Solutions pattern). */
+.pg-cover {
+  z-index: var(--z-cover);
+  background: var(--canvas-mix);
+  box-shadow: 0 -24px 48px -24px rgb(30 30 30 / 0.14);
+}
+
+/* Tags written like code, set in the brand face (no monospace). */
+.pg-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0 0.625rem;
+  border: 1px solid var(--line);
+  background: var(--chip-bg);
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  white-space: nowrap;
+}

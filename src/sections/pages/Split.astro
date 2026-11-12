@@ -1,0 +1,87 @@
+---
+/**
+ * Generic two-part section: title and text on one side, a visual (slot
+ * "visual") on the other, and anything else (default slot) underneath.
+ * `reverse` puts the visual first; `dark` turns the page dark around it.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  text?: string | readonly string[];
+  reverse?: boolean;
+  dark?: boolean;
+  rule?: number;
+  ratio?: 'even' | 'visual';
+  class?: string;
+}
+const { id, title, text, reverse = false, dark = false, rule = 70, ratio = 'even', class: className } = Astro.props;
+const texts = text ? (typeof text === 'string' ? [text] : text) : [];
+---
+
+<section
+  class:list={['sl pg-sec pg-sec--full', reverse && 'sl--rev', `sl--${ratio}`, className]}
+  aria-labelledby={id}
+  data-dark={dark ? '' : undefined}
+>
+  <div class="container">
+    <NotchRule at={rule} />
+    <div class="pg-body">
+      <div class="sl__grid">
+        <div class="sl__copy">
+          <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+          <div class="sl__texts" data-reveal-group>
+            {
+              texts.map((t, i) => (
+                <p class:list={[i === 0 ? 'pg-lead' : 'pg-text']} data-reveal>
+                  {t}
+                </p>
+              ))
+            }
+          </div>
+          <slot name="copy" />
+        </div>
+        <div class="sl__visual" data-reveal>
+          <slot name="visual" />
+        </div>
+      </div>
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .sl__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
+  }
+
+  .sl__copy {
+    display: grid;
+    align-content: center;
+    gap: 1.5rem;
+  }
+
+  .sl__texts {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 64rem) {
+    .sl__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+    }
+    .sl--visual .sl__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+    .sl--rev .sl__visual {
+      order: -1;
+    }
+    .sl--rev.sl--visual .sl__grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+  }
+</style>

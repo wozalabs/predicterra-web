@@ -1,0 +1,140 @@
+---
+/**
+ * "The decade ahead": two halves, one viewport tall. Copy (title, text, figures
+ * with their sources) on one side; a full-bleed visual on the other that runs to
+ * the edge of the page. A pull quote, if any, sits large over the visual.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import Placeholder from '../../components/Placeholder.astro';
+import type { Figure } from './types';
+
+interface Props {
+  id: string;
+  title: string;
+  text: string;
+  figures?: Figure[];
+  sources?: string;
+  quote?: string;
+  visual?: string;
+  side?: 'right' | 'left';
+}
+const { id, title, text, figures, sources, quote, visual = '', side = 'right' } = Astro.props;
+const hasVisual = Astro.slots.has('visual');
+---
+
+<section class:list={['cx pg-sec pg-sec--full', `cx--${side}`]} aria-labelledby={id}>
+  <div class="container">
+    <NotchRule at={side === 'right' ? 30 : 64} />
+    <div class="cx__grid">
+      <div class="cx__copy">
+        <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+        <p class="pg-lead" data-reveal>{text}</p>
+        {
+          figures && (
+            <dl class="cx__figs" data-reveal-group>
+              {figures.map((f) => (
+                <div class="cx__fig" data-reveal>
+                  <dt class="cx__value t-num">{f.value}</dt>
+                  <dd class="cx__label">{f.text}</dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+        {sources && <p class="pg-source" data-reveal>{sources}</p>}
+      </div>
+      <div class="cx__media" data-reveal>
+        {
+          hasVisual ? (
+            <slot name="visual" />
+          ) : (
+            <Placeholder kind="Photo" text={visual} notch>
+              {quote && <p class="cx__quote">{quote}</p>}
+            </Placeholder>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cx__grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
+    padding-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  .cx__copy {
+    display: grid;
+    align-content: center;
+    gap: clamp(1.25rem, 1rem + 1vw, 2rem);
+  }
+
+  .cx__media {
+    min-height: clamp(22rem, 60svh, 44rem);
+  }
+
+  @media (min-width: 64rem) {
+    .cx__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+    .cx--right .cx__media {
+      margin-right: calc(-1 * var(--gutter));
+    }
+    .cx--left .cx__media {
+      order: -1;
+      margin-left: calc(-1 * var(--gutter));
+    }
+  }
+
+  .cx__figs {
+    display: grid;
+    margin-top: 0.5rem;
+  }
+
+  .cx__fig {
+    display: grid;
+    grid-template-columns: minmax(9rem, 2fr) minmax(0, 3fr);
+    align-items: baseline;
+    gap: 0.25rem 1.5rem;
+    padding-block: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .cx__fig:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cx__value {
+    font-size: var(--fs-h3);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .cx__label {
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 39.99rem) {
+    .cx__fig {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Pull quote over the visual, large; no quotation marks (it isn't a testimonial). */
+  .cx__quote {
+    position: absolute;
+    top: clamp(1.25rem, 1rem + 2vw, 3rem);
+    left: clamp(1.25rem, 1rem + 2vw, 3rem);
+    right: clamp(1.25rem, 1rem + 2vw, 3rem);
+    max-width: 18ch;
+    font-size: var(--pg-statement);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+</style>

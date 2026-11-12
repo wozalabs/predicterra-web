@@ -1,0 +1,1177 @@
+---
+/**
+ * Platform (/platform), from the brief of November 2026.
+ * hero (layers lighting up in turn) · a new kind of twin (generations) ·
+ * simulation, not correlation · four layers (cards that stack as you scroll) ·
+ * the ontology in action (graph) · every horizon · ready on day one · what goes
+ * in · what comes out · validation · built in Europe (dark) · in operation · CTA.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import PageHero from '../sections/pages/PageHero.astro';
+import Compare from '../sections/pages/Compare.astro';
+import Split from '../sections/pages/Split.astro';
+import Cards from '../sections/pages/Cards.astro';
+import Rows from '../sections/pages/Rows.astro';
+import NotchRule from '../components/NotchRule.astro';
+import Placeholder from '../components/Placeholder.astro';
+import Horizons from '../components/Horizons.astro';
+import IntegrateDiagram from '../components/IntegrateDiagram.astro';
+import CodePanel from '../components/CodePanel.astro';
+import Icon from '../components/Icon.astro';
+import TextLink from '../components/TextLink.astro';
+import Cta from '../sections/home/Cta.astro';
+import { getCopy, localizePath, withBase } from '../i18n/config';
+import { softwareJsonLd } from '../data/seo';
+import type { IconName } from '../data/icons';
+
+const locale = 'en';
+const { platform: c } = getCopy(locale);
+const site = Astro.site ?? new URL('https://www.predicterra.com');
+
+// Ontology graph: the asset in the middle, six nodes around it (Decision last, in orange).
+const g = c.ontology.nodes.map((n, i) => {
+  const a = -Math.PI / 2 + (i / c.ontology.nodes.length) * Math.PI * 2;
+  return { ...n, x: 50 + Math.cos(a) * 37, y: 50 + Math.sin(a) * 37 };
+});
+---
+
+<PageLayout
+  title={c.seo.title}
+  description={c.seo.description}
+  locale={locale}
+  jsonLd={[softwareJsonLd(site, c.seo.description)]}
+>
+  <PageHero locale={locale} {...c.hero} layout="stack" logos={c.logos}>
+    <div slot="visual" class="pf-hero">
+      <Placeholder kind="Animation" text={c.hero.visual} notch />
+      <!-- The layers of the model, lighting up one at a time (as in the animation). -->
+      <ol class="pf-layers" aria-label="Layers of the model">
+        {
+          c.hero.layers.map((l, i) => (
+            <li class="pf-layer" style={`--i:${i}`}>
+              <Icon name={l.icon as IconName} />
+              <span class="pf-layer__name">{l.name}</span>
+              <span class="pf-layer__text t-small">{l.text}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </PageHero>
+
+  <Compare
+    id="era-title"
+    title={c.era.title}
+    text={c.era.text}
+    columns={c.era.columns}
+    rows={c.era.rows}
+    closing={c.era.closing}
+    support={c.era.support}
+    variant="steps"
+    rule={30}
+  />
+
+  <Split id="simulation-title" title={c.simulation.title} text={c.simulation.text} reverse rule={64}>
+    <!-- Past range ≠ future state: a grey band of history and the orange line leaving it. -->
+    <figure slot="visual" class="pf-sim" data-progress>
+      <svg viewBox="0 0 400 240" aria-hidden="true">
+        <path class="pf-sim__band" d="M0 150 C60 140 110 158 170 146 S260 150 300 144 L300 196 C250 204 200 192 150 200 S50 196 0 192 Z" />
+        <path class="pf-sim__past" d="M0 172 C40 160 70 184 110 168 S170 160 210 176 S270 166 300 170" pathLength="1" />
+        <path class="pf-sim__future" d="M300 170 C330 160 350 120 370 84 S392 40 400 28" pathLength="1" />
+        <line class="pf-sim__now" x1="300" y1="16" x2="300" y2="228" />
+      </svg>
+      <figcaption class="pf-sim__cap t-small">
+        <span><span class="pf-sim__key pf-sim__key--band"></span>{c.simulation.chart.band}</span>
+        <span><span class="pf-sim__key pf-sim__key--line"></span>{c.simulation.chart.line}</span>
+      </figcaption>
+    </figure>
+    <div slot="copy" class="pf-cols">
+      {
+        c.simulation.columns.map((col, i) => (
+          <div class:list={['pf-col', i === 1 && 'pf-col--hi o-corners']}>
+            <h3 class="pf-col__name">{col.name}</h3>
+            <p class="pf-col__text">{col.text}</p>
+          </div>
+        ))
+      }
+    </div>
+    <p class="pg-statement pf-close" data-lit>
+      {c.simulation.closing.split(' ').map((w) => <span class="w">{w} </span>)}
+    </p>
+  </Split>
+
+  <!-- Architecture: the four layers as cards that stack up as you scroll, crossed by the traceability bar. -->
+  <section class="pf-arch pg-sec" aria-labelledby="arch-title">
+    <div class="container">
+      <NotchRule at={46} />
+      <div class="pg-body">
+        <div class="pg-grid">
+          <h2 id="arch-title" class="t-h2 pg-title" data-render>{c.architecture.title}</h2>
+          <div class="pf-arch__intro" data-reveal-group>
+            <p class="pg-lead" data-reveal>{c.architecture.text}</p>
+            <a class="pf-arch__woza t-small" href={c.architecture.builtBy.href} target="_blank" rel="noopener" data-reveal>
+              {c.architecture.builtBy.label}
+              <Icon name="arrow_forward" />
+            </a>
+          </div>
+        </div>
+        <div class="pf-stack">
+          <ol class="pf-stack__list">
+            {
+              c.architecture.layers.map((l, i) => (
+                <li class="pf-card" style={`--i:${i}`}>
+                  <div class="pf-card__head">
+                    <span class="pf-card__num t-num">Layer {i + 1}</span>
+                    <span class="pf-card__name">{l.name}</span>
+                  </div>
+                  <div class="pf-card__body">
+                    <h3 class="pf-card__title">{l.title}</h3>
+                    <p class="pf-card__text">{l.text}</p>
+                    <span class="pg-tag">{l.tag}</span>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+          <aside class="pf-trace">
+            <span class="pf-trace__bar" aria-hidden="true"></span>
+            <p class="pf-trace__text">{c.architecture.trace}</p>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Split id="ontology-title" title={c.ontology.title} text={c.ontology.text} ratio="visual" rule={22}>
+    <!-- Knowledge graph on a dot grid: hovering a node lights its link to the asset. -->
+    <figure slot="visual" class="pf-graph" data-progress>
+      <svg class="pf-graph__lines" viewBox="0 0 100 100" aria-hidden="true">
+        {g.map((n, i) => <line x1="50" y1="50" x2={n.x} y2={n.y} pathLength="1" data-edge={i} />)}
+      </svg>
+      <div class="pf-graph__center o-corners">
+        <span class="t-caption">{c.ontology.center.label}</span>
+        <span>{c.ontology.center.value}</span>
+      </div>
+      {
+        g.map((n, i) => (
+          <button
+            type="button"
+            class:list={['pf-node', i === g.length - 1 && 'pf-node--decision']}
+            style={`--x:${n.x}%;--y:${n.y}%`}
+            data-node={i}
+          >
+            <span class="t-caption pf-node__label">{n.label}</span>
+            <span class="pf-node__value">{n.value}</span>
+          </button>
+        ))
+      }
+    </figure>
+    <p class="pf-onto-close">
+      <span class="pg-dot" aria-hidden="true"></span>
+      {c.ontology.closing}
+    </p>
+  </Split>
+
+  <section class="pf-hz pg-sec pg-sec--full" aria-labelledby="horizons-title">
+    <div class="container">
+      <NotchRule at={70} />
+      <div class="pg-body">
+        <div class="pg-grid">
+          <h2 id="horizons-title" class="t-h2 pg-title" data-render>{c.horizons.title}</h2>
+          <p class="pg-lead" data-reveal>{c.horizons.text}</p>
+        </div>
+        <Horizons teams={c.horizons.teams} />
+        <p class="pg-statement pf-hz__close" data-lit>
+          {c.horizons.closing.split(' ').map((w) => <span class="w">{w} </span>)}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pf-ready pg-sec pg-sec--full" aria-labelledby="ready-title">
+    <div class="container">
+      <NotchRule at={36} direction="down" />
+      <div class="pg-body">
+        <div class="pg-grid">
+          <h2 id="ready-title" class="t-h2 pg-title" data-render>{c.ready.title}</h2>
+          <p class="pg-lead" data-reveal>{c.ready.text}</p>
+        </div>
+        <ul class="pf-ready__list" data-reveal-group>
+          {
+            c.ready.items.map((it) => (
+              <li class="pf-ready__item" data-reveal>
+                <p class="pf-ready__value t-num">{it.value}</p>
+                <h3 class="pf-ready__title">{it.title}</h3>
+                <p class="pf-ready__text">{it.text}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <ul class="pf-maps" data-reveal-group>
+          {
+            c.ready.maps.map((m) => (
+              <li data-reveal>
+                <Placeholder kind="Map" text={`Halftone map of the same territory: ${m.toLowerCase()}`} ratio="4 / 3" compact />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="pf-in pg-sec pg-sec--full" aria-labelledby="inputs-title">
+    <div class="container">
+      <NotchRule at={58} />
+      <div class="pg-body">
+        <div class="pg-grid">
+          <h2 id="inputs-title" class="t-h2 pg-title" data-render>{c.inputs.title}</h2>
+          <p class="pg-lead" data-reveal>{c.inputs.text}</p>
+        </div>
+        <div class="pf-in__grid">
+          <div class="pf-in__list-wrap">
+            <ul class="pf-in__list" data-reveal-group>
+              {
+                c.inputs.items.map((it) => (
+                  <li class="pf-in__row" data-reveal>
+                    <span class="pg-tag">{it.tag}</span>
+                    <p class="pf-in__text">{it.text}</p>
+                  </li>
+                ))
+              }
+            </ul>
+            <ol class="pf-states" aria-label="Data state" data-progress>
+              {
+                c.inputs.states.map((s, i) => (
+                  <li class="pf-state" style={`--i:${i}`}>
+                    {s}
+                  </li>
+                ))
+              }
+            </ol>
+          </div>
+          <div class="pf-in__integrate" data-reveal>
+            <h3 class="pf-in__h3">{c.inputs.integrate.title}</h3>
+            <p class="pg-text">{c.inputs.integrate.text}</p>
+            <IntegrateDiagram />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Cards id="outputs-title" title={c.outputs.title} items={c.outputs.items} rule={30}>
+    <div class="pf-event">
+      <div class="pf-event__copy" data-reveal>
+        <h3 class="pf-in__h3">{c.outputs.event.title}</h3>
+        <p class="pg-text">{c.outputs.event.text}</p>
+      </div>
+      <CodePanel label={c.outputs.event.label} json={c.outputs.event.json} class="pf-event__code" />
+    </div>
+  </Cards>
+
+  <div id="validation">
+    <Cards id="validation-title" title={c.validation.title} items={c.validation.items} cols={4} rule={70}>
+      <div data-reveal>
+        <TextLink href={localizePath(c.validation.link.href, locale)} label={c.validation.link.label} />
+      </div>
+    </Cards>
+  </div>
+
+  <Rows id="trust-title" title={c.trust.title} text={c.trust.text} items={c.trust.items} marker="num" dark rule={52}>
+    <!-- Your cloud: a dashed perimeter with Predicterra inside, wired to the client's systems. -->
+    <figure slot="side" class="pf-perim" aria-hidden="true">
+      <span class="pf-perim__label t-caption">{c.trust.perimeter.label}</span>
+      <div class="pf-perim__core o-corners">Predicterra</div>
+      <ul class="pf-perim__sys">
+        {c.trust.perimeter.systems.map((s) => <li class="pf-perim__node t-small">{s}</li>)}
+      </ul>
+    </figure>
+    <div class="pf-open">
+      <div class="pf-open__copy" data-reveal>
+        <h3 class="pf-in__h3">{c.trust.open.title}</h3>
+        <p class="pg-text">{c.trust.open.text}</p>
+      </div>
+      <ul class="pf-seals" data-reveal>
+        {c.trust.seals.map((s) => <li class="chip pf-seal">{s}</li>)}
+      </ul>
+    </div>
+  </Rows>
+
+  <section class="pf-proof pg-sec pg-sec--full" aria-labelledby="proof-title">
+    <div class="container">
+      <NotchRule at={70} />
+      <div class="pg-body">
+        <div class="pg-grid">
+          <h2 id="proof-title" class="t-h2 pg-title" data-render>{c.proof.title}</h2>
+          <p class="pg-lead" data-reveal>{c.proof.text}</p>
+        </div>
+        <ul class="pf-cases" data-reveal-group>
+          {
+            c.proof.cards.map((k) => (
+              <li data-reveal>
+                <a class="pf-case" href={localizePath(k.link.href, locale)} data-btn-host>
+                  <Placeholder kind="Map" text={`${k.client} network map, with the client’s permission`} class="pf-case__map" />
+                  <div class="pf-case__body">
+                    <img
+                      class="pf-case__logo"
+                      src={withBase(k.logo.src)}
+                      alt={k.client}
+                      width={Math.round((k.logo.w / k.logo.h0) * k.logo.h)}
+                      height={k.logo.h}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <p class="pf-case__value t-num">{k.value}</p>
+                    <p class="pf-case__label">{k.label}</p>
+                    <p class="pf-case__text">{k.text}</p>
+                    <div class="pf-case__foot">
+                      <span class="chip">{k.badge}</span>
+                      <span class="pf-case__link">
+                        {k.link.label}
+                        <Icon name="arrow_forward" />
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="pf-eco t-small" data-reveal>{c.proof.ecosystem}</p>
+      </div>
+    </div>
+  </section>
+
+  <Cta locale={locale} copy={c.cta} />
+</PageLayout>
+
+<style>
+  /* ---------- Hero: layer labels over the animation ---------- */
+  .pf-hero {
+    position: relative;
+    height: 100%;
+  }
+
+  .pf-layers {
+    position: absolute;
+    top: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    right: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
+    display: grid;
+    gap: 0.375rem;
+    width: min(21rem, calc(100% - 1.5rem));
+  }
+
+  /* Phones: the layer list goes under the visual instead of over it. */
+  @media (max-width: 39.99rem) {
+    .pf-hero {
+      display: grid;
+      gap: 0.5rem;
+    }
+    .pf-hero > :global(.ph) {
+      min-height: 14rem;
+    }
+    .pf-layers {
+      position: static;
+      width: 100%;
+    }
+  }
+
+  .pf-layer {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    animation: pf-layer 8s var(--ease-in-out) infinite;
+    animation-delay: calc(var(--i) * 2s);
+    opacity: 0.45;
+  }
+
+  .pf-layer :global(.icon) {
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--accent);
+  }
+
+  .pf-layer__text {
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Each layer lights for a quarter of the loop, one after the other. */
+  @keyframes pf-layer {
+    0%,
+    25% {
+      opacity: 1;
+      box-shadow: 0 0 0 1px var(--ink);
+    }
+    32%,
+    100% {
+      opacity: 0.45;
+      box-shadow: 0 0 0 1px var(--line);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pf-layer {
+      animation: none;
+      opacity: 1;
+    }
+  }
+
+  /* ---------- Simulation ---------- */
+  .pf-sim {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1rem, 0.75rem + 1vw, 1.75rem);
+    background: var(--card);
+  }
+
+  .pf-sim svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .pf-sim__band {
+    fill: var(--line);
+  }
+
+  .pf-sim__past,
+  .pf-sim__future {
+    fill: none;
+    stroke-width: 2;
+    stroke-dasharray: 1;
+  }
+
+  .pf-sim__past {
+    stroke: var(--ink-2);
+    stroke-dashoffset: calc(1 - min(1, var(--p, 1) * 1.6));
+  }
+
+  .pf-sim__future {
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-dashoffset: calc(1 - clamp(0, var(--p, 1) * 2 - 0.9, 1));
+  }
+
+  .pf-sim__now {
+    stroke: var(--line-strong);
+    stroke-dasharray: 3 4;
+  }
+
+  .pf-sim__cap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    color: var(--ink-2);
+  }
+
+  .pf-sim__cap > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .pf-sim__key {
+    width: 1rem;
+    height: 0.625rem;
+  }
+
+  .pf-sim__key--band {
+    background: var(--line-strong);
+  }
+
+  .pf-sim__key--line {
+    height: 3px;
+    background: var(--accent);
+  }
+
+  .pf-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .pf-col {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+  }
+
+  .pf-col--hi {
+    border-color: transparent;
+  }
+
+  .pf-col__name {
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .pf-col__text {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .pf-col--hi .pf-col__text {
+    color: #cecece;
+  }
+
+  .pf-close {
+    max-width: 30ch;
+  }
+
+  /* ---------- Architecture: stacking cards ---------- */
+  .pf-arch__intro {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+
+  .pf-arch__woza {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    color: var(--ink-2);
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .pf-arch__woza :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--accent);
+  }
+
+  .pf-stack {
+    position: relative;
+    display: grid;
+    gap: 2rem var(--gutter);
+  }
+
+  @media (min-width: 64rem) {
+    .pf-stack {
+      grid-template-columns: minmax(0, 1fr) 15rem;
+    }
+  }
+
+  .pf-stack__list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .pf-card {
+    display: grid;
+    gap: 1rem 2rem;
+    min-height: 16rem;
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2.25rem);
+    background: var(--card);
+    box-shadow: 0 -1px 0 var(--line);
+  }
+
+  @media (min-width: 48rem) {
+    .pf-card {
+      grid-template-columns: minmax(10rem, 3fr) minmax(0, 7fr);
+    }
+  }
+
+  /* Wide and tall screens: each layer sticks a little lower than the one before,
+     so they pile up like the bands of the diagram. */
+  @media (min-width: 64rem) and (min-height: 44rem) {
+    .pf-card {
+      position: sticky;
+      top: calc(var(--header-h) + 1.5rem + var(--i) * 3.5rem);
+      min-height: 19rem;
+      box-shadow:
+        0 -1px 0 var(--line),
+        0 -16px 32px -24px rgb(30 30 30 / 0.18);
+    }
+    .pf-stack__list {
+      gap: 30svh;
+      padding-bottom: 6rem;
+    }
+  }
+
+  .pf-card__head {
+    display: grid;
+    align-content: start;
+    gap: 0.25rem;
+  }
+
+  .pf-card__num {
+    font-size: var(--fs-small);
+    color: var(--accent);
+  }
+
+  .pf-card__name {
+    font-size: var(--fs-h3);
+    line-height: 1.1;
+    letter-spacing: var(--track-title);
+  }
+
+  .pf-card__body {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0.75rem;
+  }
+
+  .pf-card__title {
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    letter-spacing: var(--track-title);
+  }
+
+  .pf-card__text {
+    max-width: 56ch;
+    color: var(--ink-2);
+  }
+
+  /* The traceability bar runs through all four layers. */
+  .pf-trace {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3px minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .pf-trace__bar {
+    background: var(--accent);
+  }
+
+  .pf-trace__text {
+    align-self: start;
+    color: var(--ink);
+  }
+
+  @media (min-width: 64rem) {
+    .pf-trace__text {
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+    }
+  }
+
+  /* ---------- Ontology graph ---------- */
+  .pf-graph {
+    position: relative;
+    width: 100%;
+    max-width: 42rem;
+    aspect-ratio: 1;
+    margin-inline: auto;
+    background-image: radial-gradient(circle at center, var(--line) 1px, transparent 1.4px);
+    background-size: 18px 18px;
+  }
+
+  .pf-graph__lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .pf-graph__lines line {
+    stroke: var(--line-strong);
+    stroke-width: 0.18;
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc(1 - var(--p, 1));
+    transition:
+      stroke 200ms ease,
+      stroke-width 200ms ease;
+  }
+
+  .pf-graph__lines line.is-on {
+    stroke: var(--accent);
+    stroke-width: 0.45;
+  }
+
+  .pf-graph__center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    gap: 0.25rem;
+    min-width: 10rem;
+    padding: 1rem 1.25rem;
+    transform: translate(-50%, -50%);
+  }
+
+  .pf-graph__center .t-caption {
+    color: #a7a7a7;
+  }
+
+  .pf-node {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    display: grid;
+    gap: 0.125rem;
+    min-width: 7.5rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--line-strong);
+    background: var(--canvas-mix);
+    text-align: left;
+    transform: translate(-50%, -50%);
+    transition:
+      border-color 200ms ease,
+      transform 200ms var(--ease-out);
+  }
+
+  .pf-node__label {
+    color: var(--muted);
+  }
+
+  .pf-node__value {
+    font-size: var(--fs-small);
+    white-space: nowrap;
+  }
+
+  .pf-node--decision {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .pf-node--decision .pf-node__label {
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .pf-node.is-on {
+    border-color: var(--ink);
+  }
+
+  .pf-node:active {
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+
+  @media (max-width: 39.99rem) {
+    .pf-node {
+      min-width: 0;
+      padding: 0.375rem 0.5rem;
+    }
+    .pf-node__value {
+      font-size: var(--fs-caption);
+      white-space: normal;
+      max-width: 6.5rem;
+    }
+    .pf-graph__center {
+      min-width: 7rem;
+      padding: 0.75rem;
+      font-size: var(--fs-small);
+    }
+  }
+
+  .pf-onto-close {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    max-width: 64ch;
+    font-size: var(--fs-lead);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .pf-hz__close {
+    max-width: 34ch;
+  }
+
+  /* ---------- Ready ---------- */
+  .pf-ready__list {
+    display: grid;
+    gap: 2.5rem var(--gutter);
+  }
+
+  @media (min-width: 48rem) {
+    .pf-ready__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .pf-ready__item {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .pf-ready__value {
+    font-size: clamp(3.5rem, 2.5rem + 3.5vw, 6rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+  }
+
+  .pf-ready__item:first-child .pf-ready__value {
+    color: var(--accent);
+  }
+
+  .pf-ready__title {
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .pf-ready__text {
+    max-width: 40ch;
+    color: var(--ink-2);
+  }
+
+  .pf-maps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    .pf-maps {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* ---------- Inputs ---------- */
+  .pf-in__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .pf-in__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+
+  .pf-in__list {
+    display: grid;
+  }
+
+  .pf-in__row {
+    display: grid;
+    gap: 0.5rem 1.5rem;
+    padding-block: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 40rem) {
+    .pf-in__row {
+      grid-template-columns: 11rem minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+
+  .pf-in__row .pg-tag {
+    justify-self: start;
+  }
+
+  .pf-in__text {
+    color: var(--ink-2);
+  }
+
+  /* incomplete → connected → calibrated, filling in as it scrolls. */
+  .pf-states {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .pf-state {
+    position: relative;
+    padding: 0.75rem 0.75rem 0.75rem 0;
+    border-top: 3px solid var(--line);
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .pf-state::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -3px;
+    height: 3px;
+    background: var(--ink);
+    transform-origin: left;
+    transform: scaleX(clamp(0, calc(var(--p, 1) * 3 - var(--i)), 1));
+  }
+
+  .pf-state:last-child::before {
+    background: var(--accent);
+  }
+
+  .pf-in__integrate {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+  }
+
+  .pf-in__h3 {
+    font-size: var(--fs-h3);
+    line-height: 1.1;
+    letter-spacing: var(--track-title);
+  }
+
+  /* ---------- Outputs: the risk event ---------- */
+  .pf-event {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 64rem) {
+    .pf-event {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+      align-items: start;
+    }
+  }
+
+  .pf-event__copy {
+    display: grid;
+    gap: 1rem;
+  }
+
+  /* ---------- Trust: perimeter ---------- */
+  .pf-perim {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 2.5rem;
+    padding: 3rem 1.5rem 2rem;
+    border: 1px dashed var(--line-strong);
+  }
+
+  .pf-perim__label {
+    position: absolute;
+    top: -0.6rem;
+    left: 1rem;
+    padding: 0 0.5rem;
+    background: var(--canvas-mix);
+    color: var(--muted);
+  }
+
+  .pf-perim__core {
+    --block: #2a2a2a;
+    padding: 1.25rem 2rem;
+    font-size: var(--fs-h4);
+  }
+
+  .pf-perim__sys {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  /* Wires from the core down to each system. */
+  .pf-perim__sys::before {
+    content: '';
+    position: absolute;
+    left: 12.5%;
+    right: 12.5%;
+    top: -1.25rem;
+    height: 1px;
+    background: var(--line-strong);
+  }
+
+  .pf-perim__node {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 2.75rem;
+    border: 1px solid var(--line-strong);
+    color: var(--ink-2);
+  }
+
+  .pf-perim__node::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    width: 1px;
+    height: 1.25rem;
+    background: var(--line-strong);
+  }
+
+  .pf-perim__core {
+    position: relative;
+  }
+
+  .pf-perim__core::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 1px;
+    height: 1.25rem;
+    background: var(--line-strong);
+  }
+
+  .pf-open {
+    display: grid;
+    gap: 1.5rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 64rem) {
+    .pf-open {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+      align-items: end;
+    }
+  }
+
+  .pf-open__copy {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .pf-seals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .pf-seal {
+    min-height: 2.25rem;
+    font-size: var(--fs-small);
+  }
+
+  /* ---------- Proof ---------- */
+  .pf-cases {
+    display: grid;
+    gap: var(--gutter);
+  }
+
+  @media (min-width: 64rem) {
+    .pf-cases {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .pf-case {
+    position: relative;
+    display: grid;
+    min-height: clamp(26rem, 22rem + 10vw, 34rem);
+    overflow: hidden;
+    clip-path: var(--notch);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pf-case > :global(.pf-case__map) {
+    position: absolute;
+    inset: 0;
+  }
+
+  .pf-case > :global(.pf-case__map .ph__cap) {
+    align-self: flex-start;
+  }
+
+  .pf-case__body {
+    position: relative;
+    align-self: end;
+    display: grid;
+    gap: 0.5rem;
+    margin: clamp(0.75rem, 0.5rem + 1vw, 1.25rem);
+    margin-bottom: calc(clamp(0.75rem, 0.5rem + 1vw, 1.25rem) + 18px);
+    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .pf-case__logo {
+    width: auto;
+    height: 1.5rem;
+    margin-bottom: 0.75rem;
+    filter: brightness(0);
+    opacity: 0.6;
+  }
+
+  .pf-case__value {
+    font-size: clamp(3rem, 2rem + 3vw, 5rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    color: var(--accent);
+  }
+
+  .pf-case__label {
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .pf-case__text {
+    max-width: 46ch;
+    color: var(--ink-2);
+  }
+
+  .pf-case__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  .pf-case__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    border-bottom: 1px solid var(--line-strong);
+    transition: border-color 160ms ease;
+  }
+
+  .pf-case__link :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--accent);
+    transition: transform 200ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pf-case:hover .pf-case__link {
+      border-color: var(--accent);
+    }
+    .pf-case:hover .pf-case__link :global(.icon) {
+      transform: translateX(2px);
+    }
+  }
+
+  .pf-case:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -6px;
+  }
+
+  .pf-eco {
+    max-width: 90ch;
+    color: var(--muted);
+  }
+</style>
+
+<script>
+  // Ontology graph: hovering or focusing a node lights its link to the asset.
+  const graph = document.querySelector<HTMLElement>('.pf-graph');
+  if (graph) {
+    const edges = Array.from(graph.querySelectorAll<SVGLineElement>('[data-edge]'));
+    const nodes = Array.from(graph.querySelectorAll<HTMLElement>('[data-node]'));
+    const set = (k: number) => {
+      edges.forEach((e, i) => e.classList.toggle('is-on', i === k));
+      nodes.forEach((n, i) => n.classList.toggle('is-on', i === k));
+    };
+    nodes.forEach((n, i) => {
+      n.addEventListener('pointerenter', () => set(i));
+      n.addEventListener('focus', () => set(i));
+      n.addEventListener('click', () => set(i));
+    });
+    graph.addEventListener('pointerleave', () => set(nodes.length - 1));
+    set(nodes.length - 1);
+  }
+</script>

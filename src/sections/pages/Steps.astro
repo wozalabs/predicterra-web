@@ -1,0 +1,199 @@
+---
+/**
+ * Numbered steps on a horizontal line (vertical on phones): dark numbered
+ * squares, the last step and the last stretch of line in orange. The line fills
+ * as the section scrolls in. Optional mini captures under each step, and an
+ * optional side card (buyer's guide), shown only once it is ready.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import Placeholder from '../../components/Placeholder.astro';
+import TextLink from '../../components/TextLink.astro';
+import { localizePath, type Locale } from '../../i18n/config';
+import type { Link } from './types';
+
+interface Props {
+  locale?: Locale;
+  id: string;
+  title: string;
+  text?: string;
+  steps: { title: string; text: string; shot?: string }[];
+  guide?: { ready: boolean; text: string; link: Link };
+  full?: boolean;
+}
+const { locale = 'en', id, title, text, steps, guide, full = true } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<section class:list={['sp pg-sec', full && 'pg-sec--full']} aria-labelledby={id} style={`--n:${steps.length}`}>
+  <div class="container">
+    <NotchRule at={36} />
+    <div class="pg-body">
+      <div class="pg-grid">
+        <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+        {text && <p class="pg-lead" data-reveal>{text}</p>}
+      </div>
+
+      <div class="sp__wrap" data-progress>
+      <span class="sp__track" aria-hidden="true"><span class="sp__fill"></span></span>
+      <ol class="sp__list">
+        {
+          steps.map((s, i) => (
+            <li class:list={['sp__step', i === steps.length - 1 && 'is-last']}>
+              <span class="sp__num t-num" aria-hidden="true">
+                {pad(i + 1)}
+              </span>
+              <h3 class="sp__title">{s.title}</h3>
+              <p class="sp__text">{s.text}</p>
+              {s.shot && <Placeholder kind="Platform capture" text={s.shot} ratio="4 / 3" compact class="sp__shot" />}
+            </li>
+          ))
+        }
+      </ol>
+      </div>
+
+      {
+        guide?.ready && (
+          <aside class="sp__guide" data-reveal>
+            <p>{guide.text}</p>
+            <TextLink href={localizePath(guide.link.href, locale)} label={guide.link.label} />
+          </aside>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .sp__wrap {
+    --sq: 2.75rem;
+    position: relative;
+  }
+
+  .sp__list {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  /* Phones: vertical line through the squares. */
+  .sp__track {
+    position: absolute;
+    left: calc(var(--sq) / 2);
+    top: calc(var(--sq) / 2);
+    bottom: 0;
+    width: 1px;
+    background: var(--line-strong);
+  }
+
+  .sp__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform-origin: top;
+    transform: scaleY(var(--p, 1));
+  }
+
+  .sp__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--sq) minmax(0, 1fr);
+    column-gap: 1.25rem;
+    row-gap: 0.5rem;
+  }
+
+  .sp__step > :not(.sp__num) {
+    grid-column: 2;
+  }
+
+  .sp__num {
+    grid-row: 1 / 4;
+    display: grid;
+    place-items: center;
+    width: var(--sq);
+    height: var(--sq);
+    background: var(--ink);
+    color: var(--canvas-mix);
+    font-size: var(--fs-small);
+  }
+
+  .sp__step.is-last .sp__num {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .sp__title {
+    align-self: center;
+    font-size: var(--fs-h3);
+    line-height: 1.1;
+    letter-spacing: var(--track-title);
+  }
+
+  .sp__text {
+    max-width: 36ch;
+    color: var(--ink-2);
+  }
+
+  .sp__step :global(.sp__shot) {
+    margin-top: 0.75rem;
+    max-width: 22rem;
+  }
+
+  @media (min-width: 48rem) {
+    .sp__list {
+      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+      gap: 0 var(--gutter);
+    }
+
+    /* Wide: horizontal line along the squares; the last stretch in orange. */
+    .sp__track {
+      left: 0;
+      right: 0;
+      top: calc(var(--sq) / 2);
+      bottom: auto;
+      width: auto;
+      height: 1px;
+    }
+
+    .sp__fill {
+      transform-origin: left;
+      transform: scaleX(var(--p, 1));
+      background: linear-gradient(
+        90deg,
+        var(--ink) calc(100% - 100% / var(--n) - 1rem),
+        var(--accent) calc(100% - 100% / var(--n) - 1rem)
+      );
+      height: 2px;
+      top: -0.5px;
+    }
+
+    .sp__step {
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+      row-gap: 1rem;
+    }
+
+    .sp__step > :not(.sp__num) {
+      grid-column: 1;
+    }
+
+    .sp__num {
+      grid-row: auto;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .sp__step :global(.sp__shot) {
+      max-width: none;
+    }
+  }
+
+  .sp__guide {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    padding: 1.5rem;
+    background: var(--card);
+  }
+</style>

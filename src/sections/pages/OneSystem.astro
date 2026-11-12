@@ -1,0 +1,226 @@
+---
+/**
+ * "One system": the sector at the centre (dark, orange corners), the assets it
+ * depends on around it, joined by lines that draw in as the section scrolls in.
+ * Sectors with a page are links.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import Icon from '../../components/Icon.astro';
+import { localizePath, type Locale } from '../../i18n/config';
+import type { SystemNode } from './types';
+
+interface Props {
+  locale?: Locale;
+  id: string;
+  title: string;
+  text: string;
+  center: string;
+  nodes: SystemNode[];
+}
+const { locale = 'en', id, title, text, center, nodes } = Astro.props;
+const pos = nodes.map((_, i) => {
+  const a = -Math.PI / 2 + (i / nodes.length) * Math.PI * 2 + (nodes.length % 2 ? 0 : Math.PI / nodes.length);
+  return { x: 50 + Math.cos(a) * 36, y: 50 + Math.sin(a) * 36 };
+});
+---
+
+<section class="os pg-sec pg-sec--full" aria-labelledby={id}>
+  <div class="container">
+    <NotchRule at={22} />
+    <div class="pg-body os__grid">
+      <div class="os__copy">
+        <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+        <p class="pg-lead" data-reveal>{text}</p>
+        <ul class="os__links" data-reveal>
+          {
+            nodes
+              .filter((n) => n.href)
+              .map((n) => (
+                <li>
+                  <a class="os__link" href={localizePath(n.href!, locale)}>
+                    {n.label}
+                    <Icon name="arrow_forward" />
+                  </a>
+                </li>
+              ))
+          }
+        </ul>
+      </div>
+
+      <div class="os__map" data-progress data-reveal>
+        <svg class="os__lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          {
+            pos.map((p) => (
+              <line x1="50" y1="50" x2={p.x} y2={p.y} pathLength="1" />
+            ))
+          }
+        </svg>
+        <span class="os__center o-corners">{center}</span>
+        {
+          nodes.map((n, i) =>
+            n.href ? (
+              <a class="os__node os__node--link" href={localizePath(n.href, locale)} style={`--x:${pos[i].x}%;--y:${pos[i].y}%`}>
+                {n.label}
+                <Icon name="arrow_forward" />
+              </a>
+            ) : (
+              <span class="os__node" style={`--x:${pos[i].x}%;--y:${pos[i].y}%`}>
+                {n.label}
+              </span>
+            ),
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .os__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .os__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: center;
+    }
+  }
+
+  .os__copy {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .os__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .os__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.75rem;
+    border-bottom: 1px solid var(--line-strong);
+    transition:
+      color 160ms ease,
+      border-color 160ms ease;
+  }
+
+  .os__link :global(.icon) {
+    width: 1rem;
+    height: 1rem;
+    color: var(--accent);
+    transition: transform 200ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .os__link:hover {
+      border-color: var(--accent);
+    }
+    .os__link:hover :global(.icon) {
+      transform: translateX(2px);
+    }
+  }
+
+  /* Diagram */
+  .os__map {
+    position: relative;
+    width: 100%;
+    max-width: 40rem;
+    aspect-ratio: 1;
+    margin-inline: auto;
+    background-image: radial-gradient(circle at center, var(--line) 1px, transparent 1.4px);
+    background-size: 20px 20px;
+  }
+
+  .os__lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .os__lines line {
+    /* The map is square, so viewBox units scale evenly: 0.16 ≈ 1px. */
+    stroke: var(--line-strong);
+    stroke-width: 0.16;
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc(1 - var(--p, 1));
+  }
+
+  .os__center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    min-width: 8.5rem;
+    min-height: 5rem;
+    padding: 1rem 1.5rem;
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+    transform: translate(-50%, -50%);
+  }
+
+  .os__node {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.5rem;
+    padding: 0 0.875rem;
+    border: 1px solid var(--line-strong);
+    background: var(--canvas-mix);
+    width: max-content;
+    font-size: var(--fs-small);
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+    opacity: calc(0.2 + var(--p, 1) * 0.8);
+  }
+
+  @media (max-width: 39.99rem) {
+    .os__center {
+      min-width: 6rem;
+      min-height: 3.5rem;
+      padding: 0.75rem 1rem;
+      font-size: var(--fs-body);
+    }
+    .os__node {
+      min-height: 2.25rem;
+      padding: 0 0.625rem;
+      font-size: var(--fs-caption);
+    }
+  }
+
+  .os__node--link {
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease;
+  }
+
+  .os__node--link :global(.icon) {
+    flex: none;
+    width: 0.875rem;
+    height: 0.875rem;
+    color: var(--accent);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .os__node--link:hover {
+      border-color: var(--ink);
+    }
+  }
+
+  .os__node--link:active {
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+</style>

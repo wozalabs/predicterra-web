@@ -1,0 +1,235 @@
+---
+/**
+ * Steps that take turns on a pinned stage: the list on the left with a line
+ * that fills as you go, the active step's capture on the right (crossfaded).
+ * The last step and the last stretch of line are orange. Phones and reduced
+ * motion: the steps stacked, each with its capture.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import Placeholder from '../../components/Placeholder.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  steps: readonly { title: string; text: string; shot: string }[];
+}
+const { id, title, steps } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+const last = steps.length - 1;
+---
+
+<section class="ps" aria-labelledby={id} data-stepper="(min-width: 64rem) and (min-height: 40rem)" style={`--n:${steps.length}`}>
+  <div class="ps__stage">
+    <div class="container ps__inner">
+      <NotchRule at={58} />
+      <div class="ps__grid">
+        <div class="ps__copy">
+          <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+          <div class="ps__wrap">
+          <span class="ps__track" aria-hidden="true"><span class="ps__fill"></span></span>
+          <ol class="ps__list">
+            {
+              steps.map((s, i) => (
+                <li class:list={['ps__step', i === last && 'is-last']} data-step-item>
+                  <span class="ps__num t-num" aria-hidden="true">
+                    {pad(i + 1)}
+                  </span>
+                  <div class="ps__body">
+                    <h3 class="ps__title">{s.title}</h3>
+                    <p class="ps__text">{s.text}</p>
+                  </div>
+                  <Placeholder kind="Platform capture" text={s.shot} ratio="4 / 3" compact class="ps__shot-inline" />
+                </li>
+              ))
+            }
+          </ol>
+          </div>
+        </div>
+        <div class="ps__shots" aria-hidden="true">
+          {steps.map((s, i) => <Placeholder kind="Platform capture" text={s.shot} notch class={`ps__shot ps__shot--${i}`} />)}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ps {
+    position: relative;
+    padding-block: clamp(4rem, 2.5rem + 4vw, 7rem);
+  }
+
+  .ps__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
+    padding-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  .ps__copy {
+    display: grid;
+    align-content: start;
+    gap: clamp(2rem, 1.5rem + 2vw, 3rem);
+  }
+
+  .ps__wrap {
+    --sq: 2.75rem;
+    position: relative;
+  }
+
+  .ps__list {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .ps__track {
+    position: absolute;
+    left: calc(var(--sq) / 2);
+    top: calc(var(--sq) / 2);
+    bottom: calc(var(--sq) / 2);
+    width: 1px;
+    background: var(--line-strong);
+  }
+
+  .ps__fill {
+    position: absolute;
+    inset: 0;
+    width: 2px;
+    margin-left: -0.5px;
+    background: linear-gradient(var(--ink) 0 calc(100% - 100% / (var(--n) - 1)), var(--accent) 0);
+    transform-origin: top;
+    transform: scaleY(var(--p, 1));
+  }
+
+  .ps__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--sq) minmax(0, 1fr);
+    gap: 1rem 1.25rem;
+  }
+
+  .ps__num {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: var(--sq);
+    height: var(--sq);
+    background: var(--ink);
+    color: var(--canvas-mix);
+    font-size: var(--fs-small);
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+  }
+
+  .ps__step.is-last .ps__num {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .ps__body {
+    display: grid;
+    gap: 0.375rem;
+    padding-top: 0.5rem;
+  }
+
+  .ps__title {
+    font-size: var(--fs-h3);
+    line-height: 1.1;
+    letter-spacing: var(--track-title);
+  }
+
+  .ps__text {
+    max-width: 40ch;
+    color: var(--ink-2);
+  }
+
+  .ps__step :global(.ps__shot-inline) {
+    grid-column: 2;
+    max-width: 26rem;
+  }
+
+  .ps__shots {
+    display: none;
+  }
+
+  /* ----- Pinned (set by scripts/page-motion.ts) ----- */
+  .ps:global(.is-pinned) {
+    padding-block: 0;
+  }
+
+  .ps:global(.is-pinned) .ps__stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+  }
+
+  .ps:global(.is-pinned) .ps__inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-top: calc(var(--header-h) + 1rem);
+    padding-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+
+  .ps:global(.is-pinned) .ps__grid {
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+
+  .ps:global(.is-pinned) .ps__shots {
+    position: relative;
+    display: block;
+    margin-right: calc(-1 * var(--gutter));
+  }
+
+  .ps:global(.is-pinned) :global(.ps__shot) {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: translate3d(0, 1.5rem, 0);
+    transition:
+      opacity 500ms var(--ease-out),
+      transform 700ms var(--ease-out);
+  }
+
+  .ps:global(.is-pinned) :global(.ps__shot-inline) {
+    display: none;
+  }
+
+  /* The active step reads full strength; its capture shows on the right. */
+  .ps:global(.is-pinned) .ps__step {
+    transition: opacity 300ms ease;
+  }
+
+  .ps:global(.is-pinned) .ps__step:not([data-on]) {
+    opacity: 0.38;
+  }
+
+  .ps:global(.is-pinned) .ps__step:not([data-on]):not([data-past]):not(.is-last) .ps__num {
+    background: var(--line-strong);
+  }
+
+  .ps:global(.is-pinned) .ps__step.is-last:not([data-on]) .ps__num {
+    background: var(--line-strong);
+  }
+</style>
+
+<script>
+  // Shows the capture of the active step (the stepper marks it with data-on).
+  document.querySelectorAll<HTMLElement>('.ps').forEach((sec) => {
+    const items = Array.from(sec.querySelectorAll<HTMLElement>('[data-step-item]'));
+    const shots = Array.from(sec.querySelectorAll<HTMLElement>('.ps__shot'));
+    const sync = () =>
+      items.forEach((it, i) => {
+        const on = it.hasAttribute('data-on');
+        if (!shots[i]) return;
+        shots[i].style.opacity = on ? '1' : '0';
+        shots[i].style.transform = on ? 'none' : '';
+      });
+    new MutationObserver(sync).observe(sec, { attributes: true, subtree: true, attributeFilter: ['data-on'] });
+    sync();
+  });
+</script>

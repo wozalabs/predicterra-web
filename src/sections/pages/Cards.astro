@@ -1,0 +1,104 @@
+---
+/**
+ * Grid of flat cards (3 × 2, or 4 in a row), each with an orange icon square
+ * or a number, a title and a line. Cards rise in a stagger.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import Icon from '../../components/Icon.astro';
+import type { IconName } from '../../data/icons';
+
+interface Props {
+  id: string;
+  title: string;
+  text?: string;
+  items: readonly { icon?: IconName | string; title: string; text: string }[];
+  cols?: 3 | 4;
+  full?: boolean;
+  rule?: number;
+}
+const { id, title, text, items, cols = 3, full = true, rule = 70 } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<section class:list={['cd pg-sec', full && 'pg-sec--full']} aria-labelledby={id} style={`--cols:${cols}`}>
+  <div class="container">
+    <NotchRule at={rule} />
+    <div class="pg-body">
+      <div class="pg-grid">
+        <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+        {text && <p class="pg-lead" data-reveal>{text}</p>}
+      </div>
+      <slot name="before" />
+      <ul class="cd__list" data-reveal-group>
+        {
+          items.map((it, i) => (
+            <li class="cd__card" data-reveal>
+              {it.icon ? (
+                <Icon name={it.icon as IconName} boxed size="2.75rem" />
+              ) : (
+                <span class="cd__num t-num">{pad(i + 1)}</span>
+              )}
+              <div class="cd__body">
+                <h3 class="cd__title">{it.title}</h3>
+                <p class="cd__text">{it.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .cd__list {
+    display: grid;
+    gap: 1px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (min-width: 40rem) {
+    .cd__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .cd__list {
+      grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    }
+  }
+
+  .cd__card {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    min-height: clamp(13rem, 10rem + 6vw, 17rem);
+    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    background: var(--card);
+    transition: background-color 200ms ease;
+  }
+
+  .cd__num {
+    font-size: var(--fs-small);
+    color: var(--accent);
+  }
+
+  .cd__body {
+    display: grid;
+    align-content: end;
+    gap: 0.5rem;
+  }
+
+  .cd__title {
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    letter-spacing: var(--track-title);
+  }
+
+  .cd__text {
+    max-width: 36ch;
+    color: var(--ink-2);
+  }
+</style>

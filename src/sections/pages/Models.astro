@@ -1,0 +1,239 @@
+---
+/**
+ * "What it models": the assets as rows on the right; on the left, held in place
+ * while they scroll, the title and a simple dependency chain of the same assets,
+ * whose node lights up as its row passes the middle of the screen. The hazards
+ * close the section as chips, with compound risk on its own.
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import Icon from '../../components/Icon.astro';
+import type { Models } from './types';
+
+interface Props extends Models {
+  id: string;
+}
+const { id, title, text, assets, hazards, compound } = Astro.props;
+// "Compound risk, when they hit together. <example>" → chip "Compound risk" + the rest.
+const comma = compound.indexOf(', ');
+const compoundChip = compound.slice(0, comma);
+const compoundText = compound.slice(comma + 2).replace(/^\w/, (c) => c.toUpperCase());
+---
+
+<section class="md pg-sec" aria-labelledby={id} data-spy>
+  <div class="container">
+    <NotchRule at={70} />
+    <div class="md__grid pg-body">
+      <div class="md__aside">
+        <div class="md__sticky">
+          <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
+          <p class="pg-lead" data-reveal>{text}</p>
+          <ol class="md__chain" aria-hidden="true" data-reveal>
+            {
+              assets.map((a) => (
+                <li class="md__node" data-spy-node>
+                  <Icon name={a.icon} />
+                  <span>{a.title}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
+
+      <ul class="md__rows">
+        {
+          assets.map((a, i) => (
+            <li class="md__row" data-spy-item data-on={i === 0 ? '' : undefined}>
+              <Icon name={a.icon} boxed size="2.75rem" />
+              <h3 class="md__title">{a.title}</h3>
+              <p class="md__text">{a.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="md__hazards" data-reveal>
+      <ul class="md__chips" aria-label="Hazards">
+        {hazards.map((h) => <li class="chip md__chip">{h}</li>)}
+      </ul>
+      <p class="md__compound">
+        <span class="chip md__chip md__chip--compound">
+          <span class="pg-dot" aria-hidden="true" />
+          {compoundChip}
+        </span>
+        <span class="md__compound-text">{compoundText}</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .md__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
+  }
+
+  .md__sticky {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .md__chain {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .md__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+
+    .md__chain {
+      display: grid;
+      margin-top: 1.5rem;
+      justify-items: start;
+    }
+  }
+
+  /* Held in place only where the screen is tall enough for the whole column. */
+  @media (min-width: 64rem) and (min-height: 46rem) {
+    .md__sticky {
+      position: sticky;
+      top: calc(var(--header-h) + 2rem);
+    }
+  }
+
+  /* Dependency chain: nodes joined by a line, the one in view filled in. */
+  .md__node {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.25rem;
+    padding: 0 0.875rem 0 0.625rem;
+    border: 1px solid var(--line-strong);
+    background: var(--canvas-mix);
+    font-size: var(--fs-small);
+    color: var(--muted);
+    transition:
+      background-color 240ms ease,
+      color 240ms ease,
+      border-color 240ms ease,
+      transform 320ms var(--ease-out);
+  }
+
+  .md__node + .md__node {
+    margin-top: 0.875rem;
+  }
+
+  .md__node + .md__node::before {
+    content: '';
+    position: absolute;
+    left: 1.25rem;
+    bottom: 100%;
+    width: 1px;
+    height: 0.875rem;
+    background: var(--line-strong);
+  }
+
+  .md__node :global(.icon) {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .md__node[data-on] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--canvas-mix);
+    transform: translateX(0.75rem);
+  }
+
+  .md__node[data-on] :global(.icon) {
+    color: var(--accent);
+  }
+
+  /* Rows */
+  .md__rows {
+    display: grid;
+  }
+
+  .md__row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'icon title'
+      'icon text';
+    gap: 0.375rem 1.5rem;
+    padding-block: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+    border-top: 1px solid var(--line);
+    transition: opacity 300ms ease;
+  }
+
+  .md__row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .md__row :global(.ibox) {
+    grid-area: icon;
+  }
+
+  .md__title {
+    grid-area: title;
+    align-self: center;
+    font-size: var(--fs-h4);
+    line-height: 1.2;
+    letter-spacing: var(--track-title);
+  }
+
+  .md__text {
+    grid-area: text;
+    max-width: 44ch;
+    font-size: var(--fs-lead);
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+
+  /* The row in view reads full strength, the others step back (wide screens). */
+  @media (min-width: 64rem) {
+    .md__row:not([data-on]) {
+      opacity: 0.42;
+    }
+  }
+
+  /* Hazards */
+  .md__hazards {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4rem);
+  }
+
+  .md__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .md__chip {
+    min-height: 2.25rem;
+    padding-inline: 0.875rem;
+    font-size: var(--fs-small);
+  }
+
+  .md__compound {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+  }
+
+  .md__chip--compound {
+    gap: 0.5rem;
+    border-color: var(--accent);
+  }
+
+  .md__compound-text {
+    max-width: 64ch;
+    color: var(--ink-2);
+  }
+</style>

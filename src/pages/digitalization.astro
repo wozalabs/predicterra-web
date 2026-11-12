@@ -1,0 +1,336 @@
+---
+/**
+ * Digitalization (/digitalization), from the brief of November 2026. For those
+ * who decide the architecture (CIO, CDO, data teams).
+ * hero · quick proof · why now (territory in layers, separating on scroll) ·
+ * the Cognitive Twin · not a data lake · how it's built (asset → network →
+ * region) · integrate once (48 vs 14) · AI-ready · architecture fit (dark, with
+ * the risk event) · build on the platform · how to start · CTA.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import PageHero from '../sections/pages/PageHero.astro';
+import Stats from '../sections/pages/Stats.astro';
+import Context from '../sections/pages/Context.astro';
+import Cards from '../sections/pages/Cards.astro';
+import Compare from '../sections/pages/Compare.astro';
+import Rows from '../sections/pages/Rows.astro';
+import Split from '../sections/pages/Split.astro';
+import Steps from '../sections/pages/Steps.astro';
+import Placeholder from '../components/Placeholder.astro';
+import IntegrateDiagram from '../components/IntegrateDiagram.astro';
+import CodePanel from '../components/CodePanel.astro';
+import TextLink from '../components/TextLink.astro';
+import Cta from '../sections/home/Cta.astro';
+import { getCopy, localizePath } from '../i18n/config';
+
+const locale = 'en';
+const { digitalization: c } = getCopy(locale);
+---
+
+<PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
+  <PageHero locale={locale} {...c.hero} layout="split" logos={c.logos} />
+  <Stats locale={locale} items={[...c.proof.items]} />
+
+  <Context id="ahead-title" title={c.ahead.title} text={c.ahead.text} sources={c.ahead.sources} side="right">
+    <!-- The territory in layers (assets, terrain, climate), pulling apart as it scrolls in. -->
+    <div slot="visual" class="dg-layers" data-progress aria-hidden="true">
+      {
+        [...c.ahead.layers].reverse().map((_, k) => {
+          const i = c.ahead.layers.length - 1 - k;
+          return (
+            <div class={`dg-layer dg-layer--${i}`} style={`--i:${i}`}>
+              <span class="dg-layer__plane" />
+            </div>
+          );
+        })
+      }
+      <ul class="dg-layers__labels">
+        {
+          c.ahead.layers.map((l, i) => (
+            <li class="dg-layers__label t-small" style={`--i:${i}`}>
+              <span class="pg-dot" />
+              {l}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </Context>
+
+  <Cards id="cognitive-title" title={c.cognitive.title} text={c.cognitive.text} items={c.cognitive.items} rule={46}>
+    <p slot="before" class="dg-sub t-small">{c.cognitive.subtitle}</p>
+    <div class="dg-close o-corners" data-reveal>
+      <p class="pg-statement dg-close__text">{c.cognitive.closing}</p>
+      <TextLink href={localizePath(c.cognitive.link.href, locale)} label={c.cognitive.link.label} class="dg-close__link" />
+    </div>
+  </Cards>
+
+  <Compare id="lake-title" title={c.lake.title} columns={c.lake.columns} rows={c.lake.rows} closing={c.lake.closing} rule={30} />
+
+  <Rows id="built-title" title={c.built.title} items={c.built.items} rule={64}>
+    <!-- Asset → network → region: the same object, highlighted at every scale. -->
+    <div slot="side" class="dg-scales" aria-hidden="true">
+      {
+        c.built.scales.map((s, i) => (
+          <div class={`dg-scale dg-scale--${i}`}>
+            <span class="dg-scale__label t-caption">{s}</span>
+          </div>
+        ))
+      }
+      <span class="dg-scales__obj"></span>
+    </div>
+  </Rows>
+
+  <Split id="integrate-title" title={c.integrate.title} text={c.integrate.text} ratio="visual" rule={40}>
+    <IntegrateDiagram slot="visual" />
+  </Split>
+
+  <Rows id="ai-title" title={c.ai.title} text={c.ai.text} items={c.ai.items} rule={70}>
+    <Placeholder slot="side" kind="Mock-up" text={c.ai.visual} ratio="4 / 3" notch />
+  </Rows>
+
+  <Rows id="fit-title" title={c.fit.title} text={c.fit.text} items={c.fit.items} marker="num" dark rule={52}>
+    <CodePanel slot="side" label={c.fit.code.label} json={c.fit.code.json} />
+  </Rows>
+
+  <Split id="build-title" title={c.build.title} text={c.build.text} ratio="visual" rule={28}>
+    <!-- What's already there as bands, and the client team's applications on top, in orange. -->
+    <div slot="visual" class="dg-found">
+      <ul class="dg-found__apps" aria-label="What your teams build">
+        {c.build.apps.map((a) => <li class="dg-found__app">{a}</li>)}
+      </ul>
+      <ul class="dg-found__bands" aria-label="Already running" data-reveal-group>
+        {
+          [...c.build.items].reverse().map((b) => (
+            <li class="dg-found__band" data-reveal>
+              <span class="dg-found__name">{b.title}</span>
+              <span class="dg-found__text t-small">{b.text}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </Split>
+
+  <Steps locale={locale} id="start-title" {...c.start} />
+  <Cta locale={locale} copy={c.cta} />
+</PageLayout>
+
+<style>
+  /* ---------- Territory in layers ---------- */
+  .dg-layers {
+    position: relative;
+    height: 100%;
+    min-height: clamp(24rem, 62svh, 44rem);
+    background: var(--card);
+    clip-path: var(--notch);
+    overflow: hidden;
+    perspective: 1600px;
+  }
+
+  .dg-layer {
+    position: absolute;
+    left: 44%;
+    top: 50%;
+    width: min(17rem, 44%);
+    aspect-ratio: 1;
+    /* Layers start stacked and pull apart vertically as the block scrolls in. */
+    transform: translate(-50%, -50%) translateY(calc((var(--i) - 1) * (1.5rem + var(--p, 1) * 6rem)))
+      rotateX(58deg) rotateZ(-40deg);
+    transform-style: preserve-3d;
+  }
+
+  .dg-layer__plane {
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--line-strong);
+    background-color: rgb(var(--canvas-rgb) / 0.82);
+    background-image: radial-gradient(circle at center, var(--line-strong) 1.2px, transparent 1.6px);
+    background-size: 18px 18px;
+  }
+
+  /* Climate on top: contour-like rings; terrain: denser dots; assets: orange points. */
+  .dg-layer--0 .dg-layer__plane {
+    background-image:
+      repeating-radial-gradient(circle at 30% 40%, transparent 0 18px, var(--line) 18px 19px),
+      radial-gradient(circle at center, var(--line) 1px, transparent 1.4px);
+    background-size:
+      100% 100%,
+      18px 18px;
+  }
+
+  .dg-layer--1 .dg-layer__plane {
+    background-size: 10px 10px;
+  }
+
+  .dg-layer--2 .dg-layer__plane {
+    background-image:
+      radial-gradient(circle at 22% 30%, var(--accent) 0 5px, transparent 5.5px),
+      radial-gradient(circle at 64% 58%, var(--accent) 0 5px, transparent 5.5px),
+      radial-gradient(circle at 40% 78%, var(--accent) 0 5px, transparent 5.5px),
+      linear-gradient(115deg, transparent 49.6%, var(--ink-2) 49.6% 50.1%, transparent 50.1%),
+      radial-gradient(circle at center, var(--line) 1px, transparent 1.4px);
+    background-size:
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      18px 18px;
+  }
+
+  /* Labels beside the stack, at the height of their layer. */
+  .dg-layers__labels {
+    position: absolute;
+    inset: 0;
+  }
+
+  .dg-layers__label {
+    position: absolute;
+    right: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+    top: 50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.625rem;
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+    transform: translateY(calc(-50% + (var(--i) - 1) * (1.5rem + var(--p, 1) * 6rem)));
+  }
+
+  /* ---------- Cognitive: subtitle and closing block ---------- */
+  .dg-sub {
+    margin-bottom: -1.5rem;
+    color: var(--muted);
+  }
+
+  .dg-close {
+    display: grid;
+    gap: 2rem;
+    padding: clamp(1.75rem, 1rem + 3vw, 3.5rem);
+  }
+
+  .dg-close__text {
+    max-width: 34ch;
+    color: #f1f1f1;
+  }
+
+  .dg-close :global(.dg-close__link) {
+    justify-self: start;
+    --line-strong: rgb(241 241 241 / 0.34);
+  }
+
+  .dg-close :global(.tlink__text) {
+    color: #f1f1f1;
+  }
+
+  /* ---------- Scales: region ⊃ network ⊃ asset ---------- */
+  .dg-scales {
+    position: relative;
+    aspect-ratio: 1;
+    width: 100%;
+    max-width: 32rem;
+    margin-inline: auto;
+  }
+
+  .dg-scale {
+    position: absolute;
+    border: 1px solid var(--line-strong);
+    background-image: radial-gradient(circle at center, var(--line) 1px, transparent 1.4px);
+    background-size: 16px 16px;
+  }
+
+  .dg-scale--2 {
+    inset: 0;
+  }
+
+  .dg-scale--1 {
+    z-index: 1;
+    inset: 22% 18% 18% 22%;
+    background-color: var(--canvas-mix);
+    border-color: var(--ink-2);
+  }
+
+  .dg-scale--0 {
+    z-index: 2;
+    inset: 46% 34% 30% 44%;
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .dg-scale__label {
+    position: absolute;
+    left: 0.625rem;
+    top: 0.5rem;
+    color: var(--muted);
+  }
+
+  .dg-scale--0 .dg-scale__label {
+    color: var(--canvas-mix);
+  }
+
+  .dg-scales__obj {
+    position: absolute;
+    z-index: 3;
+    left: 62%;
+    top: 61%;
+    width: 0.875rem;
+    height: 0.875rem;
+    background: var(--accent);
+    box-shadow:
+      0 0 0 6px rgb(255 55 0 / 0.18),
+      0 0 0 14px rgb(255 55 0 / 0.08);
+    transform: translate(-50%, -50%);
+  }
+
+  /* ---------- Foundation: bands and the apps built on top ---------- */
+  .dg-found {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .dg-found__apps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .dg-found__app {
+    display: grid;
+    align-items: end;
+    min-height: 5.5rem;
+    padding: 0.875rem;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+    line-height: 1.15;
+  }
+
+  .dg-found__bands {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .dg-found__band {
+    display: grid;
+    gap: 0.25rem 1.5rem;
+    padding: 1rem 1.125rem;
+    background: var(--card);
+    border-left: 3px solid var(--ink);
+  }
+
+  @media (min-width: 40rem) {
+    .dg-found__band {
+      grid-template-columns: minmax(9rem, 2fr) minmax(0, 5fr);
+      align-items: baseline;
+    }
+  }
+
+  .dg-found__name {
+    letter-spacing: var(--track-title);
+  }
+
+  .dg-found__text {
+    color: var(--ink-2);
+  }
+</style>

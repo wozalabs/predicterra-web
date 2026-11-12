@@ -1,0 +1,102 @@
+---
+/**
+ * Stand-in for a visual that doesn't exist yet (photo, platform capture,
+ * animation). Shows what goes there, from the brief's [VISUAL] note, so the team
+ * knows exactly which asset to produce. Same frame and tokens as real images,
+ * so swapping it for an <img> or <video> doesn't move the layout.
+ */
+interface Props {
+  kind: 'Photo' | 'Animation' | 'Platform capture' | 'Map' | 'Mock-up' | 'Image';
+  text: string;
+  /** CSS aspect-ratio; leave out to fill the parent's height. */
+  ratio?: string;
+  notch?: boolean;
+  /** Smaller caption for small slots. */
+  compact?: boolean;
+  class?: string;
+}
+const { kind, text, ratio, notch = false, compact = false, class: className } = Astro.props;
+---
+
+<figure
+  class:list={['ph', notch && 'ph--notch', compact && 'ph--compact', !ratio && 'ph--fill', className]}
+  style={ratio ? `aspect-ratio:${ratio}` : undefined}
+  role="img"
+  aria-label={`${kind} to come: ${text}`}
+>
+  <span class="ph__field" aria-hidden="true"></span>
+  <slot />
+  <figcaption class="ph__cap" aria-hidden="true">
+    <span class="ph__kind"><span class="pg-dot"></span>{kind}</span>
+    <span class="ph__text">{text}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .ph {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    min-height: 8rem;
+    background: var(--card);
+    color: var(--ink-2);
+    isolation: isolate;
+  }
+
+  .ph--fill {
+    height: 100%;
+  }
+
+  .ph--notch {
+    clip-path: var(--notch);
+  }
+
+  /* Dot grid with a slow diagonal fade: reads as "to come", never as broken. */
+  .ph__field {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(circle at center, var(--line-strong) 1px, transparent 1.4px);
+    background-size: 16px 16px;
+    background-position: 8px 8px;
+    -webkit-mask-image: linear-gradient(160deg, #000 10%, rgb(0 0 0 / 0.25) 70%);
+    mask-image: linear-gradient(160deg, #000 10%, rgb(0 0 0 / 0.25) 70%);
+  }
+
+  .ph__cap {
+    display: grid;
+    gap: 0.5rem;
+    max-width: 44ch;
+    padding: clamp(1rem, 0.75rem + 1vw, 1.5rem);
+    padding-bottom: calc(clamp(1rem, 0.75rem + 1vw, 1.5rem) + var(--ph-pad, 0px));
+  }
+
+  .ph--notch .ph__cap {
+    --ph-pad: 18px;
+  }
+
+  .ph__kind {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--fs-caption);
+    color: var(--ink);
+  }
+
+  .ph__text {
+    font-size: var(--fs-small);
+    line-height: 1.45;
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  .ph--compact .ph__cap {
+    padding: 0.75rem;
+  }
+
+  .ph--compact .ph__text {
+    font-size: var(--fs-caption);
+  }
+</style>
