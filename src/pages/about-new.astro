@@ -319,6 +319,26 @@ const wozaLogo = wozaLogoRaw
 </BaseLayout>
 
 <style>
+  /* ---------- Type scale for this page ----------
+     Calmer than the homepage: titles a step smaller, tracking eased off, a
+     little more leading. Set on every section wrapper, so the shared .t-h2
+     class (and the CTA card) pick it up too. */
+  .an-full,
+  .an-ms,
+  .an-pin,
+  .an-cta {
+    --an-hero: clamp(2.25rem, 1.2rem + 2.9vw, 4rem);
+    --an-statement: clamp(1.875rem, 1.3rem + 1.6vw, 2.875rem);
+    --fs-h2: clamp(1.75rem, 1.35rem + 1.1vw, 2.5rem);
+    --track-heading: -0.025em;
+  }
+
+  .an-full :global(.t-h2),
+  .an-ms :global(.t-h2),
+  .an-cta :global(.t-h2) {
+    line-height: 1.08;
+  }
+
   /* ---------- Section frame: at least one viewport tall ---------- */
   .an-full {
     position: relative;
@@ -389,9 +409,9 @@ const wozaLogo = wozaLogoRaw
 
   .an-hero__title {
     max-width: 16ch;
-    font-size: clamp(2.75rem, 1rem + 4.6vw, 6rem);
-    line-height: 0.96;
-    letter-spacing: var(--track-display);
+    font-size: var(--an-hero);
+    line-height: 1;
+    letter-spacing: -0.03em;
     text-wrap: balance;
   }
 
@@ -438,10 +458,10 @@ const wozaLogo = wozaLogoRaw
 
   /* ---------- 2. Mission ---------- */
   .an-statement {
-    max-width: 20ch;
-    font-size: var(--fs-display);
-    line-height: 0.98;
-    letter-spacing: var(--track-display);
+    max-width: 26ch;
+    font-size: var(--an-statement);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
 
@@ -595,7 +615,7 @@ const wozaLogo = wozaLogoRaw
     top: var(--cy);
     font-size: var(--fs, 5rem);
     line-height: 1;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.04em;
     white-space: nowrap;
     color: var(--ink);
     opacity: var(--o, 0);
@@ -670,9 +690,9 @@ const wozaLogo = wozaLogoRaw
   }
 
   .an-ms.is-pinned .an-ms__text {
-    max-width: 24ch;
-    font-size: var(--fs-h3);
-    line-height: 1.15;
+    max-width: 26ch;
+    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.5rem);
+    line-height: 1.25;
     letter-spacing: var(--track-title);
     color: var(--ink);
     text-wrap: balance;
@@ -708,8 +728,8 @@ const wozaLogo = wozaLogoRaw
   }
 
   .an-row__title {
-    font-size: var(--fs-h3);
-    line-height: 1.1;
+    font-size: var(--fs-h4);
+    line-height: 1.2;
     letter-spacing: var(--track-title);
   }
 
@@ -786,6 +806,7 @@ const wozaLogo = wozaLogoRaw
 
   .an-sov.is-3d .an-sov__canvas {
     display: block;
+    pointer-events: none;
     position: absolute;
     inset: 0;
     width: 100%;
@@ -923,7 +944,7 @@ const wozaLogo = wozaLogoRaw
   }
 
   .an-card__wordmark {
-    font-size: var(--fs-h3);
+    font-size: var(--fs-h4);
     letter-spacing: var(--track-title);
   }
 
@@ -1041,6 +1062,11 @@ const wozaLogo = wozaLogoRaw
     }
   }
 
+  /* The whole card is the link: pressing it presses its button. */
+  .an-woza:active :global(.btn) {
+    transform: scale(0.97);
+  }
+
   /* Inset: the notched clip-path would cut an outside outline. */
   .an-woza:focus-visible {
     outline: 2px solid var(--accent);
@@ -1051,6 +1077,8 @@ const wozaLogo = wozaLogoRaw
      the orange point glowing on it (the homepage/LinkedIn pixel motif). */
   .an-woza__field {
     grid-area: field;
+    pointer-events: none;
+    user-select: none;
     align-self: center;
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -1118,10 +1146,10 @@ const wozaLogo = wozaLogoRaw
   .an-woza__title {
     grid-area: title;
     align-self: end;
-    max-width: 18ch;
-    font-size: var(--fs-display);
-    line-height: 0.98;
-    letter-spacing: var(--track-display);
+    max-width: 22ch;
+    font-size: var(--an-statement);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
 
@@ -1392,7 +1420,7 @@ const wozaLogo = wozaLogoRaw
         const H = wheel.clientHeight;
         const wide = W >= 720;
         // Year size: large, but leaving room beside it (wide) or under it (phones) for the text.
-        const fs = Math.max(44, Math.min(H * (wide ? 0.2 : 0.14), W * (wide ? 0.17 : 0.26), 200));
+        const fs = Math.max(40, Math.min(H * (wide ? 0.15 : 0.12), W * (wide ? 0.13 : 0.22), 136));
         const R = Math.max(H * 0.95, fs * 4.2); // the dial centre sits far left, off-screen
         const markX = 6;
         const startX = markX + 22; // where the current year starts

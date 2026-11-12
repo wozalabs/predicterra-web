@@ -58,7 +58,7 @@ const links = [
   .cmp__link {
     display: inline-flex;
     align-items: center;
-    min-height: 2.25rem;
+    min-height: 2.5rem; /* 40px on desktop */
     padding: 0 0.875rem;
     white-space: nowrap;
     transition:
@@ -66,6 +66,12 @@ const links = [
       color 160ms ease,
       transform 160ms var(--ease-out);
     -webkit-tap-highlight-color: transparent;
+  }
+
+  @media (pointer: coarse) {
+    .cmp__link {
+      min-height: 2.75rem; /* 44px for touch */
+    }
   }
 
   .cmp__link[aria-current='page'] {
