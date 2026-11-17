@@ -1,7 +1,7 @@
 /**
  * Colours of the 3D scenes (sector section, asset panel view, CTA card) for each
- * theme. Light: white assets on the near-white page. Dark: mid-grey assets on
- * the dark canvas, darker dithered shadows; the orange stays the same.
+ * theme. Light: white assets on the near-white page. Dark: dark grey assets, a few
+ * steps above the dark canvas so they stay clear, darker dithered shadows; the orange stays the same.
  */
 import { isDarkTheme } from '../theme';
 
@@ -35,7 +35,7 @@ const DARK: ScenePalette = {
   bg: '#161616',
   gridDot: '#303030',
   shadow: '#0B0B0B',
-  asset: '#6A6A6A',
+  asset: '#3A3A3A',
   line: '#3D3D3D',
   deco: '#2A2A2A',
   stream: '#1F1F1F',
