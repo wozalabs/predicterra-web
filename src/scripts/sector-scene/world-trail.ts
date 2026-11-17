@@ -506,6 +506,7 @@ export function createTrailWorld(
     groundMat.uniforms.uBase.value.set(p.bg);
     groundMat.uniforms.uGridDot.value.set(p.gridDot);
     groundMat.uniforms.uShadow.value.set(p.shadow);
+    groundMat.uniforms.uAccent.value.set(p.hazard);
     whiteMat.color.set(p.asset);
     lineMat.color.set(p.line);
     decoMat.color.set(p.deco);

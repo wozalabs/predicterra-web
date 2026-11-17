@@ -17,6 +17,8 @@ export interface ScenePalette {
   idle: string;
   /** CTA card ground (a step off the page canvas). */
   ctaGround: string;
+  /** Dithered field on the ground around the asset at risk. */
+  hazard: string;
 }
 
 const LIGHT: ScenePalette = {
@@ -29,6 +31,7 @@ const LIGHT: ScenePalette = {
   stream: '#D6D6D6',
   idle: '#BDBDBD',
   ctaGround: '#EAEAEA',
+  hazard: '#FF3700',
 };
 
 const DARK: ScenePalette = {
@@ -41,6 +44,8 @@ const DARK: ScenePalette = {
   stream: '#1F1F1F',
   idle: '#3D3D3D',
   ctaGround: '#1E1E1E',
+  // Light grey on dark: the asset itself carries the orange.
+  hazard: '#A7A7A7',
 };
 
 export const scenePalette = (): ScenePalette => (isDarkTheme() ? DARK : LIGHT);
