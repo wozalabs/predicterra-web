@@ -1,0 +1,237 @@
+---
+/**
+ * Cases (/cases), from "predicterra-10-cases.md".
+ * hero · i-DE · UFD · recognition · CTA. Signed quotes, the i-DE PDF and the
+ * link to the E.DSO case are pending, so they are left out for now.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import PageHero from '../sections/pages/PageHero.astro';
+import SectionHead from '../sections/pages/SectionHead.astro';
+import Cta from '../sections/home/Cta.astro';
+import { getCopy, withBase } from '../i18n/config';
+
+const locale = 'en';
+const { casesPage: c } = getCopy(locale);
+const pad = (n: number) => String(n).padStart(3, '0');
+---
+
+<PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
+  <PageHero locale={locale} {...c.hero} layout="centred" />
+
+  {
+    c.cases.map((k, n) => (
+      <section class:list={['cs pg-sec', n % 2 === 1 && 'cs--alt']} aria-labelledby={`${k.id}-title`}>
+        <div class="container pg-body">
+          <div class="cs__head">
+            <div class="cs__brand" data-reveal>
+              <img
+                src={withBase(k.logo.src)}
+                alt=""
+                width={Math.round((k.logo.w / k.logo.h0) * k.logo.h)}
+                height={k.logo.h}
+                style={`--h:${k.logo.h}px`}
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="cs__client t-small">{k.client}</span>
+            </div>
+            <h2 id={`${k.id}-title`} class="cs__title" data-render>
+              <span class="cs__value t-num">{k.value}</span>
+              <span class="cs__claim">{k.title}</span>
+            </h2>
+          </div>
+          <dl class="cs__blocks" data-reveal-group>
+            {k.blocks.map((b, i) => (
+              <div class="cs__block" data-reveal>
+                <dt>
+                  <span class="pg-idx">{pad(i + 1)}</span>
+                  <span class="cs__label">{b.title}</span>
+                </dt>
+                <dd class="cs__text">{b.text}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="rc pg-sec" aria-labelledby="recognition-title">
+    <div class="container pg-body">
+      <SectionHead id="recognition-title" title={c.recognition.title} align="center" />
+      <ul class="rc__list" data-reveal-group>
+        {
+          c.recognition.items.map((r) => (
+            <li class="rc__item" data-reveal>
+              <div class="rc__mark">
+                {'logo' in r && r.logo ? (
+                  <img
+                    src={withBase(r.logo.src)}
+                    alt={r.name}
+                    width={Math.round((r.logo.w / r.logo.h0) * r.logo.h)}
+                    height={r.logo.h}
+                    style={`--h:${r.logo.h}px`}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <span class="rc__word">{r.name}</span>
+                )}
+              </div>
+              {'logo' in r && r.logo && <p class="rc__name t-small">{r.name}</p>}
+              <p class="rc__text">{r.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Cta locale={locale} copy={c.cta} />
+</PageLayout>
+
+<style>
+  /* ---------- A case: the figure large, the four blocks in a row ---------- */
+  .cs__head {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .cs__brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .cs__brand img {
+    width: auto;
+    height: var(--h);
+    filter: brightness(0) invert(var(--dt, 0));
+    opacity: 0.7;
+  }
+
+  .cs__client {
+    color: var(--muted);
+  }
+
+  .cs__title {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  /* Orange only at display size (contrast). */
+  .cs__value {
+    font-size: clamp(4rem, 2.5rem + 6vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: var(--accent);
+  }
+
+  .cs__claim {
+    max-width: 22ch;
+    font-size: var(--fs-h2);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  .cs__blocks {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 var(--gutter);
+  }
+
+  @media (min-width: 40rem) {
+    .cs__blocks {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .cs__blocks {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .cs__block {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    padding-block: 1.25rem 2.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .cs__block dt {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .cs__label {
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .cs__text {
+    max-width: 34ch;
+    color: var(--ink-2);
+  }
+
+  /* The second case mirrors the first: the figure on the right. */
+  @media (min-width: 64rem) {
+    .cs--alt .cs__head {
+      justify-items: end;
+      text-align: right;
+    }
+    .cs--alt .cs__title {
+      justify-items: end;
+    }
+  }
+
+  /* ---------- Recognition ---------- */
+  .rc__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 64rem) {
+    .rc__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .rc__item {
+    display: grid;
+    grid-template-rows: 1fr auto auto;
+    gap: 0.375rem;
+    min-height: clamp(11rem, 9rem + 5vw, 15rem);
+    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    background: var(--card);
+  }
+
+  .rc__mark {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .rc__mark img {
+    width: auto;
+    height: var(--h);
+    max-width: 100%;
+    filter: brightness(0) invert(var(--dt, 0));
+    opacity: 0.7;
+  }
+
+  .rc__word {
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .rc__name {
+    color: var(--muted);
+  }
+
+  .rc__text {
+    max-width: 30ch;
+  }
+</style>

@@ -15,7 +15,22 @@ const { footer } = getCopy(locale).common;
     <div class="footer__top">
       <div class="footer__brand" data-reveal>
         <Logo class="footer__logo" />
-        <p class="footer__tagline t-small t-muted">{footer.tagline}</p>
+        <address class="footer__address">
+          <span class="t-muted">{footer.contact.address}</span>
+          <a class="footer__link" href={`mailto:${footer.contact.email}`}>{footer.contact.email}</a>
+          <span class="footer__phones">
+            {
+              footer.contact.phones.map((p) => (
+                <a class="footer__link" href={p.href}>
+                  <span class="t-muted">{p.label}</span> <span class="t-num">{p.value}</span>
+                </a>
+              ))
+            }
+          </span>
+          <a class="footer__link" href={footer.contact.linkedin.href} target="_blank" rel="noopener">
+            {footer.contact.linkedin.label}
+          </a>
+        </address>
       </div>
 
       <nav class="footer__cols" aria-label="Footer" data-reveal-group>
@@ -26,11 +41,7 @@ const { footer } = getCopy(locale).common;
               <ul>
                 {col.links.map((link) => (
                   <li>
-                    <a
-                      class="footer__link"
-                      href={'external' in link && link.external ? link.href : localizePath(link.href, locale)}
-                      {...('external' in link && link.external ? { target: '_blank', rel: 'noopener' } : {})}
-                    >
+                    <a class="footer__link" href={localizePath(link.href, locale)}>
                       {link.label}
                     </a>
                   </li>
@@ -39,46 +50,17 @@ const { footer } = getCopy(locale).common;
             </div>
           ))
         }
-
-        <div data-reveal>
-          <p class="footer__title t-caption t-muted">{footer.contact.title}</p>
-          <address class="footer__address">
-            <a class="footer__link" href={`mailto:${footer.contact.email}`}>{footer.contact.email}</a>
-            {
-              footer.contact.phones.map((p) => (
-                <a class="footer__link" href={p.href}>
-                  <span class="t-muted">{p.label}</span> <span class="t-num">{p.value}</span>
-                </a>
-              ))
-            }
-            <span class="footer__street t-muted">
-              {footer.contact.address.map((line) => <span>{line}</span>)}
-            </span>
-          </address>
-        </div>
       </nav>
     </div>
 
     <div class="footer__bottom t-caption">
-      <p class="t-muted">{footer.copyright}</p>
-      <ul class="footer__chips" aria-label="Compliance">
-        {footer.compliance.map((c) => <li class="chip">{c}</li>)}
-      </ul>
-      <ul class="footer__legal">
-        {
-          footer.legal.map((l) => (
-            <li>
-              <a class="footer__link" href={localizePath(l.href, locale)}>
-                {l.label}
-              </a>
-            </li>
-          ))
-        }
-        <li>
-          <span class="t-muted">{footer.builtBy}</span>
-          <a class="footer__link" href={external.woza} target="_blank" rel="noopener">{footer.builtByName}</a>
-        </li>
-      </ul>
+      <p class="t-muted">
+        {footer.copyright} · {footer.tagline}
+      </p>
+      <p class="footer__built">
+        <span class="t-muted">{footer.builtBy}</span>
+        <a class="footer__link" href={external.woza} target="_blank" rel="noopener">{footer.builtByName}</a>
+      </p>
     </div>
   </div>
 </footer>
@@ -100,7 +82,7 @@ const { footer } = getCopy(locale).common;
 
   @media (min-width: 64rem) {
     .footer__top {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
       gap: calc(var(--gutter) * 2);
     }
   }
@@ -115,13 +97,6 @@ const { footer } = getCopy(locale).common;
     height: 1.625rem;
   }
 
-  .footer__tagline {
-    max-width: 28ch;
-    font-size: var(--fs-body);
-    line-height: 1.4;
-    letter-spacing: var(--track-body);
-  }
-
   .footer__cols {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -130,7 +105,7 @@ const { footer } = getCopy(locale).common;
 
   @media (min-width: 48rem) {
     .footer__cols {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
     }
   }
 
@@ -156,14 +131,15 @@ const { footer } = getCopy(locale).common;
 
   .footer__address {
     display: grid;
+    justify-items: start;
     gap: 0.5rem;
     font-style: normal;
   }
 
-  .footer__street {
-    display: grid;
-    margin-top: 0.375rem;
-    font-size: var(--fs-caption);
+  .footer__phones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
   }
 
   .footer__bottom {
@@ -175,26 +151,9 @@ const { footer } = getCopy(locale).common;
     border-top: 1px solid var(--line);
   }
 
-  .footer__chips {
-    display: flex;
-    gap: 0.375rem;
-  }
-
-  .footer__chips .chip {
-    min-height: 1.375rem;
-    padding: 0 0.375rem;
-    font-size: 0.6875rem;
-  }
-
-  .footer__legal {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 1.25rem;
-    margin-left: auto;
-  }
-
-  .footer__legal li {
+  .footer__built {
     display: flex;
     gap: 0.35em;
+    margin-left: auto;
   }
 </style>

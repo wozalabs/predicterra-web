@@ -4,8 +4,6 @@
  *
  * [data-lit]        statement lit word by word as it scrolls in (words: .w)
  * [data-progress]   writes --p (0 → 1) while the element crosses the viewport
- * [data-hscroll]    pinned stage whose track ([data-hs-track]) moves sideways;
- *                   [data-hs-bar] follows the active column's [data-span]
  * [data-stepper]    pinned stage that walks through its [data-step-item]s
  * [data-spy]        marks the item nearest the middle of the viewport, and the
  *                   matching [data-spy-node] (same index) inside the container
@@ -40,7 +38,6 @@ function dwell(raw: number, n: number, rest = 0.35) {
 
 export function mountPageMotion() {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const wide = window.matchMedia('(min-width: 64rem)');
 
   // Progress lines and drawings: complete straight away with reduced motion.
   document.querySelectorAll<HTMLElement>('[data-progress]').forEach((el) => {
@@ -88,64 +85,6 @@ export function mountPageMotion() {
       const on = p * words.length;
       words.forEach((w, i) => w.style.setProperty('--o', Math.min(1, Math.max(0.16, on - i + 0.16)).toFixed(3)));
     });
-  });
-
-  // Horizontal pinned tracks (wide screens only, and only if a column fits the screen).
-  document.querySelectorAll<HTMLElement>('[data-hscroll]').forEach((sec) => {
-    const stage = sec.querySelector<HTMLElement>('[data-hs-stage]')!;
-    const track = sec.querySelector<HTMLElement>('[data-hs-track]')!;
-    const cols = Array.from(track.children) as HTMLElement[];
-    const bar = sec.querySelector<HTMLElement>('[data-hs-bar]');
-    const spans = cols.map((c) => (c.dataset.span ?? '0,1').split(',').map(Number));
-    const cover = sec.hasAttribute('data-hs-cover');
-    let travel = 0;
-    let on = false;
-
-    const size = () => {
-      sec.classList.remove('is-pinned');
-      sec.style.height = '';
-      track.style.transform = '';
-      on = false;
-      if (!wide.matches) return;
-      sec.classList.add('is-pinned');
-      const vh = window.innerHeight;
-      // Too tall for the screen: keep the static grid.
-      if (stage.scrollHeight > vh + 2) {
-        sec.classList.remove('is-pinned');
-        return;
-      }
-      travel = Math.max(0, track.scrollWidth - track.clientWidth);
-      sec.style.height = `${vh + travel * 1.15 + (cover ? vh : 0)}px`;
-      on = true;
-    };
-
-    const update = () => {
-      if (!on) return;
-      const vh = window.innerHeight;
-      const span = sec.offsetHeight - vh - (cover ? vh : 0);
-      const p = clamp01(-sec.getBoundingClientRect().top / Math.max(1, span));
-      const n = cols.length;
-      const pos = dwell(p * (n - 1 + 0.4) - 0.2, n, 0.3);
-      track.style.transform = `translate3d(${(-travel * (pos / (n - 1))).toFixed(1)}px, 0, 0)`;
-      const k = Math.min(n - 1, Math.round(pos));
-      cols.forEach((c, i) => c.toggleAttribute('data-on', i === k));
-      if (bar) {
-        const a = Math.floor(pos);
-        const b = Math.min(n - 1, a + 1);
-        const t = pos - a;
-        const lo = spans[a][0] + (spans[b][0] - spans[a][0]) * t;
-        const hi = spans[a][1] + (spans[b][1] - spans[a][1]) * t;
-        bar.style.setProperty('--lo', lo.toFixed(4));
-        bar.style.setProperty('--hi', hi.toFixed(4));
-      }
-    };
-
-    const refresh = () => (size(), update());
-    document.fonts?.ready.then(refresh);
-    refresh();
-    wide.addEventListener('change', refresh);
-    window.addEventListener('resize', refresh, { passive: true });
-    whileNear(sec, update, '10% 0px');
   });
 
   // Pinned steppers: the stage holds while the steps take turns.

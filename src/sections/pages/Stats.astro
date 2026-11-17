@@ -1,7 +1,8 @@
 ---
 /**
- * Quick proof: four large figures in a row, split by hairlines (the homepage
- * sub-hero rhythm). Optional links under single figures and a backing line.
+ * Quick proof: four large figures in a row, each on its own hairline with a
+ * small running index (the homepage sub-hero rhythm, given more air). Optional
+ * links under single figures and a backing line, centred under the row.
  */
 import TextLink from '../../components/TextLink.astro';
 import { localizePath, type Locale } from '../../i18n/config';
@@ -11,17 +12,20 @@ interface Props {
   locale?: Locale;
   items: Stat[];
   backing?: { text: string; link: Link };
+  link?: Link;
   label?: string;
 }
-const { locale = 'en', items, backing, label = 'Key figures' } = Astro.props;
+const { locale = 'en', items, backing, link, label = 'Key figures' } = Astro.props;
+const pad = (n: number) => String(n).padStart(3, '0');
 ---
 
 <section class="st pg-sec" aria-label={label}>
-  <div class="container">
-    <ul class="st__list" data-reveal-group>
+  <div class="container st__inner">
+    <ul class="st__list" data-reveal-group style={`--n:${items.length}`}>
       {
-        items.map((s) => (
+        items.map((s, i) => (
           <li class="st__item" data-reveal>
+            <span class="pg-idx">{pad(i + 1)}</span>
             <p class="st__value t-num">{s.value}</p>
             <p class="st__text">{s.text}</p>
             {s.link && <TextLink href={localizePath(s.link.href, locale)} label={s.link.label} class="st__link" />}
@@ -32,11 +36,15 @@ const { locale = 'en', items, backing, label = 'Key figures' } = Astro.props;
     {
       backing && (
         <div class="st__backing" data-reveal>
-          <p class="st__backing-text">
-            <span class="pg-dot" aria-hidden="true" />
-            {backing.text}
-          </p>
+          <p class="st__backing-text">{backing.text}</p>
           <TextLink href={localizePath(backing.link.href, locale)} label={backing.link.label} />
+        </div>
+      )
+    }
+    {
+      link && (
+        <div class="st__backing" data-reveal>
+          <TextLink href={localizePath(link.href, locale)} label={link.label} />
         </div>
       )
     }
@@ -45,31 +53,37 @@ const { locale = 'en', items, backing, label = 'Key figures' } = Astro.props;
 
 <style>
   .st {
-    padding-block: clamp(3rem, 2rem + 3vw, 5rem);
+    padding-block: clamp(4rem, 2.5rem + 4vw, 7.5rem);
+  }
+
+  .st__inner {
+    display: grid;
+    gap: clamp(3rem, 2rem + 3vw, 5rem);
   }
 
   .st__list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem 0;
+    gap: 3rem var(--gutter);
   }
 
   @media (min-width: 64rem) {
     .st__list {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
     }
   }
 
   .st__item {
     display: grid;
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: auto auto auto 1fr;
     align-content: start;
-    gap: 0.625rem;
-    padding: 0 clamp(1rem, 0.5rem + 1.5vw, 2rem);
-    border-left: 1px solid var(--line);
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line-strong);
   }
 
   .st__value {
+    margin-top: 1.5rem;
     font-size: clamp(2rem, 1.5rem + 1.6vw, 3.25rem);
     line-height: 1;
     letter-spacing: -0.035em;
@@ -84,28 +98,22 @@ const { locale = 'en', items, backing, label = 'Key figures' } = Astro.props;
 
   .st__item :global(.st__link) {
     align-self: end;
-    margin-top: 0.75rem;
+    margin-top: 1rem;
     min-width: 0;
+    justify-self: start;
   }
 
   .st__backing {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    justify-content: space-between;
-    gap: 1.5rem 3rem;
-    margin-top: clamp(2.5rem, 1.5rem + 2vw, 3.5rem);
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--line);
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+    text-align: center;
   }
 
   .st__backing-text {
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-    max-width: 62ch;
+    max-width: 52ch;
     font-size: var(--fs-lead);
-    line-height: 1.45;
+    line-height: 1.5;
     letter-spacing: var(--track-title);
     color: var(--ink-2);
   }

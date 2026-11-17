@@ -1,0 +1,198 @@
+---
+/**
+ * New home: "In operation today." The two cases (figure in orange, logo, line,
+ * badge) and the trust line under them.
+ */
+import Icon from '../../components/Icon.astro';
+import Button from '../../components/Button.astro';
+import type { IconName } from '../../data/icons';
+import { getCopy, localizePath, withBase, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { cases, trust } = getCopy(locale).homeNew;
+---
+
+<section class="nh-proof" aria-labelledby="proof-title">
+  <div class="container nh-proof__inner">
+    <div class="nh-proof__head">
+      <h2 id="proof-title" class="t-h2" data-render>{cases.title}</h2>
+      <p class="nh-proof__text" data-reveal>{cases.text}</p>
+      <div data-reveal>
+        <Button variant="secondary" href={localizePath(cases.link.href, locale)} label={cases.link.label} />
+      </div>
+    </div>
+
+    <ul class="nh-proof__cases" data-reveal-group>
+      {
+        cases.items.map((k) => (
+          <li class="nh-case" data-reveal>
+            <img
+              class="nh-case__logo"
+              src={withBase(k.logo.src)}
+              alt={k.client}
+              width={Math.round((k.logo.w / k.logo.h0) * k.logo.h)}
+              height={k.logo.h}
+              style={`--h:${k.logo.h}px`}
+              loading="lazy"
+              decoding="async"
+            />
+            <p class="nh-case__value t-num">{k.value}</p>
+            <p class="nh-case__label">{k.label}</p>
+            <p class="nh-case__text">{k.text}</p>
+            <p class="nh-case__badge t-small">
+              <span aria-hidden="true" />
+              {k.badge}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <ul class="nh-trust" data-reveal-group>
+      {
+        trust.map((t) => (
+          <li class="nh-trust__item" data-reveal>
+            <Icon name={t.icon as IconName} size="1.25rem" />
+            <span>{t.text}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .nh-proof {
+    position: relative;
+    z-index: var(--z-cover);
+    background: var(--canvas);
+  }
+
+  .nh-proof__inner {
+    display: grid;
+    gap: clamp(3rem, 2rem + 3vw, 5rem);
+    padding-block: clamp(5rem, 3rem + 6vw, 10rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .nh-proof__head {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 64rem) {
+    .nh-proof__head {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: end;
+      column-gap: clamp(3rem, 1rem + 6vw, 8rem);
+    }
+    .nh-proof__head > :first-child {
+      grid-row: span 2;
+      align-self: start;
+    }
+  }
+
+  .nh-proof__text {
+    max-width: 40ch;
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .nh-proof__cases {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 48rem) {
+    .nh-proof__cases {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .nh-case {
+    display: grid;
+    grid-template-rows: auto 1fr auto auto auto;
+    gap: 0.5rem;
+    min-height: clamp(24rem, 18rem + 12vw, 32rem);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+    background: var(--card);
+  }
+
+  .nh-case__logo {
+    width: auto;
+    height: var(--h);
+    filter: brightness(0);
+    opacity: 0.7;
+  }
+
+  .nh-case__value {
+    align-self: end;
+    font-size: clamp(3.25rem, 2rem + 4.5vw, 7rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .nh-case__label {
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .nh-case__text {
+    max-width: 40ch;
+    color: var(--ink-2);
+  }
+
+  .nh-case__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    color: var(--muted);
+  }
+
+  .nh-case__badge span {
+    width: 0.375rem;
+    height: 0.375rem;
+    background: var(--accent);
+  }
+
+  .nh-trust {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 var(--gutter);
+  }
+
+  @media (min-width: 40rem) {
+    .nh-trust {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .nh-trust {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .nh-trust__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding-block: 1.25rem;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+  }
+
+  .nh-trust__item :global(.icon) {
+    flex: none;
+    color: var(--accent);
+  }
+</style>

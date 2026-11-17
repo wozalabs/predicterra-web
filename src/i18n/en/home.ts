@@ -324,7 +324,7 @@ export default {
         index: '07',
         title: 'Compliance',
         text: 'Prove compliance from one source of truth. CSRD, TCFD and internal resilience reporting drawn from the same live model, in a fraction of the time.',
-        href: routes.sectors.climate,
+        href: routes.sectors.compliance,
       },
     ],
   },

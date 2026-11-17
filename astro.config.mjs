@@ -26,6 +26,13 @@ export default defineConfig({
       filter: (page) => !page.includes('/lab/'),
     }),
   ],
+  // URLs from the earlier site map that moved with the November 2026 briefs.
+  redirects: {
+    '/climate-resilience': '/resilience',
+    '/solutions': '/platform',
+    '/success-stories': '/cases',
+    '/about-new': '/about',
+  },
   build: { inlineStylesheets: 'auto' },
   prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
 });

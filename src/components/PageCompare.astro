@@ -1,21 +1,21 @@
 ---
 /**
- * Review aid: a small switch pinned to the bottom of /about and /about-new so
- * the current page and the draft from the new brief can be compared quickly.
- * Remove it (and /about-new) once the brief is decided.
+ * Review aid: a small switch pinned to the bottom of the home (/) and the new
+ * home content (/home-new), so both can be compared quickly. Remove it (and
+ * /home-new) once the new content is decided.
  */
 import { getCopy, localizePath, type Locale } from '../i18n/config';
 import { routes } from '../data/routes';
 
 interface Props {
   locale?: Locale;
-  current: 'current' | 'draft';
+  current: 'current' | 'next';
 }
 const { locale = 'en', current } = Astro.props;
-const { compare } = getCopy(locale).aboutNew;
+const { compare } = getCopy(locale).common;
 const links = [
-  { key: 'current', label: compare.current, href: localizePath(routes.about, locale) },
-  { key: 'draft', label: compare.draft, href: localizePath('/about-new', locale) },
+  { key: 'current', label: compare.current, href: localizePath(routes.home, locale) },
+  { key: 'next', label: compare.next, href: localizePath(routes.homeNew, locale) },
 ] as const;
 ---
 
@@ -47,6 +47,15 @@ const links = [
       0 8px 24px rgb(30 30 30 / 0.1);
     transform: translateX(-50%);
     color: var(--ink);
+  }
+
+  /* Desktop: out of the way, bottom right, clear of the hero's logo band. */
+  @media (min-width: 48rem) {
+    .cmp {
+      left: auto;
+      right: var(--gutter);
+      transform: none;
+    }
   }
 
   .cmp__label {

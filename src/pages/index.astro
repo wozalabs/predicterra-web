@@ -11,6 +11,7 @@ import Solutions from '../sections/home/Solutions.astro';
 import Benefits from '../sections/home/Benefits.astro';
 import Cases from '../sections/home/Cases.astro';
 import Cta from '../sections/home/Cta.astro';
+import PageCompare from '../components/PageCompare.astro';
 import { getCopy } from '../i18n/config';
 import { softwareJsonLd } from '../data/seo';
 
@@ -38,4 +39,5 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   <Benefits locale={locale} />
   <Cases locale={locale} />
   <Cta locale={locale} />
+  <PageCompare locale={locale} current="current" />
 </BaseLayout>

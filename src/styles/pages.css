@@ -18,52 +18,45 @@
   line-height: 1.08;
 }
 
-/* ---------- Section frame ---------- */
+/* ---------- Section frame ----------
+   Generous vertical space (one idea per screen, Intrepid-like), and a hairline
+   between two sections in a row instead of a decorative rule on each one. */
+.pg {
+  --pg-y: clamp(5.5rem, 3rem + 7vw, 11.25rem);
+  --pg-gap: clamp(3rem, 2rem + 3.5vw, 6rem);
+}
+
 .pg-sec {
   position: relative;
-  padding-block: clamp(4rem, 2.5rem + 4vw, 7rem);
+  padding-block: var(--pg-y);
 }
 
-/* At least one viewport tall, content centred under the rule. */
-.pg-sec--full {
-  display: flex;
-  flex-direction: column;
-  min-height: 100svh;
+.pg-sec + .pg-sec::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: max(var(--gutter), calc((100% - var(--max-w)) / 2 + var(--gutter)));
+  right: max(var(--gutter), calc((100% - var(--max-w)) / 2 + var(--gutter)));
+  height: 1px;
+  background: var(--line);
 }
 
-.pg-sec--full > .container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+/* No hairline into or out of a dark section: the page changes colour instead. */
+.pg-sec[data-dark]::before,
+[data-dark] + .pg-sec::before {
+  display: none;
 }
 
 .pg-body {
   display: grid;
-  gap: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
-  padding-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  gap: var(--pg-gap);
 }
 
-.pg-sec--full .pg-body {
-  flex: 1;
-  align-content: center;
-}
-
-/* Title column and content column, the site's 4 : 8 rhythm. */
-.pg-grid {
-  display: grid;
-  gap: 2rem clamp(2.5rem, 1rem + 5vw, 7.5rem);
-}
-
-@media (min-width: 64rem) {
-  .pg-grid {
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-  }
-  .pg-grid--half {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  .pg-grid--wide {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  }
+/* Small running index (001, 002…) on rows and chapters. */
+.pg-idx {
+  font-size: var(--fs-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
 }
 
 .pg-title {
@@ -137,13 +130,6 @@
   background: var(--accent);
 }
 
-/* Section that slides over a pinned neighbour (homepage Solutions pattern). */
-.pg-cover {
-  z-index: var(--z-cover);
-  background: var(--canvas-mix);
-  box-shadow: 0 -24px 48px -24px rgb(30 30 30 / 0.14);
-}
-
 /* Tags written like code, set in the brand face (no monospace). */
 .pg-tag {
   display: inline-flex;
@@ -156,4 +142,54 @@
   font-variant-numeric: tabular-nums;
   color: var(--ink-2);
   white-space: nowrap;
+}
+
+/* ---------- Stepped tick bar ----------
+   The home asset panel's score bar (2px ticks, 3px apart): the filled part is
+   the same ticks in ink, and it grows a whole tick at a time (--p, 0 → 1). */
+.tick {
+  --ticks: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 5px);
+  position: relative;
+  display: block;
+  height: 6px;
+  color: color-mix(in oklab, var(--ink) 18%, transparent);
+  background: var(--ticks);
+}
+
+.tick::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--p, 1) * 100%);
+  width: round(down, calc(var(--p, 1) * 100%), 5px);
+  color: var(--tick-fill, var(--ink));
+  background: var(--ticks);
+}
+
+.tick--accent {
+  --tick-fill: var(--accent);
+}
+
+/* Vertical: ticks stacked, filling downwards. */
+.tick--v {
+  --ticks: repeating-linear-gradient(180deg, currentColor 0 2px, transparent 2px 5px);
+  width: 6px;
+  height: auto;
+}
+
+.tick--v::after {
+  inset: 0 0 auto 0;
+  width: auto;
+  height: calc(var(--p, 1) * 100%);
+  height: round(down, calc(var(--p, 1) * 100%), 5px);
+}
+
+/* ---------- CTA card on the inner pages ----------
+   The claims are longer than the homepage CTA: let them wrap, give them room. */
+.pg .cta .cta__content {
+  max-width: 54rem;
+}
+
+.pg .cta .cta__line {
+  white-space: normal;
 }

@@ -1,58 +1,61 @@
 ---
 /**
- * About. Copy and team from predicterra.com/about, in the homepage's design
- * language: light canvas, notched rules, title left / content right on a
- * 4 : 8 grid, notched image frames, the grey CTA card. Sections: intro,
- * team, where we are, CTA.
+ * About (/about), from "predicterra-11-about.md".
+ * hero (with the BAT tower) · "Newly incorporated. Not new." · the team ·
+ * Woza Labs and contact (dark). Photos always in colour.
  */
-import BaseLayout from '../layouts/BaseLayout.astro';
-import NotchRule from '../components/NotchRule.astro';
-import PageIntro from '../components/PageIntro.astro';
-import Cta from '../sections/home/Cta.astro';
-import AboutCompare from '../components/AboutCompare.astro';
+import PageLayout from '../layouts/PageLayout.astro';
+import PageHero from '../sections/pages/PageHero.astro';
+import SectionHead from '../sections/pages/SectionHead.astro';
+import Button from '../components/Button.astro';
+import wozaLogoRaw from '../assets/woza-labs.svg?raw';
 import { getCopy, withBase } from '../i18n/config';
 
 const locale = 'en';
-const { about } = getCopy(locale);
-const { hero, team, where } = about;
+const { about: a } = getCopy(locale);
 const site = Astro.site ?? new URL('https://www.predicterra.com');
-const pad = (n: number) => String(n).padStart(2, '0');
+const pad = (n: number) => String(n).padStart(3, '0');
 
 const aboutJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
-  name: about.seo.title,
-  description: about.seo.description,
+  name: a.seo.title,
+  description: a.seo.description,
   url: new URL(withBase('/about'), site).href,
   mainEntity: { '@id': new URL('/#organization', site).href },
 };
+
+// Woza Labs logo, recoloured to follow the text colour (light on the dark section).
+const wozaLogo = wozaLogoRaw
+  .replace(/<metadata[\s\S]*?<\/metadata>/g, '')
+  .replace(/fill="#161616"/g, 'fill="currentColor"')
+  .replace('<svg ', '<svg role="img" aria-label="Woza Labs" focusable="false" ');
 ---
 
-<BaseLayout title={about.seo.title} description={about.seo.description} locale={locale} jsonLd={[aboutJsonLd]}>
-  <PageIntro id="about-title" eyebrow={hero.eyebrow} title={hero.title} text={hero.text} />
+<PageLayout title={a.seo.title} description={a.seo.description} locale={locale} jsonLd={[aboutJsonLd]}>
+  <PageHero locale={locale} label={a.hero.label} title={a.hero.title} text={a.hero.text} layout="centred">
+    <figure slot="visual" class="ab-photo">
+      <img
+        src={withBase(a.hero.photo.src)}
+        alt={a.hero.photo.alt}
+        width={a.hero.photo.w}
+        height={a.hero.photo.h}
+        fetchpriority="high"
+        decoding="async"
+      />
+    </figure>
+  </PageHero>
 
-  <!-- Team -->
-  <section class="ab-sec" aria-labelledby="team-title">
-    <div class="container">
-      <NotchRule at={70} />
-      <div class="ab-grid">
-        <div class="ab-head">
-          <p class="label">{team.label}</p>
-          <h2 id="team-title" class="t-h2" data-render>{team.title}</h2>
-        </div>
-        <p class="ab-lead" data-reveal>{team.text}</p>
-      </div>
-      <ul class="ab-team" data-reveal-group>
+  <!-- The line the brief highlights, large, with the three facts under it. -->
+  <section class="ab-quote pg-sec" aria-label={a.hero.quote}>
+    <div class="container ab-quote__inner">
+      <p class="ab-quote__text" data-render>{a.hero.quote}</p>
+      <ul class="ab-quote__facts" data-reveal-group>
         {
-          team.people.map((m, i) => (
-            <li class="ab-person" data-reveal>
-              <div class="ab-person__photo">
-                <img src={withBase(m.photo)} alt={m.name} width="600" height="600" loading="lazy" decoding="async" />
-              </div>
-              <p class="ab-person__index t-caption t-num">{pad(i + 1)}</p>
-              <h3 class="ab-person__name">{m.name}</h3>
-              <p class="ab-person__role t-small">{m.role}</p>
-              {m.org && <p class="ab-person__org t-small">{m.org}</p>}
+          a.hero.facts.map((f) => (
+            <li data-reveal>
+              <span class="pg-dot" aria-hidden="true" />
+              {f}
             </li>
           ))
         }
@@ -60,88 +63,121 @@ const aboutJsonLd = {
     </div>
   </section>
 
-  <!-- Where we are -->
-  <section class="ab-sec" aria-labelledby="where-title">
-    <div class="container">
-      <NotchRule at={70} />
-      <div class="ab-grid">
-        <div class="ab-head">
-          <p class="label">{where.label}</p>
-          <h2 id="where-title" class="t-h2" data-render>{where.title}</h2>
-        </div>
-        <div class="ab-where" data-reveal-group>
-          <p class="ab-lead" data-reveal>{where.text}</p>
-          <address class="ab-where__contact" data-reveal>
-            <span>{where.address}</span>
-            {
-              where.phones.map((p) => (
-                <a href={p.href}>
-                  <span class="t-muted">{p.label}</span> <span class="t-num">{p.value}</span>
-                </a>
-              ))
-            }
-          </address>
-          <div class="ab-photo" data-reveal>
-            <img src={withBase(where.photo.src)} alt={where.photo.alt} width={where.photo.w} height={where.photo.h} loading="lazy" decoding="async" />
-          </div>
-        </div>
-      </div>
+  <section class="ab-team pg-sec" aria-labelledby="team-title">
+    <div class="container pg-body">
+      <SectionHead id="team-title" title={a.team.title} text={a.team.text} align="side" />
+      <ul class="ab-team__list" data-reveal-group>
+        {
+          a.team.people.map((m, i) => (
+            <li class="ab-person" data-reveal>
+              <div class="ab-person__photo">
+                <img src={withBase(m.photo)} alt={m.name} width="600" height="600" loading="lazy" decoding="async" />
+              </div>
+              <span class="pg-idx">{pad(i + 1)}</span>
+              <h3 class="ab-person__name">{m.name}</h3>
+              <p class="ab-person__role t-small">{m.role}</p>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </section>
 
-  <Cta locale={locale} copy={about.cta} />
-
-  <AboutCompare locale={locale} current="current" />
-</BaseLayout>
+  <section class="ab-woza pg-sec" aria-labelledby="woza-title" data-dark>
+    <div class="container ab-woza__grid">
+      <div class="ab-woza__brand">
+        <div class="ab-woza__logo" set:html={wozaLogo} />
+        <p id="woza-title" class="ab-woza__text" data-render>{a.woza.text}</p>
+        <div data-reveal>
+          <Button href={a.woza.link.href} label={a.woza.link.label} variant="secondary" external />
+        </div>
+      </div>
+      <dl class="ab-woza__contact" data-reveal-group>
+        <div class="ab-woza__fact" data-reveal>
+          <dt class="t-small">Office</dt>
+          <dd>{a.contact.address}</dd>
+        </div>
+        <div class="ab-woza__fact" data-reveal>
+          <dt class="t-small">Email</dt>
+          <dd><a href={`mailto:${a.contact.email}`}>{a.contact.email}</a></dd>
+        </div>
+        <div class="ab-woza__fact" data-reveal>
+          <dt class="t-small">{a.contact.join}</dt>
+          <dd><a href={`mailto:${a.contact.email}`}>{a.contact.joinCta}</a></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+</PageLayout>
 
 <style>
-  /* ---------- Sections ---------- */
-  .ab-sec {
-    position: relative;
-    padding-bottom: var(--section-y);
+  /* ---------- Hero photo: the BAT tower in the notched frame ---------- */
+  .ab-photo {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #e4e4e4;
+    clip-path: var(--notch);
   }
 
-  .ab-grid {
+  .ab-photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 45%;
+  }
+
+  /* ---------- Quote ---------- */
+  .ab-quote {
+    padding-block: clamp(6rem, 4rem + 8vw, 13rem);
+  }
+
+  .ab-quote__inner {
     display: grid;
-    gap: 2rem var(--gutter);
-    padding-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
+    justify-items: center;
+    gap: clamp(2.5rem, 2rem + 2vw, 4rem);
+    text-align: center;
   }
 
-  @media (min-width: 64rem) {
-    .ab-grid {
-      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    }
+  .ab-quote__text {
+    max-width: 16ch;
+    font-size: var(--pg-hero);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
   }
 
-  .ab-head {
-    display: grid;
-    align-content: start;
-    gap: 1rem;
-  }
-
-  .ab-lead {
-    max-width: 44ch;
-    font-size: var(--fs-lead);
-    line-height: 1.45;
+  .ab-quote__facts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem 2.5rem;
     color: var(--ink-2);
   }
 
+  .ab-quote__facts li {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.625rem;
+  }
+
   /* ---------- Team ---------- */
-  .ab-team {
+  .ab-team__list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2.5rem var(--gutter);
-    margin-top: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+    gap: 3rem var(--gutter);
   }
 
   @media (min-width: 48rem) {
-    .ab-team {
+    .ab-team__list {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
   @media (min-width: 80rem) {
-    .ab-team {
+    .ab-team__list {
       grid-template-columns: repeat(5, minmax(0, 1fr));
     }
   }
@@ -149,35 +185,23 @@ const aboutJsonLd = {
   .ab-person {
     display: grid;
     align-content: start;
-  }
-
-  /* Same notched frame as the success-stories images */
-  .ab-person__photo,
-  .ab-photo {
-    overflow: hidden;
-    background: #e4e4e4;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
+    gap: 0.25rem;
   }
 
   .ab-person__photo {
+    overflow: hidden;
     aspect-ratio: 1;
     margin-bottom: 1rem;
+    background: #e4e4e4;
+    clip-path: var(--notch);
   }
 
-  .ab-person__photo img,
-  .ab-photo img {
+  /* Portraits are cut out on white: multiply takes the white to the frame grey. Always in colour. */
+  .ab-person__photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-
-  /* The portraits are cut out on white: multiply takes the white to the frame grey. */
-  .ab-person__photo img {
     mix-blend-mode: multiply;
-  }
-
-  .ab-person__index {
-    color: var(--muted);
   }
 
   .ab-person__name {
@@ -187,41 +211,74 @@ const aboutJsonLd = {
   }
 
   .ab-person__role {
-    margin-top: 0.25rem;
     color: var(--ink-2);
   }
 
-  .ab-person__org {
+  /* ---------- Woza Labs and contact (dark) ---------- */
+  .ab-woza__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4rem clamp(3rem, 1rem + 6vw, 8rem);
+  }
+
+  @media (min-width: 64rem) {
+    .ab-woza__grid {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      align-items: end;
+    }
+  }
+
+  .ab-woza__brand {
+    display: grid;
+    justify-items: start;
+    gap: 2rem;
+  }
+
+  .ab-woza__logo {
+    width: clamp(10rem, 6rem + 10vw, 17rem);
+  }
+
+  .ab-woza__logo :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .ab-woza__text {
+    max-width: 22ch;
+    font-size: var(--pg-statement);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  .ab-woza__contact {
+    display: grid;
+  }
+
+  .ab-woza__fact {
+    display: grid;
+    gap: 0.375rem;
+    padding-block: 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .ab-woza__fact dt {
     color: var(--muted);
   }
 
-  /* ---------- Where we are ---------- */
-  .ab-where {
-    display: grid;
-    gap: 2rem;
-    min-width: 0;
-    align-content: start;
+  .ab-woza__fact dd {
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
   }
 
-  .ab-where__contact {
-    display: grid;
-    gap: 0.375rem;
-    font-style: normal;
-  }
-
-  .ab-where__contact a {
-    width: fit-content;
+  .ab-woza__fact a {
     transition: color 160ms ease;
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .ab-where__contact a:hover {
+    .ab-woza__fact a:hover {
       color: var(--accent);
     }
-  }
-
-  .ab-photo {
-    aspect-ratio: 3 / 2;
-    margin-top: 1rem;
   }
 </style>

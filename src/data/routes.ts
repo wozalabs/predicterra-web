@@ -1,24 +1,29 @@
 /**
- * Every internal route the site links to, in one place.
- * Only `home` exists today; the others are planned pages. Keep links pointing
- * here so adding a page is a matter of creating `src/pages/<route>.astro`.
+ * Every internal route the site links to, in one place (site map of the
+ * November 2026 briefs). Keep links pointing here.
  */
 export const routes = {
   home: '/',
+  /** New home content, side by side with the current one for comparison. */
+  homeNew: '/home-new',
   platform: '/platform',
-  solutions: '/solutions',
-  cases: '/success-stories',
+  cases: '/cases',
+  /** Case detail pages from the earlier site (linked from the current home). */
+  stories: '/success-stories',
   about: '/about',
   contact: '/contact',
   demo: '/contact?topic=demo',
+  engineer: '/contact?topic=engineer',
   privacy: '/privacy',
   legal: '/legal',
+  cookies: '/cookies',
   sectors: {
     grid: '/grid',
     solar: '/solar',
     wind: '/wind',
     oilGas: '/oil-gas',
-    climate: '/climate-resilience',
+    resilience: '/resilience',
+    compliance: '/compliance',
     digitalization: '/digitalization',
   },
 } as const;

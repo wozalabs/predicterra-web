@@ -3,7 +3,7 @@
  * Grid of flat cards (3 × 2, or 4 in a row), each with an orange icon square
  * or a number, a title and a line. Cards rise in a stagger.
  */
-import NotchRule from '../../components/NotchRule.astro';
+import SectionHead from './SectionHead.astro';
 import Icon from '../../components/Icon.astro';
 import type { IconName } from '../../data/icons';
 
@@ -13,21 +13,18 @@ interface Props {
   text?: string;
   items: readonly { icon?: IconName | string; title: string; text: string }[];
   cols?: 3 | 4;
-  full?: boolean;
-  rule?: number;
+  head?: 'center' | 'stack' | 'side';
+  /** Wider title measure (long titles). */
+  wide?: boolean;
 }
-const { id, title, text, items, cols = 3, full = true, rule = 70 } = Astro.props;
+const { id, title, text, items, cols = 3, head = 'stack', wide = false } = Astro.props;
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<section class:list={['cd pg-sec', full && 'pg-sec--full']} aria-labelledby={id} style={`--cols:${cols}`}>
+<section class="cd pg-sec" aria-labelledby={id} style={`--cols:${cols}`}>
   <div class="container">
-    <NotchRule at={rule} />
     <div class="pg-body">
-      <div class="pg-grid">
-        <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
-        {text && <p class="pg-lead" data-reveal>{text}</p>}
-      </div>
+      <SectionHead id={id} title={title} text={text} align={head} wide={wide} />
       <slot name="before" />
       <ul class="cd__list" data-reveal-group>
         {
@@ -54,7 +51,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 <style>
   .cd__list {
     display: grid;
-    gap: 1px;
+    gap: 0.75rem;
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -73,9 +70,9 @@ const pad = (n: number) => String(n).padStart(2, '0');
   .cd__card {
     display: grid;
     grid-template-rows: auto 1fr;
-    gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
-    min-height: clamp(13rem, 10rem + 6vw, 17rem);
-    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    gap: clamp(3rem, 2rem + 3vw, 5rem);
+    min-height: clamp(15rem, 11rem + 7vw, 20rem);
+    padding: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
     background: var(--card);
     transition: background-color 200ms ease;
   }

@@ -10,9 +10,10 @@ import type { IconName } from '../../data/icons';
 
 interface Props {
   locale?: Locale;
+  /** Other copy for the same scene (the new home's incidents). Same steps, so the camera stays in sync. */
+  scene?: ReturnType<typeof getCopy>['home']['scene'];
 }
-const { locale = 'en' } = Astro.props;
-const { scene } = getCopy(locale).home;
+const { locale = 'en', scene = getCopy(locale).home.scene } = Astro.props;
 // One stop per sector, then the capability stops (no overview). Only sectors
 // carry an at-risk asset, a marker and a panel.
 const steps = [...scene.sectors, ...scene.capabilities];

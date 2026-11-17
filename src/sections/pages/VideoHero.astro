@@ -1,0 +1,290 @@
+---
+/**
+ * Video hero (the homepage's clean layout, reusable): the footage, a short label,
+ * a two-line title, a line of copy, the actions and the logo band along the
+ * bottom edge. Same entrance as the homepage hero.
+ */
+import Button from '../../components/Button.astro';
+import LogoBand from './LogoBand.astro';
+import { getCopy, localizePath, withBase, type Locale } from '../../i18n/config';
+import type { LogoGroup } from '../../i18n/en/pages-shared';
+import type { Link } from './types';
+
+interface Props {
+  locale?: Locale;
+  id?: string;
+  label?: string;
+  titleLine1: string;
+  titleLine2: string;
+  text: string;
+  primary: Link;
+  secondary?: Link;
+  logos?: LogoGroup[];
+}
+const { locale = 'en', id = 'page-title', label, titleLine1, titleLine2, text, primary, secondary, logos } = Astro.props;
+const { video } = getCopy(locale).home.hero;
+---
+
+<section class="hcl theme-dark" aria-labelledby={id} data-header-dark>
+  <video
+    class="hcl__video"
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    poster={withBase(video.poster)}
+    disablepictureinpicture
+    aria-hidden="true"
+    data-hero-video
+  >
+    <source src={withBase(video.large)} type="video/mp4" media="(min-width: 60em)" />
+    <source src={withBase(video.small)} type="video/mp4" />
+  </video>
+  <div class="hcl__scrim" aria-hidden="true"></div>
+  <!-- Film grain over the footage: hides compression and low resolution -->
+  <div class="hcl__grain" aria-hidden="true"></div>
+
+  <div class="hcl__content container">
+    {label && <p class="label hcl__label">{label}</p>}
+    <h1 id={id} class="hcl__title">
+      <span class="hcl__line"><span>{titleLine1}</span></span>
+      <span class="hcl__line"><span>{titleLine2}</span></span>
+    </h1>
+    <p class="hcl__text">{text}</p>
+    <div class="hcl__actions">
+      <Button href={localizePath(primary.href, locale)} label={primary.label} size="lg" />
+      {secondary && <Button href={localizePath(secondary.href, locale)} label={secondary.label} size="lg" variant="secondary" />}
+    </div>
+  </div>
+
+  {
+    logos && (
+      <div class="hcl__logos container">
+        <LogoBand groups={logos} class="hcl__band" />
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .hcl {
+    position: relative;
+    height: 100svh;
+    min-height: 34rem;
+    overflow: clip;
+    background: var(--grey-700);
+  }
+
+  .hcl__video,
+  .hcl__scrim {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hcl__video {
+    object-fit: cover;
+  }
+
+  /* Dimmed so the footage stays in the background; darker behind the copy. */
+  .hcl__video {
+    filter: saturate(0.8);
+  }
+
+  .hcl__scrim {
+    background:
+      linear-gradient(to bottom, rgb(16 16 16 / 0.35), rgb(16 16 16 / 0) 24%),
+      linear-gradient(to top, rgb(16 16 16 / 0.82), rgb(16 16 16 / 0) 62%),
+      rgb(16 16 16 / 0.5);
+  }
+
+  /* Grain: a tiled fractal-noise texture, greyscale, blended softly. It jumps
+     to a new offset a few times a second like film grain (transform only, so
+     it stays on the compositor); static with reduced motion. */
+  .hcl__grain {
+    position: absolute;
+    inset: -50%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+    opacity: 0.42;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hcl__grain {
+      animation: hcl-grain 0.9s steps(1, end) infinite;
+    }
+  }
+
+  @keyframes hcl-grain {
+    0% {
+      transform: translate(0, 0);
+    }
+    16% {
+      transform: translate(-7%, 4%);
+    }
+    33% {
+      transform: translate(5%, -6%);
+    }
+    50% {
+      transform: translate(-3%, -9%);
+    }
+    66% {
+      transform: translate(8%, 3%);
+    }
+    83% {
+      transform: translate(-6%, 7%);
+    }
+  }
+
+  .hcl__content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--logos-h) + clamp(2rem, 1rem + 4vh, 4.5rem));
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hcl {
+    --logos-h: clamp(5.5rem, 4.5rem + 2vw, 6.75rem);
+  }
+
+  .hcl__text {
+    max-width: 34rem;
+    margin-top: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.45;
+    letter-spacing: var(--track-body);
+    color: rgb(255 255 255 / 0.78);
+  }
+
+  /* Logo band along the bottom edge, in white */
+  .hcl__logos {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0 auto;
+    padding-bottom: 1.25rem;
+  }
+
+  .hcl__logos :global(.hcl__band) {
+    border-top-color: rgb(255 255 255 / 0.18);
+  }
+
+  .hcl__logos :global(.lb__item img) {
+    filter: brightness(0) invert(1);
+    opacity: 0.72;
+  }
+
+  .hcl__logos :global(.lb__word) {
+    color: #fff;
+    opacity: 0.72;
+  }
+
+  .hcl__logos :global(.lb__label) {
+    color: rgb(255 255 255 / 0.6);
+  }
+
+  .hcl__label {
+    margin-bottom: 1.25rem;
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  .hcl__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: clamp(1.5rem, 1rem + 1.2vw, 2.25rem);
+  }
+
+  @media (max-width: 47.99rem) {
+    .hcl {
+      --logos-h: 9.5rem;
+    }
+  }
+
+  .hcl__title {
+    display: grid;
+    font-size: clamp(2.5rem, 1rem + 4vw, 5rem);
+    line-height: 0.96;
+    letter-spacing: var(--track-display);
+    color: #ffffff;
+  }
+
+  /* ---------- Entrance ----------
+     The footage fades up from the dark section background while easing back
+     from a 4% zoom (one long, soft move). Then the title lines slide up out of
+     a mask, the description and button focus in, logos one by one. */
+  /* Masked lines (padding keeps descenders inside the mask) */
+  .hcl__line {
+    display: block;
+    overflow: clip;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+
+  .hcl__line > span {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hcl__video {
+      animation: hcl-video 1800ms cubic-bezier(0.19, 1, 0.22, 1) 80ms both;
+    }
+    .hcl__line > span {
+      animation: hcl-line 1100ms cubic-bezier(0.19, 1, 0.22, 1) both;
+      animation-delay: var(--d, 0ms);
+    }
+    .hcl__line:nth-child(1) > span {
+      --d: 380ms;
+    }
+    .hcl__line:nth-child(2) > span {
+      --d: 470ms;
+    }
+    .hcl__text,
+    .hcl__actions {
+      animation: hcl-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
+    .hcl__text {
+      animation-delay: 640ms;
+    }
+    .hcl__actions {
+      animation-delay: 740ms;
+    }
+    .hcl__logos {
+      animation: hcl-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) 860ms both;
+    }
+  }
+
+  @keyframes hcl-video {
+    from {
+      opacity: 0;
+      transform: scale(1.04);
+    }
+  }
+
+  @keyframes hcl-line {
+    from {
+      transform: translateY(108%);
+    }
+  }
+
+  @keyframes hcl-focus {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+      filter: blur(6px);
+    }
+  }
+
+</style>
+
+<script>
+  import { mountHeroVideos } from '../../scripts/hero-video';
+  mountHeroVideos();
+</script>

@@ -1,52 +1,49 @@
-import { routes } from '../../data/routes';
+import { external } from '../../data/routes';
 
-// Copy from predicterra.com/about. Team numbers are sequential (the live site
-// shows "10" twice); labels are sentence case (brand: no uppercase).
+// /about, from "predicterra-11-about.md". Copy word for word; eyebrows left out.
+// Photos stay in colour (site rule), whatever the brief's visual note says.
 export default {
   seo: {
-    title: 'About Predicterra | Foresight Infrastructure for Energy',
+    title: 'About Predicterra | European Deep-Tech for the Energy System',
     description:
-      'Predicterra builds foresight infrastructure for energy and critical assets. Built by Woza Labs, modeling the physical world for what matters most.',
+      'Predicterra builds the Cognitive Twin of the energy system. Built in Bilbao, independent of any vendor, and in operation on two of Spain’s largest grids.',
   },
-
   hero: {
-    eyebrow: 'About',
-    title: 'Deep-tech for energy resilience.',
-    text: 'Energy infrastructure operates inside a physical world it cannot see. Predicterra builds the system that makes it visible, and turns it into decisions.',
+    label: 'About Predicterra',
+    title: 'European deep-tech for the energy system.',
+    text: 'Predicterra started inside Woza Labs, running on real infrastructure for Spain’s largest grid operators. Once the technology had proven its value, it became an independent company.',
+    quote: 'Newly incorporated. Not new.',
+    facts: [
+      'Built in Bilbao',
+      'Independent of any energy company or vendor',
+      'In operation on two of Spain’s largest grids',
+    ],
+    photo: {
+      src: '/about/bilbao-1.webp',
+      w: 1200,
+      h: 800,
+      alt: 'BAT Acceleration Tower on Gran Vía, Bilbao, home of the Predicterra office',
+    },
   },
-
   team: {
-    label: 'The team',
-    title: 'Earth System Engineers',
-    text: 'Engineers, scientists and energy specialists working as one. The people who connect the platform to the reality of your network, and make it act.',
-    // Photos in public/about, from predicterra.com/about.
+    title: 'Earth System Engineers.',
+    text: 'Engineers, scientists and energy specialists. We connect the platform to the reality of your assets, and stay until it works.',
     people: [
-      { name: 'Sebastian Priolo', role: 'Executive Chairman', org: 'CEO @wozalabs', photo: '/about/sebastian-priolo.webp' },
-      { name: 'Fernando Tadakuma', role: 'Head of Predicterra', org: 'CDO @wozalabs', photo: '/about/fernando-tadakuma.webp' },
-      { name: 'Federico Hasicic', role: 'Head of Science', org: 'CRSO @wozalabs', photo: '/about/federico-hasicic.webp' },
-      { name: 'Martin Tanielian', role: 'Head of Earth System Engineer', org: 'IT Lead @wozalabs', photo: '/about/martin-tanielian.webp' },
-      { name: 'Omer Gómez', role: 'Developer', org: '', photo: '/about/omer-gomez.webp' },
+      { name: 'Sebastián Priolo', role: 'Executive Chairman', photo: '/about/sebastian-priolo.webp' },
+      { name: 'Fernando Tadakuma', role: 'Head of Predicterra', photo: '/about/fernando-tadakuma.webp' },
+      { name: 'Federico Hasicic', role: 'Head of Science', photo: '/about/federico-hasicic.webp' },
+      { name: 'Martín Tanielian', role: 'Head of Earth System Engineering', photo: '/about/martin-tanielian.webp' },
+      { name: 'Omer Gómez', role: 'Developer', photo: '/about/omer-gomez.webp' },
     ],
   },
-
-  where: {
-    label: 'Where we are',
-    title: 'Based in Bilbao',
-    text: 'Predicterra was built in the Basque Country, at the centre of Europe’s energy industry, and runs on the assets of the operators who work with us.',
-    address: 'BAT - Gran Vía 1, 48001, Bizkaia.',
-    phones: [
-      { label: 'EU', value: '+34 900 752 605', href: 'tel:+34900752605' },
-      { label: 'USA', value: '+1 929-323-2391', href: 'tel:+19293232391' },
-    ],
-    photo: { src: '/about/bilbao-1.webp', w: 1200, h: 800, alt: 'BAT tower on Gran Vía, Bilbao, home of the Predicterra office' },
+  woza: {
+    text: 'Built by Woza Labs, a Bilbao deep-tech studio.',
+    link: { label: 'Visit Woza Labs', href: external.woza },
   },
-
-  cta: {
-    label: 'Ready before the next event',
-    titleLine1: 'Run your infrastructure',
-    titleLine2: 'on',
-    titleAccent: 'foresight.',
-    text: 'One live system across every asset, every feed, every team. Act before the event, not after the report.',
-    primary: { label: 'Deploy Predicterra', href: routes.demo },
+  contact: {
+    address: 'BAT Acceleration Tower, Gran Vía 1, 48001 Bilbao',
+    email: 'hello@predicterra.com',
+    join: 'Want to model the physical world with us?',
+    joinCta: 'Write to hello@predicterra.com',
   },
-};
+} as const;

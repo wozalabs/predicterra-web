@@ -1,0 +1,389 @@
+---
+/**
+ * Contact (/contact), from "predicterra-12-contact.md". Every "Request a demo"
+ * and "Talk to an engineer" lands here (?topic=demo | engineer).
+ * The CRM is not wired yet: submitting validates in the browser and shows the
+ * confirmation in place, nothing is sent.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import Button from '../components/Button.astro';
+import { getCopy, localizePath } from '../i18n/config';
+import { icons } from '../data/icons';
+
+const locale = 'en';
+const { contact: c } = getCopy(locale);
+const f = c.form;
+---
+
+<PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
+  <section class="ct" aria-labelledby="page-title">
+    <div class="container ct__grid">
+      <div class="ct__intro">
+        <p class="label" data-reveal>{c.hero.label}</p>
+        <h1 id="page-title" class="ct__title" data-render>{c.hero.title}</h1>
+        <p class="ct__text" data-reveal>{c.hero.text}</p>
+
+        <div class="ct__other" data-reveal>
+          <p class="ct__other-title">{c.other.title}</p>
+          <ul class="ct__facts">
+            <li><a href={`mailto:${c.other.email}`}>{c.other.email}</a></li>
+            {
+              c.other.phones.map((p) => (
+                <li>
+                  <span class="t-small ct__muted">{p.label}</span> <a href={p.href}>{p.value}</a>
+                </li>
+              ))
+            }
+            <li class="ct__muted">{c.other.address}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ct__panel" data-reveal>
+        <form class="ct__form" data-contact-form novalidate>
+          <div class="ct__row">
+            <label class="fld">
+              <span class="fld__label">{f.name}</span>
+              <input class="fld__input" name="name" type="text" autocomplete="name" required />
+            </label>
+            <label class="fld">
+              <span class="fld__label">{f.email}</span>
+              <input class="fld__input" name="email" type="email" autocomplete="email" spellcheck="false" required />
+            </label>
+          </div>
+          <div class="ct__row">
+            <label class="fld">
+              <span class="fld__label">{f.company}</span>
+              <input class="fld__input" name="company" type="text" autocomplete="organization" required />
+            </label>
+            <label class="fld">
+              <span class="fld__label">{f.role} <span class="fld__opt">{f.optional}</span></span>
+              <input class="fld__input" name="role" type="text" autocomplete="organization-title" />
+            </label>
+          </div>
+          <label class="fld">
+            <span class="fld__label">{f.sector}</span>
+            <span class="fld__select">
+              <select class="fld__input" name="sector" required>
+                <option value="" disabled selected>{f.sectorPlaceholder}</option>
+                {f.sectors.map((s) => <option value={s}>{s}</option>)}
+              </select>
+            </span>
+          </label>
+          <label class="fld">
+            <span class="fld__label">{f.problem} <span class="fld__opt">{f.optional}</span></span>
+            <textarea class="fld__input fld__area" name="problem" rows="4"></textarea>
+          </label>
+
+          <label class="ct__check">
+            <input type="checkbox" name="news" />
+            <span>{f.news}</span>
+          </label>
+
+          <div class="ct__submit">
+            <button class="btn btn--lg" type="submit">
+              <span>{f.submit}</span>
+              <span class="btn__sq" aria-hidden="true">
+                <svg class="btn__icon" viewBox="0 -960 960 960"><path d={icons.arrow_forward} /></svg>
+              </span>
+            </button>
+            <p class="ct__legal t-small">
+              {f.legal} <a href={localizePath(f.legalLink.href, locale)}>{f.legalLink.label}</a>.
+            </p>
+          </div>
+          <p class="ct__error t-small" data-form-error role="alert" hidden>Please fill in the required fields.</p>
+        </form>
+
+        <div class="ct__done" data-contact-done hidden tabindex="-1">
+          <span class="ct__done-mark" aria-hidden="true"></span>
+          <h2 class="ct__done-title">{c.done.title}</h2>
+          <p class="ct__text">{c.done.text}</p>
+          <Button href={localizePath(c.done.link.href, locale)} label={c.done.link.label} variant="secondary" />
+        </div>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const done = document.querySelector<HTMLElement>('[data-contact-done]');
+  const error = document.querySelector<HTMLElement>('[data-form-error]');
+  if (form && done && error) {
+    // Errors show only after a first submit attempt, then update as the field is fixed.
+    form.addEventListener('input', (e) => {
+      const el = e.target as HTMLInputElement;
+      if (form.dataset.tried) el.toggleAttribute('aria-invalid', !el.checkValidity());
+    });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      form.dataset.tried = '1';
+      const fields = [...form.querySelectorAll<HTMLInputElement>('input, select, textarea')];
+      fields.forEach((el) => el.toggleAttribute('aria-invalid', !el.checkValidity()));
+      const firstBad = fields.find((el) => !el.checkValidity());
+      if (firstBad) {
+        error.hidden = false;
+        firstBad.focus();
+        return;
+      }
+      error.hidden = true;
+      form.hidden = true;
+      done.hidden = false;
+      done.focus({ preventScroll: true });
+    });
+  }
+</script>
+
+<style>
+  .ct {
+    padding-top: calc(var(--header-h) + clamp(3rem, 1.5rem + 8vh, 8rem));
+    padding-bottom: var(--pg-y);
+  }
+
+  .ct__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4rem clamp(3rem, 1rem + 6vw, 8rem);
+  }
+
+  @media (min-width: 64rem) {
+    .ct__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: start;
+    }
+    .ct__intro {
+      position: sticky;
+      top: calc(var(--header-h) + 3rem);
+    }
+  }
+
+  .ct__intro {
+    display: grid;
+    align-content: start;
+    gap: 1.5rem;
+  }
+
+  .ct__title {
+    max-width: 14ch;
+    font-size: var(--pg-hero);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .ct__text {
+    max-width: 44ch;
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    letter-spacing: var(--track-title);
+    color: var(--ink-2);
+  }
+
+  .ct__other {
+    display: grid;
+    gap: 1rem;
+    margin-top: clamp(1.5rem, 1rem + 3vw, 4rem);
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .ct__other-title {
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .ct__facts {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .ct__facts a {
+    transition: color 160ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .ct__facts a:hover,
+    .ct__legal a:hover {
+      color: var(--accent);
+    }
+  }
+
+  .ct__muted {
+    color: var(--muted);
+  }
+
+  /* ---------- Form ---------- */
+  .ct__panel {
+    padding: clamp(1.5rem, 1rem + 2vw, 3rem);
+    background: var(--card);
+  }
+
+  .ct__form {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .ct__row {
+    display: grid;
+    gap: 1.5rem var(--gutter);
+  }
+
+  @media (min-width: 40rem) {
+    .ct__row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .fld {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .fld__label {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .fld__opt {
+    color: var(--muted);
+  }
+
+  /* 16px so iOS does not zoom on focus. */
+  .fld__input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 0.875rem;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0;
+    transition: border-color 150ms ease;
+    appearance: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .fld__input:hover {
+      border-color: var(--line-strong);
+    }
+  }
+
+  .fld__input:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 0;
+    border-color: var(--ink);
+  }
+
+  .fld__input[aria-invalid] {
+    border-color: var(--accent);
+  }
+
+  .fld__area {
+    min-height: 8rem;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  .fld__select {
+    position: relative;
+    display: block;
+  }
+
+  .fld__select::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 1.5px solid var(--ink-2);
+    border-bottom: 1.5px solid var(--ink-2);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+
+  .fld__select select {
+    padding-right: 2.5rem;
+  }
+
+  .fld__select select:invalid {
+    color: var(--muted);
+  }
+
+  .ct__check {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    padding-top: 0.25rem;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+
+  .ct__check input {
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 0.15rem;
+    accent-color: var(--accent);
+  }
+
+  .ct__submit {
+    display: grid;
+    justify-items: start;
+    gap: 1rem;
+    padding-top: 0.5rem;
+  }
+
+  .ct__legal {
+    max-width: 56ch;
+    color: var(--muted);
+  }
+
+  .ct__legal a {
+    color: var(--ink-2);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    transition: color 160ms ease;
+  }
+
+  .ct__error {
+    color: var(--ink);
+  }
+
+  .ct__error::before {
+    content: '';
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-right: 0.5rem;
+    background: var(--accent);
+  }
+
+  /* ---------- Confirmation ---------- */
+  .ct__done {
+    display: grid;
+    justify-items: start;
+    align-content: center;
+    gap: 1.25rem;
+    min-height: 28rem;
+    outline: none;
+  }
+
+  .ct__done[hidden] {
+    display: none;
+  }
+
+  .ct__done-mark {
+    width: 0.75rem;
+    height: 0.75rem;
+    background: var(--accent);
+  }
+
+  .ct__done-title {
+    font-size: var(--fs-h2);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+  }
+</style>

@@ -1,0 +1,100 @@
+---
+/**
+ * Section opening, in three compositions so consecutive sections don't repeat
+ * one another, and copy is never parked in a middle column:
+ *  - center: title centred, text centred under it (Intrepid-style intro)
+ *  - stack:  title and text stacked on the left
+ *  - side:   title on the left, text pushed to the right edge, bottom-aligned
+ */
+interface Props {
+  id: string;
+  title: string;
+  text?: string | readonly string[];
+  align?: 'center' | 'stack' | 'side';
+  /** Wider title measure, for long titles. */
+  wide?: boolean;
+  class?: string;
+}
+const { id, title, text, align = 'stack', wide = false, class: className } = Astro.props;
+const texts = text ? (typeof text === 'string' ? [text] : text) : [];
+---
+
+<header class:list={['sh', `sh--${align}`, wide && 'sh--wide', className]}>
+  <h2 id={id} class="t-h2 sh__title" data-render>{title}</h2>
+  {
+    (texts.length > 0 || Astro.slots.has('default')) && (
+      <div class="sh__text" data-reveal-group>
+        {texts.map((t, i) => (
+          <p class:list={[i === 0 ? 'sh__lead' : 'sh__more']} data-reveal>
+            {t}
+          </p>
+        ))}
+        <slot />
+      </div>
+    )
+  }
+</header>
+
+<style>
+  .sh {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .sh__title {
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+
+  .sh--wide .sh__title {
+    max-width: 30ch;
+  }
+
+  .sh__text {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .sh__lead {
+    max-width: 50ch;
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    letter-spacing: var(--track-title);
+    color: var(--ink-2);
+  }
+
+  .sh__more {
+    max-width: 56ch;
+    color: var(--ink-2);
+  }
+
+  /* centre */
+  .sh--center {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .sh--center .sh__text {
+    justify-items: center;
+  }
+
+  .sh--center .sh__title {
+    max-width: 20ch;
+  }
+
+  /* side: title left, text at the far right, both resting on the same baseline */
+  @media (min-width: 64rem) {
+    .sh--side {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 1fr) minmax(0, 4fr);
+      align-items: end;
+    }
+    .sh--side .sh__text {
+      grid-column: 3;
+    }
+    .sh--side .sh__lead {
+      font-size: var(--fs-body);
+      line-height: 1.55;
+      letter-spacing: var(--track-body);
+    }
+  }
+</style>

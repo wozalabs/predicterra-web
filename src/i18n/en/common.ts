@@ -14,6 +14,7 @@ export default {
     fontLabel: 'Typeface (test)',
     nav: [
       { label: 'Platform', href: routes.platform },
+      { label: 'Cases', href: routes.cases },
       { label: 'About', href: routes.about },
       { label: 'Contact', href: routes.contact },
     ],
@@ -25,9 +26,8 @@ export default {
       {
         title: 'Platform',
         links: [
-          { label: 'How it works', href: routes.platform },
-          { label: 'Solutions', href: routes.solutions },
-          { label: 'Success stories', href: routes.cases },
+          { label: 'Platform', href: routes.platform },
+          { label: 'Cases', href: routes.cases },
         ],
       },
       {
@@ -36,8 +36,14 @@ export default {
           { label: 'Grid', href: routes.sectors.grid },
           { label: 'Solar', href: routes.sectors.solar },
           { label: 'Wind', href: routes.sectors.wind },
-          { label: 'Oil & gas', href: routes.sectors.oilGas },
-          { label: 'Climate & resilience', href: routes.sectors.climate },
+          { label: 'Oil & Gas', href: routes.sectors.oilGas },
+        ],
+      },
+      {
+        title: 'Solutions',
+        links: [
+          { label: 'Resilience', href: routes.sectors.resilience },
+          { label: 'Compliance', href: routes.sectors.compliance },
           { label: 'Digitalization', href: routes.sectors.digitalization },
         ],
       },
@@ -69,17 +75,14 @@ export default {
     email: 'hello@predicterra.com',
   },
 
+  // Footer from the home brief (November 2026). "Methodology (PDF)" stays hidden
+  // until the PDF exists; "Cookie settings" waits for the cookie banner.
   footer: {
-    tagline: 'The physical world, modeled for the infrastructure that matters most.',
+    tagline: 'The Cognitive Twin for energy',
     columns: [
       {
         title: 'Platform',
-        links: [
-          { label: 'How it works', href: routes.platform },
-          { label: 'Solutions', href: routes.solutions },
-          { label: 'Success stories', href: routes.cases },
-          { label: 'Explore on Azure', href: external.azure, external: true },
-        ],
+        links: [{ label: 'Platform', href: routes.platform }],
       },
       {
         title: 'Sectors',
@@ -87,36 +90,67 @@ export default {
           { label: 'Grid', href: routes.sectors.grid },
           { label: 'Solar', href: routes.sectors.solar },
           { label: 'Wind', href: routes.sectors.wind },
-          { label: 'Oil & gas', href: routes.sectors.oilGas },
-          { label: 'Climate & resilience', href: routes.sectors.climate },
+          { label: 'Oil & Gas', href: routes.sectors.oilGas },
+        ],
+      },
+      {
+        title: 'Solutions',
+        links: [
+          { label: 'Resilience', href: routes.sectors.resilience },
+          { label: 'Compliance', href: routes.sectors.compliance },
           { label: 'Digitalization', href: routes.sectors.digitalization },
         ],
       },
       {
         title: 'Company',
         links: [
+          { label: 'Cases', href: routes.cases },
           { label: 'About', href: routes.about },
           { label: 'Contact', href: routes.contact },
-          { label: 'LinkedIn', href: external.linkedin, external: true },
+        ],
+      },
+      {
+        title: 'Legal',
+        links: [
+          { label: 'Legal notice', href: routes.legal },
+          { label: 'Privacy', href: routes.privacy },
+          { label: 'Cookies', href: routes.cookies },
         ],
       },
     ],
     contact: {
-      title: 'Contact',
+      address: 'BAT Acceleration Tower, Gran Vía 1, 48001 Bilbao',
       email: 'hello@predicterra.com',
       phones: [
         { label: 'EU', value: '+34 900 752 605', href: 'tel:+34900752605' },
-        { label: 'USA', value: '+1 929 323 2391', href: 'tel:+19293232391' },
+        { label: 'USA', value: '+1 929-323-2391', href: 'tel:+19293232391' },
       ],
-      address: ['BAT Tower, Gran Vía 1', '48001 Bilbao, Bizkaia, Spain'],
+      linkedin: { label: 'LinkedIn', href: external.linkedin },
     },
-    compliance: ['GDPR', 'CCPA'],
-    copyright: '© 2026 Predicterra SL. All rights reserved.',
+    copyright: '© 2026 Predicterra SL',
     builtBy: 'Built by',
     builtByName: 'Woza Labs',
-    legal: [
-      { label: 'Privacy', href: routes.privacy },
-      { label: 'Legal', href: routes.legal },
+  },
+
+  // 404 (from the brief).
+  notFound: {
+    title: 'This page isn’t in the model.',
+    text: 'The page you’re looking for doesn’t exist or has moved. Everything else is still running.',
+    primary: { label: 'Back to home', href: routes.home },
+    secondary: { label: 'Request a demo', href: routes.demo },
+    links: [
+      { label: 'Platform', href: routes.platform },
+      { label: 'Grid', href: routes.sectors.grid },
+      { label: 'Solar', href: routes.sectors.solar },
+      { label: 'Wind', href: routes.sectors.wind },
+      { label: 'Oil & Gas', href: routes.sectors.oilGas },
     ],
+  },
+
+  // Comparison switch between the current home and the new content.
+  compare: {
+    label: 'Home',
+    current: 'Current',
+    next: 'New content',
   },
 };

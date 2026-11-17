@@ -1,0 +1,205 @@
+---
+/**
+ * Legal notice, Privacy policy and Cookie policy: one quiet reading layout.
+ * Title on the left (sticky on desktop), numbered blocks on the right.
+ * Templates with bracketed fields, so the pages stay out of search for now.
+ */
+import PageLayout from '../../layouts/PageLayout.astro';
+import type { LegalDoc } from '../../i18n/en/legal';
+import type { Locale } from '../../i18n/config';
+
+interface Props {
+  doc: LegalDoc;
+  locale?: Locale;
+}
+const { doc, locale = 'en' } = Astro.props;
+const pad = (n: number) => String(n).padStart(3, '0');
+---
+
+<PageLayout title={doc.seo.title} description={doc.seo.description} locale={locale} noindex>
+  <article class="lg" aria-labelledby="page-title">
+    <div class="container lg__grid">
+      <header class="lg__head">
+        <h1 id="page-title" class="lg__title">{doc.title}</h1>
+        <p class="lg__updated t-small">{doc.updated}</p>
+      </header>
+
+      <div class="lg__body">
+        {
+          doc.blocks.map((b, i) => (
+            <section class="lg__block">
+              <h2 class="lg__h">
+                <span class="pg-idx">{pad(i + 1)}</span>
+                <span>{b.title}</span>
+              </h2>
+              {b.paragraphs?.map((p) => <p class="lg__p">{p}</p>)}
+              {b.facts && (
+                <dl class="lg__facts">
+                  {b.facts.map((x) => (
+                    <div class="lg__fact">
+                      <dt class="t-small">{x.label}</dt>
+                      <dd>{x.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {b.table && (
+                <div class="lg__scroll">
+                  <table class="lg__table">
+                    <thead>
+                      <tr>{b.table.head.map((h) => <th scope="col">{h}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                      {b.table.rows.map((r) => (
+                        <tr>{r.map((cell) => <td>{cell}</td>)}</tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </article>
+</PageLayout>
+
+<style>
+  .lg {
+    padding-top: calc(var(--header-h) + clamp(3rem, 1.5rem + 8vh, 8rem));
+    padding-bottom: var(--pg-y);
+  }
+
+  .lg__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem clamp(3rem, 1rem + 6vw, 8rem);
+  }
+
+  @media (min-width: 64rem) {
+    .lg__grid {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+      align-items: start;
+    }
+    .lg__head {
+      position: sticky;
+      top: calc(var(--header-h) + 3rem);
+    }
+  }
+
+  .lg__head {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .lg__title {
+    font-size: var(--pg-hero);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+
+  .lg__updated {
+    color: var(--muted);
+  }
+
+  .lg__body {
+    display: grid;
+    max-width: 46rem;
+  }
+
+  .lg__block {
+    display: grid;
+    gap: 1rem;
+    padding-block: 1.5rem 2.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .lg__h {
+    display: grid;
+    gap: 0.75rem;
+    font-size: var(--fs-h4);
+    line-height: 1.25;
+    letter-spacing: var(--track-title);
+  }
+
+  .lg__p {
+    max-width: 65ch;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  .lg__facts {
+    display: grid;
+  }
+
+  .lg__fact {
+    display: grid;
+    gap: 0.25rem 1.5rem;
+    padding-block: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .lg__fact:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .lg__fact {
+      grid-template-columns: 11rem minmax(0, 1fr);
+    }
+  }
+
+  .lg__fact dt {
+    color: var(--muted);
+  }
+
+  .lg__scroll {
+    overflow-x: auto;
+  }
+
+  .lg__table {
+    width: 100%;
+    min-width: 32rem;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .lg__table th {
+    padding: 0 1rem 0.75rem 0;
+    font-size: var(--fs-small);
+    font-weight: inherit;
+    color: var(--muted);
+  }
+
+  .lg__table td {
+    padding: 0.875rem 1rem 0.875rem 0;
+    vertical-align: top;
+    color: var(--ink-2);
+    border-top: 1px solid var(--line);
+  }
+
+  /* Phones: each row stacks (purpose above its basis) instead of scrolling sideways. */
+  @media (max-width: 40rem) {
+    .lg__table {
+      min-width: 0;
+    }
+    .lg__table thead {
+      display: none;
+    }
+    .lg__table tr {
+      display: grid;
+      gap: 0.25rem;
+      padding-block: 0.875rem;
+      border-top: 1px solid var(--line);
+    }
+    .lg__table td {
+      padding: 0;
+      border-top: 0;
+    }
+    .lg__table td:first-child {
+      color: var(--ink);
+    }
+  }
+</style>

@@ -1,23 +1,16 @@
 ---
 /**
- * The four sector pages (Grid, Solar, Wind, Oil & Gas) share one structure from
- * the briefs; each brings its own copy, hero layout and the side its context
- * photo sits on, so they don't read as copies of each other.
- *
- * hero · quick proof · the decade ahead · what it models (sticky chain) · four
- * teams (pinned, sideways) · works with what you have (dark, slides over) ·
- * results · one system · how to start · CTA
+ * Grid, Solar, Wind and Oil & Gas share one short structure from the briefs:
+ * hero (the sector's asset from the homepage 3D scene) · metrics · what we do
+ * (and its use cases) · why Predicterra · claim and CTA. Each section opens a
+ * different way (side, centred), with plenty of air between them.
  */
 import PageLayout from '../../layouts/PageLayout.astro';
 import PageHero from './PageHero.astro';
 import Stats from './Stats.astro';
-import Context from './Context.astro';
-import Models from './Models.astro';
-import Teams from './Teams.astro';
-import WorksWith from './WorksWith.astro';
-import Results from './Results.astro';
-import OneSystem from './OneSystem.astro';
-import Steps from './Steps.astro';
+import SectionHead from './SectionHead.astro';
+import Cards from './Cards.astro';
+import AssetView from '../../components/AssetView.astro';
 import Cta from '../home/Cta.astro';
 import type { SectorCopy } from './types';
 import type { Locale } from '../../i18n/config';
@@ -25,20 +18,76 @@ import type { Locale } from '../../i18n/config';
 interface Props {
   locale?: Locale;
   copy: SectorCopy;
-  contextSide?: 'right' | 'left';
+  /** Which side the asset sits on, so the four pages don't open identically. */
+  layout?: 'split' | 'split-reverse';
 }
-const { locale = 'en', copy: c, contextSide = 'right' } = Astro.props;
+const { locale = 'en', copy: c, layout = 'split' } = Astro.props;
+const pad = (n: number) => String(n).padStart(3, '0');
 ---
 
 <PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
-  <PageHero locale={locale} {...c.hero} logos={c.logos} />
-  <Stats locale={locale} items={c.proof.items} backing={c.proof.backing} />
-  <Context id="ahead-title" {...c.ahead} side={contextSide} />
-  <Models id="models-title" {...c.models} />
-  <Teams id="teams-title" title={c.teams.title} items={c.teams.items} cover />
-  <WorksWith id="works-title" {...c.works} cover />
-  <Results id="results-title" {...c.results} />
-  <OneSystem locale={locale} id="system-title" {...c.system} />
-  <Steps locale={locale} id="start-title" {...c.start} />
-  <Cta locale={locale} copy={c.cta} />
+  <PageHero locale={locale} {...c.hero} layout={layout}>
+    <AssetView slot="visual" asset={c.asset} />
+  </PageHero>
+
+  <Stats locale={locale} items={c.metrics.items} backing={c.metrics.backing} link={c.metrics.link} />
+
+  <section class="sw pg-sec" aria-labelledby="what-title">
+    <div class="container pg-body">
+      <SectionHead id="what-title" title={c.what.title} text={c.what.text} align="side" />
+      <ul class="sw__uses" aria-label="Use cases" data-reveal-group>
+        {
+          c.what.uses.map((u, i) => (
+            <li class="sw__use" data-reveal>
+              <span class="pg-idx">{pad(i + 1)}</span>
+              <span class="sw__name">{u}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <Cards id="why-title" title={c.why.title} items={c.why.items} cols={4} head="center" wide />
+
+  <div class="sw-cta">
+    <Cta locale={locale} copy={c.cta} />
+  </div>
 </PageLayout>
+
+<style>
+  /* Use cases: a quiet grid of short lines, each on its own hairline. */
+  .sw__uses {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: var(--gutter);
+  }
+
+  @media (min-width: 40rem) {
+    .sw__uses {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .sw__uses {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .sw__use {
+    display: grid;
+    align-content: start;
+    gap: 1.25rem;
+    min-height: 7.5rem;
+    padding-block: 1rem 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .sw__name {
+    max-width: 18ch;
+    font-size: var(--fs-h4);
+    line-height: 1.25;
+    letter-spacing: var(--track-title);
+  }
+</style>

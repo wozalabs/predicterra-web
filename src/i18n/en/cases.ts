@@ -146,4 +146,4 @@ export default {
   },
 };
 
-export const casePath = (slug: string) => `${routes.cases}/${slug}`;
+export const casePath = (slug: string) => `${routes.stories}/${slug}`;

@@ -1,0 +1,73 @@
+---
+/**
+ * The sector's asset from the homepage 3D scene (white, the part at risk in
+ * orange), turning slowly. Same builders, materials and light as the 3D section
+ * (scripts/sector-scene/asset-preview.ts). three.js loads only when the view is
+ * near the screen, and the turning stops while it is out of sight. Without
+ * WebGL it stays a plain canvas-coloured panel.
+ */
+interface Props {
+  asset: 'grid' | 'substation' | 'solar' | 'wind' | 'oilgas';
+  class?: string;
+}
+const { asset, class: className } = Astro.props;
+---
+
+<div class:list={['av', className]} data-asset-view={asset}>
+  <canvas class="av__canvas" aria-hidden="true"></canvas>
+</div>
+
+<style>
+  .av {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 20rem;
+    overflow: hidden;
+    background: #fafafa;
+  }
+
+  .av__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 900ms var(--ease-out);
+  }
+
+  .av__canvas[data-ready] {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  import type { SectorId } from '../scripts/sector-scene/world';
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-asset-view]').forEach((el) => {
+    const canvas = el.querySelector<HTMLCanvasElement>('canvas')!;
+    const id = el.dataset.assetView as SectorId;
+    let mod: typeof import('../scripts/sector-scene/asset-preview') | null = null;
+    let on = false;
+    const start = () => {
+      if (!mod) return;
+      mod.showPreview(id, canvas, { reducedMotion: reduce });
+      canvas.dataset.ready = '';
+    };
+    new IntersectionObserver(
+      async ([e]) => {
+        on = e.isIntersecting;
+        if (on && !mod) mod = await import('../scripts/sector-scene/asset-preview');
+        if (on) start();
+        else mod?.hidePreview();
+      },
+      { rootMargin: '200px 0px' },
+    ).observe(el);
+    let t = 0;
+    new ResizeObserver(() => {
+      clearTimeout(t);
+      t = window.setTimeout(() => on && start(), 120);
+    }).observe(el);
+  });
+</script>

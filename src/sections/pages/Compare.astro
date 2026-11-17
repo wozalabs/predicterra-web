@@ -7,7 +7,7 @@
  *    (descriptive → physical → cognitive twin)
  * The closing line, if any, is lit word by word under it.
  */
-import NotchRule from '../../components/NotchRule.astro';
+import SectionHead from './SectionHead.astro';
 import Icon from '../../components/Icon.astro';
 
 interface Props {
@@ -21,30 +21,16 @@ interface Props {
   variant?: 'table' | 'steps';
   dark?: boolean;
   rule?: number;
+  head?: 'center' | 'stack' | 'side';
 }
-const { id, title, text, columns, rows, closing, support, variant = 'table', dark = false, rule = 70 } = Astro.props;
+const { id, title, text, columns, rows, closing, support, variant = 'table', dark = false, head = 'side' } = Astro.props;
 const hi = columns.length - 1;
-const texts = text ? (Array.isArray(text) ? text : [text]) : [];
 ---
 
-<section class:list={['cp pg-sec pg-sec--full', `cp--${variant}`]} aria-labelledby={id} data-dark={dark ? '' : undefined}>
+<section class:list={['cp pg-sec', `cp--${variant}`]} aria-labelledby={id} data-dark={dark ? '' : undefined}>
   <div class="container">
-    <NotchRule at={rule} />
     <div class="pg-body">
-      <div class="pg-grid">
-        <h2 id={id} class="t-h2 pg-title" data-render>{title}</h2>
-        {
-          texts.length > 0 && (
-            <div class="cp__text" data-reveal-group>
-              {texts.map((t) => (
-                <p class="pg-lead" data-reveal>
-                  {t}
-                </p>
-              ))}
-            </div>
-          )
-        }
-      </div>
+      <SectionHead id={id} title={title} text={text} align={head} />
 
       {
         variant === 'table' ? (

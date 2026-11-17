@@ -1,6 +1,6 @@
 ---
 /**
- * Inner pages (Platform, Solutions, sectors, Climate, Digitalization): the base
+ * Inner pages: the base
  * layout plus one scrubbed surface around the content, so the whole page turns
  * dark while a [data-dark] section is in view, and the shared page styles.
  */
@@ -13,11 +13,12 @@ interface Props {
   description: string;
   locale?: Locale;
   jsonLd?: Record<string, unknown>[];
+  noindex?: boolean;
 }
-const { title, description, locale = 'en', jsonLd } = Astro.props;
+const { title, description, locale = 'en', jsonLd, noindex = false } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} locale={locale} jsonLd={jsonLd}>
+<BaseLayout title={title} description={description} locale={locale} jsonLd={jsonLd} noindex={noindex}>
   <div class="pg theme-scrub" data-pg data-header-dark="scrub">
     <slot />
   </div>

@@ -1,0 +1,160 @@
+---
+/**
+ * New home: "One model. Every team." Dark, it slides over the pinned 3D stage
+ * like the current home's Solutions section, and the page is scrubbed from
+ * light to dark around it (scripts/theme-scrub.ts).
+ */
+import NotchRule from '../../components/NotchRule.astro';
+import { getCopy, localizePath, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { teams } = getCopy(locale).homeNew;
+const pad = (n: number) => String(n).padStart(3, '0');
+---
+
+<section
+  class="nh-teams theme-scrub"
+  id="teams"
+  aria-labelledby="teams-title"
+  data-theme-dark
+  data-header-dark="scrub"
+>
+  <div class="container nh-teams__inner">
+    <NotchRule at={70} />
+    <div class="nh-teams__head">
+      <h2 id="teams-title" class="t-h2" data-render>{teams.title}</h2>
+    </div>
+
+    <ol class="nh-teams__list" data-reveal-group>
+      {
+        teams.items.map((t, i) => (
+          <li class="nh-team" data-reveal>
+            <span class="nh-team__i t-small t-num">{pad(i + 1)}</span>
+            <h3 class="nh-team__name">{t.team}</h3>
+            <p class="nh-team__horizon t-small">{t.horizon}</p>
+            <p class="nh-team__gets">{t.gets}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <ul class="nh-teams__links" data-reveal>
+      {
+        teams.links.map((l) => (
+          <li>
+            <a href={localizePath(l.href, locale)}>
+              {l.label}
+              <span class="nh-teams__sq" aria-hidden="true" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .nh-teams {
+    position: relative;
+    z-index: var(--z-cover);
+    margin-top: -100svh;
+    box-shadow: 0 -24px 48px -24px rgb(30 30 30 / 0.14);
+  }
+
+  .nh-teams__inner {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3rem, 2rem + 4vw, 6rem);
+    min-height: 100svh;
+    padding-top: calc(var(--header-h) + 1rem);
+    padding-bottom: clamp(3rem, 2rem + 3vw, 5rem);
+  }
+
+  .nh-teams__head {
+    padding-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
+  }
+
+  .nh-teams__list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 var(--gutter);
+    margin-top: auto;
+  }
+
+  @media (min-width: 48rem) {
+    .nh-teams__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .nh-teams__list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .nh-team {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+    padding-block: 1.25rem 2.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .nh-team__i {
+    margin-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
+    color: var(--accent);
+  }
+
+  .nh-team__name {
+    font-size: var(--fs-h3);
+    line-height: 1.15;
+    letter-spacing: var(--track-title);
+  }
+
+  .nh-team__horizon {
+    color: var(--muted);
+  }
+
+  .nh-team__gets {
+    max-width: 30ch;
+    margin-top: 0.75rem;
+    color: var(--ink-2);
+  }
+
+  .nh-teams__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2rem;
+  }
+
+  .nh-teams__links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+    transition: color 160ms ease;
+  }
+
+  .nh-teams__sq {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--accent);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nh-teams__links a:hover {
+      color: var(--accent);
+    }
+  }
+</style>
+
+<script>
+  import { mountThemeScrub } from '../../scripts/theme-scrub';
+  mountThemeScrub();
+</script>

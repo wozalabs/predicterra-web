@@ -1,25 +1,93 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+/**
+ * 404, from "predicterra-16-404.md": the model doesn't know this page, the
+ * rest of the system is still running.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
 import Button from '../components/Button.astro';
-import { withBase } from '../i18n/config';
+import { getCopy, localizePath } from '../i18n/config';
+
+const locale = 'en';
+const { notFound: nf } = getCopy(locale).common;
 ---
 
-<BaseLayout title="Page not found | Predicterra" description="This page does not exist yet." noindex>
-  <section class="nf container">
-    <p class="label">404</p>
-    <h1 class="t-h2">This page is not built yet.</h1>
-    <p class="t-lead t-muted">The new Predicterra site is growing section by section.</p>
-    <Button href={withBase('/')} label="Back to home" />
+<PageLayout title="Page not found | Predicterra" description={nf.text} locale={locale} noindex>
+  <section class="nf" aria-labelledby="page-title">
+    <div class="container nf__inner">
+      <p class="nf__code t-num" aria-hidden="true">404</p>
+      <h1 id="page-title" class="nf__title">{nf.title}</h1>
+      <p class="nf__text">{nf.text}</p>
+      <div class="nf__actions">
+        <Button href={localizePath(nf.primary.href, locale)} label={nf.primary.label} size="lg" />
+        <Button href={localizePath(nf.secondary.href, locale)} label={nf.secondary.label} size="lg" variant="secondary" />
+      </div>
+      <ul class="nf__links">
+        {nf.links.map((l) => <li><a href={localizePath(l.href, locale)}>{l.label}</a></li>)}
+      </ul>
+    </div>
   </section>
-</BaseLayout>
+</PageLayout>
 
 <style>
-  .nf {
+  .nf__inner {
     display: grid;
-    justify-items: start;
-    gap: 1.5rem;
-    min-height: 80svh;
+    justify-items: center;
     align-content: center;
-    padding-top: var(--header-h);
+    gap: 1.5rem;
+    min-height: 100svh;
+    padding-block: calc(var(--header-h) + 3rem) 4rem;
+    text-align: center;
+  }
+
+  .nf__code {
+    font-size: clamp(5rem, 3rem + 9vw, 12rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: var(--accent);
+  }
+
+  .nf__title {
+    max-width: 18ch;
+    font-size: var(--pg-hero);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .nf__text {
+    max-width: 44ch;
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .nf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .nf__links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 1.5rem;
+    margin-top: 1.5rem;
+    color: var(--ink-2);
+  }
+
+  .nf__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    transition: color 160ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nf__links a:hover {
+      color: var(--accent);
+    }
   }
 </style>
