@@ -10,8 +10,6 @@ export default {
     closeMenu: 'Close menu',
     demo: 'Request a demo',
     navLabel: 'Main',
-    font: 'Font',
-    fontLabel: 'Typeface (test)',
     toLight: 'Switch to light theme',
     toDark: 'Switch to dark theme',
     nav: [
@@ -78,6 +76,7 @@ export default {
       cutout: 'Cutout',
       pixel: 'Pixel',
       clean: 'Clean',
+      app: 'App',
     },
     email: 'hello@predicterra.com',
   },

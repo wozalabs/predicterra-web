@@ -549,14 +549,16 @@ html[data-scene='overview'] [data-sectors='trail'] {
 }
 
 /* ---------- Hero layout test switch (menu) ---------- */
-/* Clean is the default (also without JavaScript); the others are test layouts. */
+/* App is the default (also without JavaScript); the others are test layouts. */
 [data-hero-variant='cutout'],
 [data-hero-variant='pixel'],
-[data-hero-variant='clean'] {
+[data-hero-variant='clean'],
+[data-hero-variant='app'] {
   display: none;
 }
-html:not([data-hero]) [data-hero-variant='clean'],
+html:not([data-hero]) [data-hero-variant='app'],
 html[data-hero='clean'] [data-hero-variant='clean'],
+html[data-hero='app'] [data-hero-variant='app'],
 html[data-hero='cutout'] [data-hero-variant='cutout'],
 html[data-hero='pixel'] [data-hero-variant='pixel'] {
   display: block;

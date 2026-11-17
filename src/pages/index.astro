@@ -4,7 +4,9 @@ import Hero from '../sections/home/Hero.astro';
 import HeroCutout from '../sections/home/HeroCutout.astro';
 import HeroPixel from '../sections/home/HeroPixel.astro';
 import HeroClean from '../sections/home/HeroClean.astro';
+import HeroApp from '../sections/home/HeroApp.astro';
 import Claim from '../sections/home/Claim.astro';
+import Showcase from '../sections/home/Showcase.astro';
 import SectorTrail from '../sections/home/SectorTrail.astro';
 import SectorScene from '../sections/home/SectorScene.astro';
 import Solutions from '../sections/home/Solutions.astro';
@@ -26,11 +28,14 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   locale={locale}
   jsonLd={[softwareJsonLd(site, home.seo.description)]}
 >
+  <!-- Default hero: title centred, the platform capture peeking up from the bottom. -->
+  <HeroApp locale={locale} />
   <Hero locale={locale} />
   <!-- Test only: cutout hero, shown when selected in the menu (Hero layout). -->
   <HeroCutout locale={locale} />
   <HeroPixel locale={locale} />
   <HeroClean locale={locale} />
+  <Showcase locale={locale} peek />
   <Claim locale={locale} />
   <SectorTrail locale={locale} />
   <!-- Test only: previous 3D variant, shown when selected in the menu (3D view). -->

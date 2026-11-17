@@ -7,6 +7,15 @@ export default {
       'Predicterra turns satellite, weather and sensor data into asset-level foresight for grid, solar, wind and oil & gas operators. See the physical future of your assets before it happens.',
   },
 
+  // Platform capture between the hero and the 3D section (both homes).
+  showcase: {
+    label: 'The Predicterra platform',
+    alt: 'The Predicterra platform: an asset list, satellite view of a transmission tower in Zamora with a wind-speed forecast, and the tower’s risk panel with flood, economic and wildfire scores.',
+    src: '/showcase/predicterra-app',
+    w: 3000,
+    h: 1600,
+  },
+
   hero: {
     eyebrow: 'Asset foresight for energy',
     titleLine1: 'Foresight infrastructure',

@@ -9,6 +9,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import VideoHero from '../sections/pages/VideoHero.astro';
 import SectorTrail from '../sections/home/SectorTrail.astro';
 import Intro from '../sections/home-new/Intro.astro';
+import Showcase from '../sections/home/Showcase.astro';
 import Teams from '../sections/home-new/Teams.astro';
 import Figures from '../sections/home-new/Figures.astro';
 import Proof from '../sections/home-new/Proof.astro';
@@ -23,6 +24,7 @@ const { homeNew: h } = getCopy(locale);
 
 <BaseLayout title={h.seo.title} description={h.seo.description} locale={locale} noindex>
   <VideoHero locale={locale} {...h.hero} logos={[...h.logos]} />
+  <Showcase locale={locale} />
   <Intro locale={locale} />
   <SectorTrail locale={locale} scene={h.scene} />
   <Teams locale={locale} />

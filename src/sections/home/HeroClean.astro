@@ -154,6 +154,13 @@ const { video, clean } = hero;
   }
 
   /* Logos row: a hairline, then the marks in white */
+  /* Copy and logos stay above the platform capture that peeks in from below
+     (Showcase.astro sits at z-index cover). */
+  .hcl__content,
+  .hcl__logos {
+    z-index: calc(var(--z-cover) + 1);
+  }
+
   .hcl__logos {
     position: absolute;
     left: 0;

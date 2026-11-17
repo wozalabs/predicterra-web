@@ -1,0 +1,306 @@
+---
+/**
+ * Platform capture under the hero, centred. It arrives tilted back and
+ * straightens as it reaches the middle of the viewport (scroll-linked, see the
+ * script below). Reduced motion: shown flat, no movement.
+ *
+ * `peek` (homepage only): with the App hero layout (the default) the capture
+ * is pulled up into the bottom of the hero, barely tilted, so it is already in
+ * view on load.
+ */
+import { getCopy, withBase, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+  peek?: boolean;
+}
+const { locale = 'en', peek = false } = Astro.props;
+const { showcase: s } = getCopy(locale).home;
+const src = (w: number) => withBase(`${s.src}-${w}.webp`);
+---
+
+<section class="sc" aria-label={s.label} data-showcase data-peek={peek ? '' : undefined}>
+  {peek && <canvas class="sc__dither" aria-hidden="true" data-dither />}
+  <div class="container sc__stage">
+    <figure class="sc__frame" data-showcase-frame>
+      <img
+        src={src(1600)}
+        srcset={`${src(960)} 960w, ${src(1600)} 1600w, ${src(2400)} 2400w`}
+        sizes="(min-width: 80rem) 76rem, (min-width: 48rem) calc(100vw - 4rem), 150vw"
+        alt={s.alt}
+        width={s.w}
+        height={s.h}
+        decoding="async"
+      />
+    </figure>
+  </div>
+</section>
+
+<style>
+  .sc {
+    /* 0 = tilted back, 1 = flat and centred in the viewport. */
+    --p: 0;
+    --q: calc(1 - var(--p));
+    /* How far the capture is pulled up over the hero (App hero layout only). */
+    --peek: 0px;
+    position: relative;
+    z-index: var(--z-cover);
+    margin-top: calc(-1 * var(--peek));
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem);
+    overflow-x: clip;
+    /* Transparent where it overlaps the hero, page canvas below. */
+    background: linear-gradient(180deg, transparent var(--peek), var(--canvas) var(--peek));
+    pointer-events: none;
+  }
+
+  /* App hero: pulled up into the bottom of the hero, only a slight tilt, and
+     it rises into place on load after the title. */
+  :global(html[data-hero='app']) .sc[data-peek] {
+    --peek: var(--hero-peek);
+    --tilt: 6deg;
+    padding-top: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html[data-hero='app']) .sc[data-peek] .sc__stage {
+      animation: sc-rise 1300ms cubic-bezier(0.19, 1, 0.22, 1) 520ms both;
+    }
+  }
+
+  @keyframes sc-rise {
+    from {
+      opacity: 0;
+      transform: translateY(6rem);
+    }
+  }
+
+  /* App hero: an ordered-dither gradient behind the capture, densest along an
+     arc (the bottom of the first screen in the middle, higher at the edges)
+     and thinning out above and below it. It breaks up into bits as the page
+     scrolls. Drawn by the script; the hero's copy sits above it. */
+  .sc__dither {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: calc(-1 * var(--peek));
+    width: 100%;
+    height: calc(3 * var(--peek));
+    pointer-events: none;
+  }
+
+  :global(html[data-hero='app']) .sc[data-peek] .sc__dither {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html[data-hero='app']) .sc[data-peek] .sc__dither {
+      animation: sc-fade 1400ms ease 300ms both;
+    }
+  }
+
+  @keyframes sc-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .sc__stage {
+    position: relative;
+    perspective: 1600px;
+    perspective-origin: 50% 30%;
+  }
+
+  .sc__frame {
+    position: relative;
+    max-width: 76rem;
+    margin-inline: auto;
+    background: #161616;
+    box-shadow:
+      0 0 0 1px rgb(241 241 241 / 0.12),
+      0 30px 80px -20px rgb(0 0 0 / 0.55);
+    transform-origin: 50% 100%;
+    transform: rotateX(calc(var(--q) * var(--tilt, 22deg))) scale(calc(1 - var(--q) * 0.06));
+    will-change: transform;
+  }
+
+  .sc__frame img {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Phones: wider than the screen, cropped at the sides, so the interface
+     stays legible instead of shrinking to a thumbnail. */
+  @media (max-width: 47.99rem) {
+    .sc__frame {
+      width: 150vw;
+      max-width: none;
+      margin-left: calc(50% - 75vw);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sc {
+      --p: 1 !important;
+    }
+    .sc__frame {
+      will-change: auto;
+    }
+  }
+</style>
+
+<script>
+  import { onThemeChange } from '../../scripts/theme';
+
+  /* ---------- Dither gradient (App hero) ---------- */
+  const dither = document.querySelector<HTMLCanvasElement>('[data-dither]');
+  if (dither) {
+    // 8×8 Bayer matrix, thresholds 0..1.
+    const B = [0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21].map((v) => (v + 0.5) / 64);
+    const CELL = 4; // CSS px per dither cell
+    const DOT = 2; // CSS px dot inside it
+    const MAX = 0.42; // peak density
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const smooth = (a: number, b: number, x: number) => {
+      const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+      return t * t * (3 - 2 * t);
+    };
+    // Stable pseudo-random value per cell (0..1), for the dissolve.
+    const hash = (x: number, y: number) => {
+      let h = (x * 374761393 + y * 668265263) | 0;
+      h = Math.imul(h ^ (h >>> 13), 1274126177);
+      return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+    };
+
+    const ctx = dither.getContext('2d');
+    let xs = new Float32Array(0);
+    let ys = new Float32Array(0);
+    let rs = new Float32Array(0);
+    let count = 0;
+    let colour = '#363636';
+    let shown = -1;
+
+    // Which cells are on. The canvas spans 3 peeks: it starts one peek above
+    // the section, whose top sits one peek above the bottom of the first
+    // screen. The band of dots follows an arc: lowest in the middle (behind
+    // the capture), rising towards the edges.
+    const build = () => {
+      if (!ctx || getComputedStyle(dither).display === 'none') return false;
+      const w = dither.clientWidth;
+      const h = dither.clientHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dither.width = Math.round(w * dpr);
+      dither.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      colour = getComputedStyle(dither).getPropertyValue('--hero-dither').trim() || '#363636';
+      const peek = h / 3;
+      const centre = 2 * peek; // the bottom of the first screen
+      const rise = 0.85 * peek; // how much higher the band sits at the edges
+      const above = 0.75 * peek; // fade-in height above the densest line
+      const below = 1.0 * peek; // fade-out depth below it
+      const cols = Math.ceil(w / CELL);
+      const rows = Math.ceil(h / CELL);
+      const max = cols * rows;
+      if (xs.length < max) {
+        xs = new Float32Array(max);
+        ys = new Float32Array(max);
+        rs = new Float32Array(max);
+      }
+      count = 0;
+      for (let c = 0; c < cols; c++) {
+        const u = (c * CELL + CELL / 2) / w * 2 - 1;
+        const line = centre - rise * u * u;
+        for (let r = 0; r < rows; r++) {
+          const y = r * CELL;
+          const d = y < line ? MAX * smooth(line - above, line, y) : MAX * (1 - smooth(line, line + below, y));
+          if (d > 0.004 && B[(r % 8) * 8 + (c % 8)] < d) {
+            xs[count] = c * CELL + 1;
+            ys[count] = y + 1;
+            rs[count] = hash(c, r);
+            count++;
+          }
+        }
+      }
+      return true;
+    };
+
+    // s: 0 = all dots, 1 = none. Dots drop out in random order (dissolve).
+    const render = (s: number) => {
+      if (!ctx) return;
+      shown = s;
+      ctx.clearRect(0, 0, dither.width, dither.height);
+      ctx.fillStyle = colour;
+      for (let i = 0; i < count; i++) if (rs[i] >= s) ctx.fillRect(xs[i], ys[i], DOT, DOT);
+    };
+
+    const amount = () => (reduce ? 0 : Math.round(Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.5))) * 40) / 40);
+    const redraw = () => {
+      if (build()) render(amount());
+    };
+
+    let raf = 0;
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (raf || !count) return;
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          const s = amount();
+          if (s !== shown) render(s);
+        });
+      },
+      { passive: true },
+    );
+    redraw();
+    let t = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(t);
+      t = window.setTimeout(redraw, 120);
+    });
+    onThemeChange(redraw);
+    window.addEventListener('hero:change', () => requestAnimationFrame(redraw));
+  }
+
+  /* ---------- Scroll: tilt → flat ---------- */
+  const section = document.querySelector<HTMLElement>('[data-showcase]');
+  const frame = section?.querySelector<HTMLElement>('[data-showcase-frame]');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (section && frame && !reduce.matches) {
+    const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+    const smooth = (t: number) => t * t * (3 - 2 * t);
+    let raf = 0;
+    let last = -1;
+
+    // p runs from 0 when the frame's top enters the viewport (or at the top of
+    // the page, when it is already in view) to 1 when the frame is centred.
+    const update = () => {
+      raf = 0;
+      const vh = window.innerHeight;
+      const top = section.getBoundingClientRect().top + window.scrollY + frame.offsetTop; // untransformed
+      const h = frame.offsetHeight;
+      const start = Math.max(0, top - vh);
+      const end = Math.max(start + 1, top - Math.max(0, (vh - h) / 2));
+      const p = Math.round(smooth(clamp01((window.scrollY - start) / (end - start))) * 1000) / 1000;
+      if (p === last) return;
+      last = p;
+      section.style.setProperty('--p', String(p));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+
+    // Only listen while the showcase is near the viewport.
+    new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) window.addEventListener('scroll', onScroll, { passive: true });
+        else window.removeEventListener('scroll', onScroll);
+        update();
+      },
+      { rootMargin: '25% 0px' },
+    ).observe(section);
+    window.addEventListener('resize', onScroll, { passive: true });
+    // The hero layout switch changes where the frame starts.
+    window.addEventListener('hero:change', () => requestAnimationFrame(update));
+    update();
+  }
+</script>

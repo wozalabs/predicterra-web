@@ -1,5 +1,4 @@
 ---
-import { testFonts, FONT_KEY } from '../data/fonts';
 import '../styles/global.css';
 import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url';
 import SiteHeader from '../components/SiteHeader.astro';
@@ -66,11 +65,11 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
       try {
         var scene = localStorage.getItem('predicterra:scene');
         if (scene === 'overview') document.documentElement.dataset.scene = 'overview';
-        // Clean is the default hero. New key: earlier saved choices are ignored.
-        var hero = localStorage.getItem('predicterra:hero');
-        document.documentElement.dataset.hero = ['centred', 'split', 'cutout', 'pixel'].indexOf(hero) > -1 ? hero : 'clean';
+        // App is the default hero. New key: earlier saved choices are ignored.
+        var hero = localStorage.getItem('predicterra:hero-v3');
+        document.documentElement.dataset.hero = ['centred', 'split', 'cutout', 'pixel', 'clean'].indexOf(hero) > -1 ? hero : 'app';
       } catch (e) {
-        document.documentElement.dataset.hero = 'clean';
+        document.documentElement.dataset.hero = 'app';
       }
       // The header animates in on the first page of a visit only, not on every navigation.
       try {
@@ -80,33 +79,6 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
 
     </script>
 
-    <!-- Test switch (header): global typeface. Runs before paint. -->
-    <script is:inline define:vars={{ testFonts, FONT_KEY }}>
-      window.predicterraFont = function (id) {
-        var f = testFonts.filter(function (x) { return x.id === id; })[0] || testFonts[0];
-        var root = document.documentElement;
-        if (!f.href) {
-          root.style.removeProperty('--font-sans');
-          delete root.dataset.font;
-        } else {
-          if (!document.getElementById('gf-' + f.id)) {
-            var l = document.createElement('link');
-            l.id = 'gf-' + f.id;
-            l.rel = 'stylesheet';
-            l.href = f.href;
-            document.head.appendChild(l);
-          }
-          root.style.setProperty('--font-sans', f.stack);
-          root.dataset.font = f.id;
-        }
-        try { localStorage.setItem(FONT_KEY, f.id); } catch (e) {}
-        return f.id;
-      };
-      try {
-        var saved = localStorage.getItem(FONT_KEY);
-        if (saved && saved !== 'archivo') window.predicterraFont(saved);
-      } catch (e) {}
-    </script>
 
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
     <link rel="sitemap" href={withBase('/sitemap-index.xml')} />

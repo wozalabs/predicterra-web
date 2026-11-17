@@ -4,7 +4,6 @@ import Icon from './Icon.astro';
 import Button from './Button.astro';
 import { getCopy, localizePath, type Locale } from '../i18n/config';
 import { routes } from '../data/routes';
-import { testFonts } from '../data/fonts';
 
 interface Props {
   locale?: Locale;
@@ -24,16 +23,6 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     </a>
 
     <div class="site-header__actions">
-      <!-- Test switch: global typeface (src/data/fonts.ts) -->
-      <label class="site-header__font">
-        <span class="site-header__font-label">{header.font}</span>
-        <span class="site-header__font-field">
-          <select aria-label={header.fontLabel} data-font-select>
-            {testFonts.map((f) => <option value={f.id}>{f.name}</option>)}
-          </select>
-          <Icon name="expand_more" class="site-header__font-icon" />
-        </span>
-      </label>
       <nav class="site-header__nav" aria-label={header.navLabel}>
         <ul>
           {
@@ -127,7 +116,8 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     <div class="menu__test" role="group" aria-label={menu.hero.label}>
       <span class="t-small t-muted">{menu.hero.label}</span>
       <div class="seg">
-        <button type="button" class="seg__btn" data-hero-option="clean" aria-pressed="true">{menu.hero.clean}</button>
+        <button type="button" class="seg__btn" data-hero-option="app" aria-pressed="true">{menu.hero.app}</button>
+        <button type="button" class="seg__btn" data-hero-option="clean" aria-pressed="false">{menu.hero.clean}</button>
         <button type="button" class="seg__btn" data-hero-option="centred" aria-pressed="false">{menu.hero.centred}</button>
         <button type="button" class="seg__btn" data-hero-option="split" aria-pressed="false">{menu.hero.split}</button>
         <button type="button" class="seg__btn" data-hero-option="cutout" aria-pressed="false">{menu.hero.cutout}</button>
@@ -155,8 +145,34 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     color: color-mix(in oklab, #f1f1f1 var(--hpct), #1e1e1e);
     /* Kept in place across page navigations (see @view-transition in global.css). */
     view-transition-name: site-header;
-    /* No background or border: the header floats over the page. */
     transition: color 240ms ease;
+  }
+
+  /* Faded backdrop: once the page has scrolled, the content running under the
+     header fades out into a gradient that is fully opaque at the top, instead
+     of colliding with the logo and links. Dark or light like the header text. */
+  .site-header::before {
+    --fade: color-mix(in oklab, #161616 var(--hpct), #fafafa);
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: -1;
+    height: calc(var(--header-h) + 3rem);
+    /* Solid behind the logo and links, then fading out below them. */
+    background: linear-gradient(
+      180deg,
+      var(--fade) 0%,
+      var(--fade) 45%,
+      color-mix(in srgb, var(--fade) 60%, transparent) 72%,
+      transparent 100%
+    );
+    opacity: 0;
+    transition: opacity 240ms ease;
+    pointer-events: none;
+  }
+
+  .site-header[data-scrolled]::before {
+    opacity: 1;
   }
 
   /* Dark theme: light text from the first paint (the script keeps --hd at 1). */
@@ -206,77 +222,6 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     display: flex;
     align-items: stretch;
     height: 2.5rem;
-  }
-
-  /* ---------- Font test switch ---------- */
-  .site-header__font {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-right: 1.75rem;
-    font-size: 0.9375rem;
-  }
-
-  .site-header__font-label {
-    opacity: 0.72;
-  }
-
-  .site-header__font-field {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-  }
-
-  .site-header__font select {
-    appearance: none;
-    height: 2rem;
-    padding: 0 2rem 0 0.625rem;
-    border: 1px solid color-mix(in oklab, currentColor 28%, transparent);
-    border-radius: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-    transition: border-color 160ms ease;
-  }
-
-  .site-header__font select:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .site-header__font select:hover {
-      border-color: currentColor;
-    }
-  }
-
-  /* The open list is drawn by the OS on a light surface */
-  .site-header__font option {
-    color: #1e1e1e;
-    background: #ffffff;
-  }
-
-  .site-header__font :global(.site-header__font-icon) {
-    position: absolute;
-    right: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    pointer-events: none;
-  }
-
-  @media (max-width: 40rem) {
-    .site-header__font {
-      margin: 0 0.25rem 0 0.75rem;
-    }
-    .site-header__font-label {
-      display: none;
-    }
-    .site-header__font select {
-      width: 7rem;
-      font-size: 0.875rem;
-      text-overflow: ellipsis;
-    }
   }
 
   /* Top-level pages, always visible on wide screens (the drawer has them on small ones). */
@@ -602,13 +547,6 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
 
 <script>
   import { currentTheme, isDarkTheme, onThemeChange, setTheme, type Theme } from '../scripts/theme';
-  // Font test switch: the pre-paint script in BaseLayout defines predicterraFont().
-  const fontSelect = document.querySelector<HTMLSelectElement>('[data-font-select]');
-  const applyFont = (window as unknown as { predicterraFont?: (id: string) => string }).predicterraFont;
-  if (fontSelect && applyFont) {
-    fontSelect.value = document.documentElement.dataset.font ?? 'archivo';
-    fontSelect.addEventListener('change', () => applyFont(fontSelect.value));
-  }
 
   // Theme switch (header icon and the drawer's Dark / Light control).
   const themeToggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
@@ -702,7 +640,7 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
   // Hero layout test switch: applies instantly, remembered for next visits.
   const heroOptions = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-hero-option]'));
   const syncHero = () => {
-    const now = document.documentElement.dataset.hero ?? 'clean';
+    const now = document.documentElement.dataset.hero ?? 'app';
     heroOptions.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.heroOption === now)));
   };
   heroOptions.forEach((btn) =>
@@ -710,7 +648,7 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
       const value = btn.dataset.heroOption!;
       document.documentElement.dataset.hero = value;
       try {
-        localStorage.setItem('predicterra:hero', value);
+        localStorage.setItem('predicterra:hero-v3', value);
       } catch {
         /* storage unavailable: applies to this page view only */
       }

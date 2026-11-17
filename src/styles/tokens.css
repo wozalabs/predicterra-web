@@ -85,6 +85,8 @@
   /* 1 turns monochrome logos white (dark surfaces). */
   --logo-inv: 0;
   /* Inset CTA card ground (matches the CTA 3D scene). */
+  /* App hero: how much of the platform capture shows at the bottom on load. */
+  --hero-peek: clamp(10rem, 30vh, 16rem);
   --cta-ground: #eaeaea;
   --cta-ground-rgb: 234 234 234;
   /* Image frames, idle score ticks, the 3D section's dot pattern. */
@@ -93,7 +95,15 @@
   --portrait: #e4e4e4;
   --tick-off: #d6d6d6;
   --scene-dot: #cfcfcf;
+  /* Dots of the dithered gradient at the bottom of the App hero. */
+  --hero-dither: #cfcfcf;
   color-scheme: light;
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --hero-peek: clamp(14rem, 36vh, 24rem);
+  }
 }
 
 /*
@@ -125,5 +135,6 @@
   --portrait: #cfcfcf;
   --tick-off: #3d3d3d;
   --scene-dot: #2e2e2e;
+  --hero-dither: #363636;
   color-scheme: dark;
 }

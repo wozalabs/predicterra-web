@@ -1,0 +1,123 @@
+---
+/**
+ * Hero, app layout (default). No footage: the title, its line and the action
+ * centred on the page canvas, and the platform capture (Showcase.astro, which
+ * follows this section) peeking up from the bottom, barely tilted.
+ * Follows the site theme (dark by default).
+ */
+import Button from '../../components/Button.astro';
+import { getCopy, localizePath, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { clean } = getCopy(locale).home.hero;
+---
+
+<section class="hap" aria-labelledby="hap-title" data-hero-variant="app">
+  <div class="hap__content container">
+    <h1 id="hap-title" class="hap__title">
+      <span class="hap__line"><span>{clean.titleLine1}</span></span>
+      <span class="hap__line"><span>{clean.titleLine2}</span></span>
+    </h1>
+    <p class="hap__text">{clean.text}</p>
+    <Button class="hap__cta" href={localizePath(clean.cta.href, locale)} label={clean.cta.label} size="lg" />
+  </div>
+</section>
+
+<style>
+  /* No display here: the hero layout switch (global.css) shows or hides it. */
+  .hap {
+    position: relative;
+    height: 100svh;
+    min-height: 36rem;
+    /* The bottom of the screen belongs to the capture (Showcase --peek). */
+    padding-top: var(--header-h);
+    padding-bottom: var(--hero-peek);
+    background: var(--canvas);
+    color: var(--ink);
+  }
+
+  /* Above the capture's dither gradient (Showcase sits at z-index cover). */
+  .hap__content {
+    position: relative;
+    z-index: calc(var(--z-cover) + 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .hap__title {
+    display: grid;
+    font-size: clamp(2.75rem, 1rem + 4.6vw, 6rem);
+    line-height: 0.96;
+    letter-spacing: var(--track-display);
+  }
+
+  .hap__text {
+    max-width: 34rem;
+    margin-top: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .hap__content :global(.hap__cta) {
+    margin-top: clamp(1.5rem, 1rem + 1.2vw, 2.25rem);
+  }
+
+  /* Masked lines (padding keeps descenders inside the mask) */
+  .hap__line {
+    display: block;
+    overflow: clip;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+
+  .hap__line > span {
+    display: block;
+  }
+
+  /* Entrance: the title lines slide up out of their mask, then the line and
+     the button focus in (same timing as the video hero). */
+  @media (prefers-reduced-motion: no-preference) {
+    .hap__line > span {
+      animation: hap-line 1100ms cubic-bezier(0.19, 1, 0.22, 1) both;
+      animation-delay: var(--d, 0ms);
+    }
+    .hap__line:nth-child(1) > span {
+      --d: 200ms;
+    }
+    .hap__line:nth-child(2) > span {
+      --d: 290ms;
+    }
+    .hap__text,
+    .hap__content :global(.hap__cta) {
+      animation: hap-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
+    .hap__text {
+      animation-delay: 460ms;
+    }
+    .hap__content :global(.hap__cta) {
+      animation-delay: 560ms;
+    }
+  }
+
+  @keyframes hap-line {
+    from {
+      transform: translateY(108%);
+    }
+  }
+
+  @keyframes hap-focus {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+      filter: blur(6px);
+    }
+  }
+</style>
