@@ -44,8 +44,8 @@ const DARK: ScenePalette = {
   stream: '#1F1F1F',
   idle: '#3D3D3D',
   ctaGround: '#1E1E1E',
-  // Light grey on dark: the asset itself carries the orange.
-  hazard: '#A7A7A7',
+  // Quiet grey, a step above the assets: the asset itself carries the orange.
+  hazard: '#4A4A4A',
 };
 
 export const scenePalette = (): ScenePalette => (isDarkTheme() ? DARK : LIGHT);
