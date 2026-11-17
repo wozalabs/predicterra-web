@@ -12,6 +12,8 @@ export default {
     navLabel: 'Main',
     font: 'Font',
     fontLabel: 'Typeface (test)',
+    toLight: 'Switch to light theme',
+    toDark: 'Switch to dark theme',
     nav: [
       { label: 'Platform', href: routes.platform },
       { label: 'Cases', href: routes.cases },
@@ -57,6 +59,11 @@ export default {
       },
     ],
     contactLabel: 'Talk to us',
+    theme: {
+      label: 'Theme',
+      dark: 'Dark',
+      light: 'Light',
+    },
     // Temporary test switch between the two 3D section variants.
     scene: {
       label: '3D view (test)',

@@ -373,7 +373,8 @@ ol {
   --btn-dither: #dcdcdc;
 }
 
-.theme-dark .btn--secondary {
+.theme-dark .btn--secondary,
+:root[data-theme='dark'] .btn--secondary {
   box-shadow: none;
   --btn-bg: var(--grey-600);
   --btn-fg: #ffffff;
@@ -499,11 +500,26 @@ ol {
   --muted: color-mix(in oklab, #a7a7a7 var(--tpct), #5e5e5e);
   --line: color-mix(in oklab, rgb(241 241 241 / 0.16) var(--tpct), rgb(30 30 30 / 0.16));
   --line-strong: color-mix(in oklab, rgb(241 241 241 / 0.34) var(--tpct), rgb(30 30 30 / 0.32));
-  --surface: color-mix(in oklab, #262626 var(--pct), #ffffff);
-  --card: color-mix(in oklab, #262626 var(--pct), #f0f0f0);
-  --canvas-mix: color-mix(in oklab, #1e1e1e var(--pct), #fafafa);
+  --surface: color-mix(in oklab, var(--dk-surface) var(--pct), #ffffff);
+  --card: color-mix(in oklab, var(--dk-card) var(--pct), #f0f0f0);
+  --canvas-mix: color-mix(in oklab, var(--dk-canvas) var(--pct), #fafafa);
+  --logo-inv: var(--dt);
   background: var(--canvas-mix);
   color: var(--ink);
+}
+
+/* Dark theme: every scrubbed surface simply stays dark (the scripts also pin
+   --d and --dt to 1, this covers the first paint). */
+:root[data-theme='dark'] .theme-scrub {
+  --d: 1;
+  --dt: 1;
+}
+
+/* Switching themes: no transitions for one frame, so nothing cascades. */
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+  transition: none !important;
 }
 
 /* ---------- Fixed dark theme (hero over video, CTA) ---------- */
@@ -514,6 +530,7 @@ ol {
   --line: rgb(241 241 241 / 0.16);
   --line-strong: rgb(241 241 241 / 0.34);
   --surface: #262626;
+  --logo-inv: 1;
   color: var(--ink);
 }
 

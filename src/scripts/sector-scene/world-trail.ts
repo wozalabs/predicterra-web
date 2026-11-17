@@ -50,6 +50,7 @@ import {
   type ChipSide,
 } from './geometry';
 import { createGroundMaterial, createFlowMaterial, HAZARD_SLOTS } from './materials';
+import { scenePalette } from './palette';
 import type { SectorId, World } from './world';
 
 const AZIMUTH = Math.PI / 4;
@@ -97,12 +98,12 @@ export function createTrailWorld(
   const dpr = Math.min(window.devicePixelRatio || 1, opts.lowPower ? 1.5 : 2);
   renderer.setPixelRatio(dpr);
   renderer.outputColorSpace = SRGBColorSpace;
-  renderer.setClearColor(new Color('#FAFAFA'), 1);
+  renderer.setClearColor(new Color(scenePalette().bg), 1);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
 
   const scene = new Scene();
-  scene.background = new Color('#FAFAFA');
+  scene.background = new Color(scenePalette().bg);
 
   /* ---------------- Trace geometry (plan space) ---------------- */
   const stopsPlan: P[] = Array.from({ length: STOPS }, (_, i) => [i * HOP_DU, i * HOP_DV]);
@@ -497,7 +498,24 @@ export function createTrailWorld(
   }
 
   setBasis(STOP_AZIMUTH[0] * DEG, STOP_ELEVATION[0] * DEG);
-  return { setFocus, resize, tick, project, dispose, setPointer };
+  // Theme colours (applied now, and again on every switch).
+  function setTheme() {
+    const p = scenePalette();
+    renderer.setClearColor(new Color(p.bg), 1);
+    (scene.background as Color).set(p.bg);
+    groundMat.uniforms.uBase.value.set(p.bg);
+    groundMat.uniforms.uGridDot.value.set(p.gridDot);
+    groundMat.uniforms.uShadow.value.set(p.shadow);
+    whiteMat.color.set(p.asset);
+    lineMat.color.set(p.line);
+    decoMat.color.set(p.deco);
+    streamMat.color.set(p.stream);
+    trailMat.uniforms.uIdle.value.set(p.idle);
+    coreMat.uniforms.uIdle.value.set(p.idle);
+  }
+  setTheme();
+
+  return { setFocus, resize, tick, project, dispose, setPointer, setTheme };
 }
 
 function addBundle(

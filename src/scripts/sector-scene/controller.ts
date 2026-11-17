@@ -7,6 +7,7 @@
  * - Alert cards open on hover (fine pointers), focus, or tap.
  */
 import type { World, SectorId } from './world';
+import { onThemeChange } from '../theme';
 
 /** Fraction of each scroll segment spent holding on a stop before travelling. */
 const HOLD = 0.32;
@@ -313,6 +314,14 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
       positionOverlays();
     }
   }
+
+  // Theme switch: recolour the scene and draw it again.
+  onThemeChange(() => {
+    if (!world?.setTheme) return;
+    world.setTheme();
+    world.tick(0);
+    schedule();
+  });
 
   new IntersectionObserver(
     ([entry]) => {

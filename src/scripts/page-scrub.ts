@@ -5,6 +5,8 @@
  * written on the page wrapper (.pg.theme-scrub), which remixes the tokens for
  * everything inside. The header follows through [data-header-dark="scrub"].
  */
+import { isDarkTheme, onThemeChange } from './theme';
+
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
@@ -18,8 +20,9 @@ export function mountPageScrub(root: HTMLElement) {
   const update = () => {
     raf = 0;
     const vh = window.innerHeight;
-    let raw = 0;
-    for (const el of darks) {
+    // Dark theme: the page is dark throughout, nothing to scrub.
+    let raw = isDarkTheme() ? 1 : 0;
+    if (!raw) for (const el of darks) {
       const r = el.getBoundingClientRect();
       const enter = clamp01((vh * 0.85 - r.top) / (vh * 0.45));
       const leave = clamp01((vh * 0.85 - r.bottom) / (vh * 0.45));
@@ -43,5 +46,6 @@ export function mountPageScrub(root: HTMLElement) {
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
+  onThemeChange(update);
   update();
 }

@@ -47,6 +47,19 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
           }
         </ul>
       </nav>
+      <!-- Theme switch: shows the theme it switches to. Label kept in sync by the script. -->
+      <button
+        class="site-header__theme"
+        type="button"
+        aria-label={header.toLight}
+        title={header.toLight}
+        data-theme-toggle
+        data-label-light={header.toLight}
+        data-label-dark={header.toDark}
+      >
+        <Icon name="light_mode" class="site-header__theme-icon site-header__theme-icon--light" />
+        <Icon name="dark_mode" class="site-header__theme-icon site-header__theme-icon--dark" />
+      </button>
       <Button class="site-header__demo" href={localizePath(routes.demo, locale)} label={header.demo} />
       <button
         class="site-header__menu"
@@ -95,6 +108,14 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
       }
     </nav>
 
+    <div class="menu__test" role="group" aria-label={menu.theme.label}>
+      <span class="t-small t-muted">{menu.theme.label}</span>
+      <div class="seg">
+        <button type="button" class="seg__btn" data-theme-option="dark" aria-pressed="true">{menu.theme.dark}</button>
+        <button type="button" class="seg__btn" data-theme-option="light" aria-pressed="false">{menu.theme.light}</button>
+      </div>
+    </div>
+
     <div class="menu__test" role="group" aria-label={menu.scene.label}>
       <span class="t-small t-muted">{menu.scene.label}</span>
       <div class="seg">
@@ -136,6 +157,11 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     view-transition-name: site-header;
     /* No background or border: the header floats over the page. */
     transition: color 240ms ease;
+  }
+
+  /* Dark theme: light text from the first paint (the script keeps --hd at 1). */
+  :global(:root[data-theme='dark']) .site-header {
+    --hd: 1;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -303,6 +329,56 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     }
   }
 
+  /* ---------- Theme switch ---------- */
+  .site-header__theme {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    margin-right: 0.75rem;
+    opacity: 0.72;
+    transition:
+      opacity 160ms ease,
+      transform 160ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .site-header__theme:active {
+    transform: scale(0.96);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-header__theme:hover {
+      opacity: 1;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .site-header__theme::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+    }
+  }
+
+  .site-header__theme :global(.site-header__theme-icon) {
+    grid-area: 1 / 1;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* Dark theme shows the sun (go light); light theme shows the moon. */
+  :global(:root[data-theme='dark']) .site-header__theme :global(.site-header__theme-icon--dark),
+  :global(:root[data-theme='light']) .site-header__theme :global(.site-header__theme-icon--light) {
+    display: none;
+  }
+
+  @media (max-width: 40rem) {
+    .site-header__theme {
+      margin-right: 0.25rem;
+    }
+  }
+
   .site-header__menu {
     display: inline-flex;
     align-items: center;
@@ -377,7 +453,7 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
   }
 
   .menu::backdrop {
-    background: rgb(30 30 30 / 0);
+    background: rgb(0 0 0 / 0);
     transition:
       background-color 420ms ease,
       overlay 420ms allow-discrete,
@@ -385,12 +461,12 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
   }
 
   .menu[open]::backdrop {
-    background: rgb(30 30 30 / 0.28);
+    background: rgb(0 0 0 / 0.4);
   }
 
   @starting-style {
     .menu[open]::backdrop {
-      background: rgb(30 30 30 / 0);
+      background: rgb(0 0 0 / 0);
     }
   }
 
@@ -525,6 +601,7 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
 </style>
 
 <script>
+  import { currentTheme, isDarkTheme, onThemeChange, setTheme, type Theme } from '../scripts/theme';
   // Font test switch: the pre-paint script in BaseLayout defines predicterraFont().
   const fontSelect = document.querySelector<HTMLSelectElement>('[data-font-select]');
   const applyFont = (window as unknown as { predicterraFont?: (id: string) => string }).predicterraFont;
@@ -532,6 +609,23 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     fontSelect.value = document.documentElement.dataset.font ?? 'archivo';
     fontSelect.addEventListener('change', () => applyFont(fontSelect.value));
   }
+
+  // Theme switch (header icon and the drawer's Dark / Light control).
+  const themeToggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const themeOptions = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-theme-option]'));
+  const syncTheme = () => {
+    const now = currentTheme();
+    themeOptions.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.themeOption === now)));
+    if (themeToggle) {
+      const label = (now === 'dark' ? themeToggle.dataset.labelLight : themeToggle.dataset.labelDark) ?? '';
+      themeToggle.setAttribute('aria-label', label);
+      themeToggle.title = label;
+    }
+  };
+  themeToggle?.addEventListener('click', () => setTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
+  themeOptions.forEach((b) => b.addEventListener('click', () => setTheme(b.dataset.themeOption as Theme)));
+  onThemeChange(syncTheme);
+  syncTheme();
 
   const header = document.querySelector<HTMLElement>('[data-site-header]');
   const dialog = document.querySelector<HTMLDialogElement>('[data-menu]');
@@ -546,7 +640,7 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     const update = () => {
       header.toggleAttribute('data-scrolled', window.scrollY > 8);
       const line = header.offsetHeight / 2;
-      const dark = darkSections.some((el) => {
+      const dark = isDarkTheme() || darkSections.some((el) => {
         const r = el.getBoundingClientRect();
         const isDark = el.dataset.headerDark === 'scrub' ? el.hasAttribute('data-is-dark') : true;
         return isDark && r.height > 0 && r.top <= line && r.bottom > line;

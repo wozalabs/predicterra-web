@@ -130,7 +130,7 @@ const stops = scene.sectors.length + 1; // overview + one stop per sector
     position: absolute;
     inset: 0;
     /* Static fallback before WebGL loads: the same dot grid as the 3D ground. */
-    background-image: radial-gradient(circle, #cfcfcf 1px, transparent 1.6px);
+    background-image: radial-gradient(circle, var(--scene-dot) 1px, transparent 1.6px);
     background-size: 22px 22px;
   }
 

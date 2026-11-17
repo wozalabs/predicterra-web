@@ -38,6 +38,7 @@ import {
   type Bucket,
 } from './geometry';
 import { createGroundMaterial, createFlowMaterial, HAZARD_SLOTS } from './materials';
+import { scenePalette } from './palette';
 
 export type SectorId = 'grid' | 'substation' | 'solar' | 'wind' | 'oilgas';
 export const SECTOR_ORDER: SectorId[] = ['grid', 'substation', 'solar', 'wind', 'oilgas'];
@@ -59,6 +60,8 @@ export interface World {
   dispose(): void;
   /** Optional decorative tilt from the pointer, x/y in −1..1. */
   setPointer?(x: number, y: number): void;
+  /** Re-reads the scene palette after a theme switch. */
+  setTheme?(): void;
 }
 
 /* Camera: 45° azimuth, ~34° elevation (near-isometric). */
@@ -85,12 +88,12 @@ export function createWorld(
   const dpr = Math.min(window.devicePixelRatio || 1, opts.lowPower ? 1.5 : 2);
   renderer.setPixelRatio(dpr);
   renderer.outputColorSpace = SRGBColorSpace;
-  renderer.setClearColor(new Color('#FAFAFA'), 1);
+  renderer.setClearColor(new Color(scenePalette().bg), 1);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
 
   const scene = new Scene();
-  scene.background = new Color('#FAFAFA');
+  scene.background = new Color(scenePalette().bg);
 
   /* ---------------- Lights ---------------- */
   scene.add(new HemisphereLight(0xffffff, 0xc4c4c4, 2.0));
@@ -412,7 +415,20 @@ export function createWorld(
   }
 
   setFocus(0);
-  return { setFocus, resize, tick, project, dispose };
+  function setTheme() {
+    const p = scenePalette();
+    renderer.setClearColor(new Color(p.bg), 1);
+    (scene.background as Color).set(p.bg);
+    groundMat.uniforms.uBase.value.set(p.bg);
+    groundMat.uniforms.uGridDot.value.set(p.gridDot);
+    groundMat.uniforms.uShadow.value.set(p.shadow);
+    whiteMat.color.set(p.asset);
+    lineMat.color.set(p.line);
+    flowMat.uniforms.uIdle.value.set(p.idle);
+  }
+  setTheme();
+
+  return { setFocus, resize, tick, project, dispose, setTheme };
 }
 
 /** Parallel cable bundle along a plan-space polyline; one cable is orange and animated. */

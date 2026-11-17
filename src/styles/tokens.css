@@ -77,4 +77,53 @@
   --z-cover: 2;
   --z-header: 50;
   --z-menu: 60;
+
+  /* Dark endpoints of the scroll-scrubbed sections (light theme). */
+  --dk-canvas: #1e1e1e;
+  --dk-card: #262626;
+  --dk-surface: #262626;
+  /* 1 turns monochrome logos white (dark surfaces). */
+  --logo-inv: 0;
+  /* Inset CTA card ground (matches the CTA 3D scene). */
+  --cta-ground: #eaeaea;
+  --cta-ground-rgb: 234 234 234;
+  /* Image frames, idle score ticks, the 3D section's dot pattern. */
+  --media: #e4e4e4;
+  --media-hover: #dadada;
+  --portrait: #e4e4e4;
+  --tick-off: #d6d6d6;
+  --scene-dot: #cfcfcf;
+  color-scheme: light;
+}
+
+/*
+ * Dark theme (the default). Set on <html> before first paint (BaseLayout) and
+ * switched from the header. Same brand ramp: the canvas sits one step below
+ * #1E1E1E so flat cards can use the brand's darkest grey.
+ */
+:root[data-theme='dark'] {
+  --canvas: #161616;
+  --canvas-rgb: 22 22 22;
+  --card: #1e1e1e;
+  --surface: #262626;
+  --ink: #f1f1f1;
+  --ink-2: #cecece;
+  --muted: #a7a7a7;
+  --muted-large: #818181;
+  --line: rgb(241 241 241 / 0.14);
+  --line-strong: rgb(241 241 241 / 0.32);
+  --chip-bg: rgb(129 129 129 / 0.16);
+  --dk-canvas: #161616;
+  --dk-card: #1e1e1e;
+  --dk-surface: #262626;
+  --logo-inv: 1;
+  --cta-ground: #1e1e1e;
+  --cta-ground-rgb: 30 30 30;
+  --media: #262626;
+  --media-hover: #2e2e2e;
+  /* Portraits are cut out on white: a light tile keeps them true to colour. */
+  --portrait: #cfcfcf;
+  --tick-off: #3d3d3d;
+  --scene-dot: #2e2e2e;
+  color-scheme: dark;
 }

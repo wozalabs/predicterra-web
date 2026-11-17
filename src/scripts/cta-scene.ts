@@ -23,6 +23,7 @@ import {
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { cable, rotorGeometry, solarPlant, substation, tower, windTurbine, type Bucket } from './sector-scene/geometry';
 import { createGroundMaterial } from './sector-scene/materials';
+import { scenePalette } from './sector-scene/palette';
 
 const DEG = Math.PI / 180;
 const BASE_AZ = 45;
@@ -30,14 +31,16 @@ const BASE_EL = 32;
 /** Pointer tilt range (degrees), close to the 3D section so the two feel related. */
 const TILT_AZ = 3.5;
 const TILT_EL = 2.5;
-/** Card ground: a step darker than the page so the inset card reads as a card. */
-export const CTA_GROUND = '#EAEAEA';
+// Card ground: a step off the page so the inset card reads as a card
+// (palette.ctaGround, mirrored by --cta-ground in tokens.css).
 
 export interface CtaScene {
   resize(w: number, h: number): void;
   setPointer(x: number, y: number): void;
   tick(dt: number): boolean;
   dispose(): void;
+  /** Re-reads the scene palette after a theme switch. */
+  setTheme(): void;
 }
 
 export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion: boolean }): CtaScene {
@@ -45,15 +48,14 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   renderer.setPixelRatio(dpr);
   renderer.outputColorSpace = SRGBColorSpace;
-  renderer.setClearColor(new Color(CTA_GROUND), 1);
+  renderer.setClearColor(new Color(scenePalette().ctaGround), 1);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
 
   const scene = new Scene();
-  scene.background = new Color(CTA_GROUND);
+  scene.background = new Color(scenePalette().ctaGround);
   const assetMat = new MeshLambertMaterial({ color: 0xffffff });
   const groundMat = createGroundMaterial({ pixel: Math.max(1, Math.round(1.5 * dpr)) });
-  groundMat.uniforms.uBase.value = new Color(CTA_GROUND);
 
   // Same light rig as the 3D section.
   scene.add(new HemisphereLight(0xffffff, 0xc4c4c4, 2.0));
@@ -230,5 +232,16 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
     ground.geometry.dispose();
   }
 
-  return { resize, setPointer, tick, dispose };
+  function setTheme() {
+    const p = scenePalette();
+    renderer.setClearColor(new Color(p.ctaGround), 1);
+    (scene.background as Color).set(p.ctaGround);
+    groundMat.uniforms.uBase.value.set(p.ctaGround);
+    groundMat.uniforms.uGridDot.value.set(p.gridDot);
+    groundMat.uniforms.uShadow.value.set(p.shadow);
+    assetMat.color.set(p.asset);
+  }
+  setTheme();
+
+  return { resize, setPointer, tick, dispose, setTheme };
 }

@@ -66,7 +66,7 @@ const sector = story.sector.startsWith('[') ? '' : story.sector;
   .case__media {
     overflow: hidden;
     aspect-ratio: 4 / 3;
-    background: #e4e4e4;
+    background: var(--media);
     /* Notched bottom edge, Hut 8 card pattern */
     clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 18px) calc(100% - 18px), 0 calc(100% - 18px));
     transition: background-color 240ms ease;
@@ -110,7 +110,7 @@ const sector = story.sector.startsWith('[') ? '' : story.sector;
 
   @media (hover: hover) and (pointer: fine) {
     .case:hover .case__media {
-      background: #dadada;
+      background: var(--media-hover);
     }
     .case:hover .case__media img {
       transform: scale(1.02);

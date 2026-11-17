@@ -21,13 +21,15 @@ import {
   SRGBColorSpace,
   Vector3,
   WebGLRenderer,
+  type ShaderMaterial,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { cable, oilGas, rotorGeometry, solarPlant, substation, tower, windTurbine, type Bucket } from './geometry';
 import { createGroundMaterial } from './materials';
+import { scenePalette } from './palette';
+import { onThemeChange } from '../theme';
 import type { SectorId } from './world';
 
-const BG = '#FAFAFA';
 const AZ = (45 * Math.PI) / 180;
 const EL = (26 * Math.PI) / 180;
 const TURN_SPEED = 0.25; // rad/s
@@ -39,6 +41,7 @@ interface Mini {
   /** World units that must fit vertically in the view. */
   fitH: number;
   target: Vector3;
+  ground: ShaderMaterial;
 }
 
 let renderer: WebGLRenderer | null = null;
@@ -52,10 +55,10 @@ function ensureRenderer() {
   renderer = new WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = SRGBColorSpace;
-  renderer.setClearColor(new Color(BG), 1);
+  renderer.setClearColor(new Color(scenePalette().bg), 1);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
-  whiteMat = new MeshLambertMaterial({ color: 0xffffff });
+  whiteMat = new MeshLambertMaterial({ color: new Color(scenePalette().asset) });
   riskMat = new MeshLambertMaterial({ color: new Color('#FF3700') });
   return renderer;
 }
@@ -107,7 +110,7 @@ function build(id: SectorId): Mini {
   }
 
   const scene = new Scene();
-  scene.background = new Color(BG);
+  scene.background = new Color(scenePalette().bg);
   scene.add(new HemisphereLight(0xffffff, 0xc4c4c4, 2.0));
   scene.add(new AmbientLight(0xffffff, 0.55));
   const sun = new DirectionalLight(0xffffff, 1.6);
@@ -165,7 +168,9 @@ function build(id: SectorId): Mini {
   pivot.add(model);
   scene.add(pivot);
 
-  return { scene, pivot, rotors, fitH, target: new Vector3(0, lift, 0) };
+  const mini: Mini = { scene, pivot, rotors, fitH, target: new Vector3(0, lift, 0), ground: groundMat };
+  paint(mini);
+  return mini;
 }
 
 function aim(mini: Mini, w: number, h: number) {
@@ -185,7 +190,26 @@ function aim(mini: Mini, w: number, h: number) {
   camera.updateProjectionMatrix();
 }
 
-let active: { id: SectorId; canvas: HTMLCanvasElement; raf: number } | null = null;
+/** Theme colours for one mini scene. */
+function paint(mini: Mini) {
+  const p = scenePalette();
+  (mini.scene.background as Color).set(p.bg);
+  mini.ground.uniforms.uBase.value.set(p.bg);
+  mini.ground.uniforms.uGridDot.value.set(p.gridDot);
+  mini.ground.uniforms.uShadow.value.set(p.shadow);
+}
+
+let active: { id: SectorId; canvas: HTMLCanvasElement; raf: number; redraw: () => void } | null = null;
+
+// Theme switch: recolour every built view and redraw the one on screen.
+onThemeChange(() => {
+  if (!renderer) return;
+  const p = scenePalette();
+  renderer.setClearColor(new Color(p.bg), 1);
+  whiteMat.color.set(p.asset);
+  minis.forEach(paint);
+  active?.redraw();
+});
 
 /** Starts the live view for a panel. Safe to call repeatedly. */
 export function showPreview(id: SectorId, canvas: HTMLCanvasElement, opts: { reducedMotion: boolean }) {
@@ -213,6 +237,11 @@ export function showPreview(id: SectorId, canvas: HTMLCanvasElement, opts: { red
     aim(mini, w, h);
   };
 
+  const draw = () => {
+    r.render(mini.scene, camera);
+    ctx.drawImage(r.domElement, 0, 0, canvas.width, canvas.height);
+  };
+
   let last = performance.now();
   const frame = (now: number) => {
     const dt = Math.min(0.05, (now - last) / 1000);
@@ -221,13 +250,12 @@ export function showPreview(id: SectorId, canvas: HTMLCanvasElement, opts: { red
       mini.pivot.rotation.y += dt * TURN_SPEED;
       mini.rotors.forEach((m) => (m.rotation.z -= dt * 1.1));
     }
-    r.render(mini.scene, camera);
-    ctx.drawImage(r.domElement, 0, 0, canvas.width, canvas.height);
+    draw();
     if (active && active.canvas === canvas && !opts.reducedMotion) active.raf = requestAnimationFrame(frame);
   };
 
   size();
-  active = { id, canvas, raf: 0 };
+  active = { id, canvas, raf: 0, redraw: draw };
   active.raf = requestAnimationFrame(frame);
 }
 

@@ -73,8 +73,8 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
     max-width: var(--max-w);
     margin-inline: auto;
     padding: clamp(3rem, 2rem + 4vw, 5.5rem) var(--gutter);
-    /* Matches CTA_GROUND in scripts/cta-scene.ts (shown until WebGL is ready). */
-    background: #eaeaea;
+    /* Matches palette.ctaGround in scripts/sector-scene/palette.ts (shown until WebGL is ready). */
+    background: var(--cta-ground);
     /* Notched top edge: the success-stories card notch, mirrored to the top. */
     clip-path: polygon(0 18px, calc(42% - 18px) 18px, 42% 0, 100% 0, 100% 100%, 0 100%);
     color: var(--ink);
@@ -99,7 +99,7 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: radial-gradient(ellipse 34% 52% at 50% 50%, #eaeaea 55%, rgb(234 234 234 / 0) 100%);
+    background: radial-gradient(ellipse 34% 52% at 50% 50%, var(--cta-ground) 55%, rgb(var(--cta-ground-rgb) / 0) 100%);
     pointer-events: none;
   }
 
@@ -143,13 +143,14 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
       white-space: normal;
     }
     .cta__veil {
-      background: radial-gradient(ellipse 70% 34% at 50% 50%, #eaeaea 60%, rgb(234 234 234 / 0) 100%);
+      background: radial-gradient(ellipse 70% 34% at 50% 50%, var(--cta-ground) 60%, rgb(var(--cta-ground-rgb) / 0) 100%);
     }
   }
 </style>
 
 <script>
   import type { CtaScene } from '../../scripts/cta-scene';
+  import { onThemeChange } from '../../scripts/theme';
 
   const card = document.querySelector<HTMLElement>('[data-cta-card]');
   const canvas = card?.querySelector<HTMLCanvasElement>('[data-cta-canvas]');
@@ -193,6 +194,11 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
         /* No WebGL: the card stays plain orange. */
       }
     };
+
+    onThemeChange(() => {
+      scene?.setTheme();
+      scene?.tick(0);
+    });
 
     // Load three.js only when the card gets close.
     const near = new IntersectionObserver(

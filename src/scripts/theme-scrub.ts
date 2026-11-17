@@ -7,6 +7,8 @@
  * on every `.theme-scrub` element (only those elements recalculate styles).
  * The header theme is handled in SiteHeader.astro via [data-header-dark].
  */
+import { isDarkTheme, onThemeChange } from './theme';
+
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
@@ -31,7 +33,8 @@ export function mountThemeScrub() {
     const nextTop = next ? next.getBoundingClientRect().top : Infinity;
     const enter = clamp01((vh * 0.85 - darkTop) / (vh * 0.45));
     const leave = clamp01((vh * 0.85 - nextTop) / (vh * 0.45));
-    const raw = enter * (1 - leave);
+    // Dark theme: the page is dark throughout, nothing to scrub.
+    const raw = isDarkTheme() ? 1 : enter * (1 - leave);
     // Background eases across the window; text flips quickly in the middle so it
     // never sits mid-grey on a mid-grey background for long.
     const d = Math.round(smooth(raw) * 1000) / 1000;
@@ -67,5 +70,6 @@ export function mountThemeScrub() {
   io.observe(dark);
   if (next) io.observe(next);
   window.addEventListener('resize', onScroll, { passive: true });
+  onThemeChange(update);
   update();
 }
