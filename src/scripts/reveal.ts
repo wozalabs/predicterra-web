@@ -44,6 +44,14 @@ export function mountReveal() {
   );
   reveals.forEach((el) => revealIO.observe(el));
 
+  // Keyboard: anything that takes focus is shown at once, never left faded out.
+  document.addEventListener('focusin', (e) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>('[data-reveal]');
+    if (!el || el.classList.contains('is-in')) return;
+    revealIO.unobserve(el);
+    reveal(el);
+  });
+
   if (reduce) return;
 
   // Renders start a little later than reveals, once the text is properly in view.

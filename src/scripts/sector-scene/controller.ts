@@ -138,7 +138,8 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
         x = FALLBACK[id][0] * width;
         y = FALLBACK[id][1] * height;
       }
-      const off = x < -40 || y < -40 || x > width + 40 || y > height + 40;
+      // Off screen markers hide, unless one has keyboard focus.
+      const off = (x < -40 || y < -40 || x > width + 40 || y > height + 40) && !m.contains(document.activeElement);
       m.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
       m.style.visibility = off ? 'hidden' : '';
       if (openId === id) placeCard(id, x, y);
@@ -240,6 +241,68 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
     closeAlert(true);
   });
 
+  /* ---------------- Keyboard ----------------
+   * Tab walks the stops in reading order: a stop's link, then its asset
+   * marker (which opens its panel), then the next stop's link… The page
+   * scrolls to each stop as its link takes focus, so what has focus is always
+   * on screen. Shift+Tab walks back the same way. */
+  const linkAt = (i: number) => steps[i]?.querySelector<HTMLElement>('a') ?? null;
+  const markerAt = (i: number) => {
+    for (const id of SECTORS) if (stepOf(id) === i) return markers.get(id)!.querySelector<HTMLElement>('button');
+    return null;
+  };
+  const goToStop = (i: number) => {
+    const top = root.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: top + (i + 0.08) * window.innerHeight, behavior: 'auto' });
+    readScroll();
+    // Land on the stop at once, so its marker is where it belongs when it takes focus.
+    world?.snap?.();
+    positionOverlays();
+    schedule();
+  };
+  // Focuses a stop's marker once it is on screen (the 3D scene may still be
+  // loading, or landing on the stop); the panel opens with it.
+  const focusMarker = (i: number) => {
+    const btn = markerAt(i);
+    if (!btn) return false;
+    const marker = btn.parentElement as HTMLElement;
+    let tries = 0;
+    const attempt = () => {
+      positionOverlays();
+      if (marker.style.visibility !== 'hidden' || ++tries > 40) {
+        marker.style.visibility = '';
+        btn.focus();
+      } else requestAnimationFrame(attempt);
+    };
+    attempt();
+    return true;
+  };
+  steps.forEach((step, i) => {
+    linkAt(i)?.addEventListener('focus', () => activeIndex !== i && goToStop(i));
+  });
+  root.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const t = e.target as HTMLElement;
+    const linkIndex = steps.findIndex((_, i) => linkAt(i) === t);
+    const markerIndex = steps.findIndex((_, i) => markerAt(i) === t);
+    if (linkIndex > -1) {
+      if (!e.shiftKey && focusMarker(linkIndex)) e.preventDefault();
+      else if (e.shiftKey && linkIndex > 0) {
+        e.preventDefault();
+        goToStop(linkIndex - 1);
+        if (!focusMarker(linkIndex - 1)) linkAt(linkIndex - 1)?.focus();
+      }
+    } else if (markerIndex > -1) {
+      if (e.shiftKey) {
+        e.preventDefault();
+        linkAt(markerIndex)?.focus();
+      } else if (linkAt(markerIndex + 1)) {
+        e.preventDefault();
+        linkAt(markerIndex + 1)!.focus();
+      }
+    }
+  });
+
   /* ---------------- Progress nav ---------------- */
   gotoButtons.forEach((b) =>
     b.addEventListener('click', () => {
@@ -303,6 +366,8 @@ export function mountSectorScene(root: HTMLElement, variant: SceneVariant = 'ove
       world = create(canvas, { reducedMotion: reduceMotion.matches, lowPower });
       world.resize(width, height);
       world.setFocus(focus);
+      // Start on the current stop rather than gliding in from the first one.
+      world.snap?.();
       // Render one frame before fading the canvas in.
       world.tick(0);
       requestAnimationFrame(() => host.setAttribute('data-ready', ''));

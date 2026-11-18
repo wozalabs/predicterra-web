@@ -24,6 +24,20 @@ export function mountPanels() {
     }
   };
 
+  // Keyboard: a focused link or button in a pinned section must not sit under
+  // the panel sliding over it. Scroll back until the panel's top is below it.
+  for (const { pin, panel } of items) {
+    pin.addEventListener('focusin', (e) => {
+      requestAnimationFrame(() => {
+        const el = e.target as HTMLElement;
+        const r = el.getBoundingClientRect();
+        const cover = panel.getBoundingClientRect().top;
+        if (cover >= r.bottom + 16) return;
+        window.scrollBy({ top: cover - r.bottom - 16 - window.innerHeight * 0.15, behavior: 'auto' });
+      });
+    });
+  }
+
   const ro = new ResizeObserver(place);
   items.forEach(({ pin }) => ro.observe(pin));
   window.addEventListener('resize', place, { passive: true });

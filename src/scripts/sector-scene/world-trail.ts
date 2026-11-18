@@ -518,7 +518,18 @@ export function createTrailWorld(
   }
   setTheme();
 
-  return { setFocus, resize, tick, project, dispose, setPointer, setTheme };
+  function snap() {
+    cur.target.copy(goal.target);
+    cur.view = goal.view;
+    cur.s = goal.s;
+    cur.az = goal.az;
+    cur.el = goal.el;
+    vel.target.set(0, 0, 0);
+    vel.view = vel.s = vel.az = vel.el = 0;
+    applyCamera();
+  }
+
+  return { setFocus, resize, tick, project, dispose, setPointer, setTheme, snap };
 }
 
 function addBundle(

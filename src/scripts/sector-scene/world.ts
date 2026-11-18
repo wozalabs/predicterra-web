@@ -62,6 +62,8 @@ export interface World {
   setPointer?(x: number, y: number): void;
   /** Re-reads the scene palette after a theme switch. */
   setTheme?(): void;
+  /** Puts the camera on its goal at once (keyboard jumps between stops). */
+  snap?(): void;
 }
 
 /* Camera: 45° azimuth, ~34° elevation (near-isometric). */
