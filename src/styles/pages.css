@@ -31,15 +31,7 @@
   padding-block: var(--pg-y);
 }
 
-.pg-sec + .pg-sec::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: max(var(--gutter), calc((100% - var(--max-w)) / 2 + var(--gutter)));
-  right: max(var(--gutter), calc((100% - var(--max-w)) / 2 + var(--gutter)));
-  height: 1px;
-  background: var(--line);
-}
+/* No hairlines between sections: the page flows on, spacing does the separating. */
 
 /* No hairline into or out of a dark section: the page changes colour instead. */
 .pg-sec[data-dark]::before,
@@ -136,7 +128,6 @@
   align-items: center;
   min-height: 1.75rem;
   padding: 0 0.625rem;
-  border: 1px solid var(--line);
   background: var(--chip-bg);
   font-size: var(--fs-caption);
   font-variant-numeric: tabular-nums;

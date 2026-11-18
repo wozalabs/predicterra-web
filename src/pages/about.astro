@@ -1,8 +1,8 @@
 ---
 /**
- * About (/about), from "predicterra-11-about.md".
- * hero (with the BAT tower) · "Newly incorporated. Not new." · the team ·
- * Woza Labs and contact (dark). Photos always in colour.
+ * About (/about), from "predicterra-03-about.md".
+ * hero (with the BAT tower) · our story · the team · Woza Labs and contact
+ * (dark). Photos always in colour.
  */
 import PageLayout from '../layouts/PageLayout.astro';
 import PageHero from '../sections/pages/PageHero.astro';
@@ -33,7 +33,7 @@ const wozaLogo = wozaLogoRaw
 ---
 
 <PageLayout title={a.seo.title} description={a.seo.description} locale={locale} jsonLd={[aboutJsonLd]}>
-  <PageHero locale={locale} label={a.hero.label} title={a.hero.title} text={a.hero.text} layout="centred">
+  <PageHero locale={locale} label={a.hero.label} title={a.hero.title} text={a.hero.text} note={a.hero.note} layout="centred">
     <figure slot="visual" class="ab-photo">
       <img
         src={withBase(a.hero.photo.src)}
@@ -46,23 +46,16 @@ const wozaLogo = wozaLogoRaw
     </figure>
   </PageHero>
 
-  <!-- The line the brief highlights, large, with the three facts under it. -->
-  <section class="ab-quote pg-sec" aria-label={a.hero.quote}>
-    <div class="container ab-quote__inner">
-      <p class="ab-quote__text" data-render>{a.hero.quote}</p>
-      <ul class="ab-quote__facts" data-reveal-group>
-        {
-          a.hero.facts.map((f) => (
-            <li data-reveal>
-              <span class="pg-dot" aria-hidden="true" />
-              {f}
-            </li>
-          ))
-        }
-      </ul>
+  <!-- Our story: the title on the left, the paragraph on the right. -->
+  <section class="ab-story pg-sec" aria-labelledby="story-title">
+    <div class="container ab-story__grid">
+      <h2 id="story-title" class="ab-story__title" data-render>{a.story.title}</h2>
+      <p class="ab-story__text" data-reveal>{a.story.text}</p>
     </div>
   </section>
 
+  <!-- Woza Labs enters as a panel over the team (scripts/panels.ts). -->
+  <div class="pnl">
   <section class="ab-team pg-sec" aria-labelledby="team-title">
     <div class="container pg-body">
       <SectionHead id="team-title" title={a.team.title} text={a.team.text} align="side" />
@@ -94,20 +87,23 @@ const wozaLogo = wozaLogoRaw
       </div>
       <dl class="ab-woza__contact" data-reveal-group>
         <div class="ab-woza__fact" data-reveal>
-          <dt class="t-small">Office</dt>
+          <dt class="t-small">{a.contact.officeLabel}</dt>
           <dd>{a.contact.address}</dd>
         </div>
         <div class="ab-woza__fact" data-reveal>
-          <dt class="t-small">Email</dt>
+          <dt class="t-small">{a.contact.emailLabel}</dt>
           <dd><a href={`mailto:${a.contact.email}`}>{a.contact.email}</a></dd>
         </div>
         <div class="ab-woza__fact" data-reveal>
-          <dt class="t-small">{a.contact.join}</dt>
-          <dd><a href={`mailto:${a.contact.email}`}>{a.contact.joinCta}</a></dd>
+          <dt class="t-small">{a.contact.joinLabel}</dt>
+          <dd>
+            {a.contact.join} <a href={`mailto:${a.contact.email}`}>{a.contact.email}</a>.
+          </dd>
         </div>
       </dl>
     </div>
   </section>
+  </div>
 </PageLayout>
 
 <style>
@@ -129,38 +125,34 @@ const wozaLogo = wozaLogoRaw
     object-position: 50% 45%;
   }
 
-  /* ---------- Quote ---------- */
-  .ab-quote {
-    padding-block: clamp(6rem, 4rem + 8vw, 13rem);
-  }
-
-  .ab-quote__inner {
+  /* ---------- Our story ---------- */
+  .ab-story__grid {
     display: grid;
-    justify-items: center;
-    gap: clamp(2.5rem, 2rem + 2vw, 4rem);
-    text-align: center;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem clamp(3rem, 1rem + 6vw, 8rem);
   }
 
-  .ab-quote__text {
+  @media (min-width: 64rem) {
+    .ab-story__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+  }
+
+  .ab-story__title {
     max-width: 16ch;
-    font-size: var(--pg-hero);
-    line-height: 1.02;
-    letter-spacing: -0.03em;
+    font-size: var(--fs-h2);
+    line-height: 1.08;
+    letter-spacing: var(--track-heading);
     text-wrap: balance;
   }
 
-  .ab-quote__facts {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.75rem 2.5rem;
+  .ab-story__text {
+    max-width: 58ch;
+    font-size: var(--fs-lead);
+    line-height: 1.55;
+    letter-spacing: var(--track-title);
     color: var(--ink-2);
-  }
-
-  .ab-quote__facts li {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.625rem;
   }
 
   /* ---------- Team ---------- */
@@ -245,9 +237,9 @@ const wozaLogo = wozaLogoRaw
   }
 
   .ab-woza__text {
-    max-width: 22ch;
-    font-size: var(--pg-statement);
-    line-height: 1.1;
+    max-width: 30ch;
+    font-size: var(--fs-h3);
+    line-height: 1.25;
     letter-spacing: -0.025em;
     text-wrap: balance;
   }

@@ -1,8 +1,8 @@
 /**
- * Scroll-linked light → dark → light transition around the dark Solutions section.
+ * Scroll-linked light → dark → light transition around the home's dark section.
  *
- * Darkness d (0..1) rises while Solutions slides in over the 3D stage and falls
- * again while Benefits comes in, so the whole viewport changes theme together
+ * Darkness d (0..1) rises while the dark section slides in over the 3D stage and falls
+ * again while the next section comes in, so the whole viewport changes theme together
  * instead of showing a hard edge. `--d` (background) and `--dt` (text) are written
  * on every `.theme-scrub` element (only those elements recalculate styles).
  * The header theme is handled in SiteHeader.astro via [data-header-dark].

@@ -1,19 +1,19 @@
 ---
 /**
  * Platform (/platform), from "predicterra-02-platform.md".
- * hero (video) · what a Cognitive Twin is · how it's built · what goes in and
- * what comes out · validation · trust (dark) · CTA.
- * "Read the methodology" stays hidden until the PDF exists.
+ * hero (video) · what it is · how it's built · the ontology in action · every
+ * team, every horizon · already built · in and out · validation and trust
+ * (dark) · CTA. "Read the methodology" stays hidden until the PDF exists.
  */
 import PageLayout from '../layouts/PageLayout.astro';
 import VideoHero from '../sections/pages/VideoHero.astro';
 import Compare from '../sections/pages/Compare.astro';
 import Rows from '../sections/pages/Rows.astro';
-import Stats from '../sections/pages/Stats.astro';
-import Cards from '../sections/pages/Cards.astro';
 import SectionHead from '../sections/pages/SectionHead.astro';
+import Stats from '../sections/pages/Stats.astro';
 import CodePanel from '../components/CodePanel.astro';
 import Cta from '../sections/home/Cta.astro';
+import Showcase from '../sections/home/Showcase.astro';
 import { getCopy } from '../i18n/config';
 import { softwareJsonLd } from '../data/seo';
 
@@ -29,7 +29,10 @@ const pad = (n: number) => String(n).padStart(3, '0');
   locale={locale}
   jsonLd={[softwareJsonLd(site, c.seo.description)]}
 >
-  <VideoHero locale={locale} {...c.hero} logos={[...c.logos]} />
+  <VideoHero locale={locale} {...c.hero} />
+
+  <!-- The platform itself: the app capture from the home hero, straightening as it scrolls in. -->
+  <Showcase locale={locale} />
 
   <Compare
     id="twin-title"
@@ -37,29 +40,99 @@ const pad = (n: number) => String(n).padStart(3, '0');
     text={c.twin.text}
     columns={c.twin.columns}
     rows={c.twin.rows}
+    closing={c.twin.closing}
     variant="steps"
     head="center"
   />
 
-  <Rows
-    id="arch-title"
-    title={c.architecture.title}
-    items={c.architecture.layers.map((l) => ({ title: l.title, text: l.text }))}
-    marker="num"
-    head="side"
-  />
-  <Stats locale={locale} items={[...c.architecture.figures]} label="The platform in figures" />
+  <Rows id="arch-title" title={c.architecture.title} text={c.architecture.text} items={c.architecture.layers} marker="num">
+    <p class="pf-note" data-reveal>
+      <span class="pg-dot" aria-hidden="true"></span>
+      {c.architecture.closing}
+    </p>
+  </Rows>
 
-  <!-- What goes in and what comes out: two quiet lists, the risk event beside them. -->
+  <!-- The ontology in action: the story on one side, the object and its relationships on the other. -->
+  <section class="pf-ont pg-sec" aria-labelledby="ont-title">
+    <div class="container pf-ont__grid">
+      <SectionHead id="ont-title" title={c.ontology.title} text={c.ontology.text} align="stack" />
+      <figure class="pf-obj" data-reveal>
+        <figcaption class="pf-obj__bar t-caption">
+          <span class="pf-obj__live" aria-hidden="true"></span>
+          {c.ontology.label}
+        </figcaption>
+        <dl class="pf-obj__list">
+          {
+            c.ontology.nodes.map((n) => (
+              <div class="pf-obj__row">
+                <dt class="t-small">{n.label}</dt>
+                <dd>{n.value}</dd>
+              </div>
+            ))
+          }
+          <div class="pf-obj__row pf-obj__row--decision">
+            <dt class="t-small">{c.ontology.decision.label}</dt>
+            <dd>{c.ontology.decision.value}</dd>
+          </div>
+        </dl>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Every team, every horizon: one row per team. -->
+  <section class="pf-hz pg-sec" aria-labelledby="hz-title">
+    <div class="container pg-body">
+      <SectionHead id="hz-title" title={c.horizons.title} text={c.horizons.text} align="side" />
+      <div class="pf-hz__table" role="table" aria-label={c.horizons.title}>
+        <div class="pf-hz__row pf-hz__row--head" role="row">
+          <span role="columnheader"></span>
+          <span role="columnheader">{c.horizons.labels.question}</span>
+          <span role="columnheader">{c.horizons.labels.gets}</span>
+        </div>
+        {
+          c.horizons.teams.map((t, i) => (
+            <div class="pf-hz__row" role="row" data-reveal>
+              <div class="pf-hz__team" role="cell">
+                <span class="pg-idx">{pad(i + 1)}</span>
+                <span class="pf-hz__name">{t.team}</span>
+                <span class="pf-hz__horizon t-small">{t.horizon}</span>
+              </div>
+              <p class="pf-hz__q" role="cell">
+                {t.question}
+              </p>
+              <p class="pf-hz__gets" role="cell">
+                {t.gets}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+      <p class="pf-note" data-reveal>
+        <span class="pg-dot" aria-hidden="true"></span>
+        {c.horizons.closing}
+      </p>
+    </div>
+  </section>
+
+  <!-- Already built: the three figures as rows, each with what it means. -->
+  <Stats
+    id="built-title"
+    title={c.built.title}
+    text={c.built.text}
+    items={c.built.items.map((it) => ({ value: it.value, text: it.title, note: it.text }))}
+  />
+
+  <!-- In and out, then validation and trust entering over it as a panel (scripts/panels.ts). -->
+  <div class="pnl">
   <section class="pf-io pg-sec" aria-labelledby="io-title">
     <div class="container pg-body">
-      <SectionHead id="io-title" title={c.io.title} align="stack" wide />
+      <SectionHead id="io-title" title={c.io.title} text={c.io.text} align="side" />
       <div class="pf-io__grid">
         <div class="pf-io__lists">
           {
             [
-              { label: c.io.readsLabel, items: c.io.reads, out: false },
-              { label: c.io.returnsLabel, items: c.io.returns, out: true },
+              { label: c.io.inLabel, items: c.io.in, out: false },
+              { label: c.io.outLabel, items: c.io.out, out: true },
             ].map((list) => (
               <div class="pf-io__list">
                 <p class:list={['pf-io__label t-small', list.out && 'is-out']}>{list.label}</p>
@@ -79,25 +152,170 @@ const pad = (n: number) => String(n).padStart(3, '0');
           <CodePanel label={c.io.code.label} json={c.io.code.json} />
         </div>
       </div>
-      <p class="pf-io__note" data-reveal>
+      <p class="pf-note" data-reveal>
         <span class="pg-dot" aria-hidden="true"></span>
-        {c.io.integrations}
+        {c.io.note}
       </p>
     </div>
   </section>
 
-  <Cards id="validation-title" title={c.validation.title} items={c.validation.items} head="center" />
-
-  <Rows id="trust-title" title={c.trust.title} items={c.trust.items} head="stack" dark>
-    <ul class="pf-seals" aria-label="Certifications and availability" data-reveal>
-      {c.trust.seals.map((s) => <li class="chip pf-seal">{s}</li>)}
-    </ul>
+  <Rows id="trust-title" title={c.trust.title} items={c.trust.items} dark>
+    <div class="pf-trust" data-reveal>
+      <p class="pf-trust__text">{c.trust.statement}</p>
+      <ul class="pf-seals" aria-label="Certifications and availability">
+        {c.trust.seals.map((s) => <li class="chip pf-seal">{s}</li>)}
+      </ul>
+    </div>
   </Rows>
+  </div>
 
   <Cta locale={locale} copy={c.cta} />
 </PageLayout>
 
 <style>
+  /* A closing line under a section, with the orange dot. */
+  .pf-note {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    max-width: 60ch;
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    letter-spacing: var(--track-title);
+    color: var(--ink-2);
+  }
+
+  /* ---------- The ontology in action ---------- */
+  .pf-ont__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 3rem clamp(3rem, 1rem + 6vw, 8rem);
+  }
+
+  @media (min-width: 64rem) {
+    .pf-ont__grid {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: center;
+    }
+  }
+
+  /* The object card: the brand's dark panel, one row per relationship, the
+     decision in orange at the end. */
+  .pf-obj {
+    background: #1e1e1e;
+    color: #f1f1f1;
+  }
+
+  .pf-obj__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid rgb(241 241 241 / 0.1);
+    color: #a7a7a7;
+  }
+
+  .pf-obj__live {
+    width: 0.375rem;
+    height: 0.375rem;
+    background: var(--accent);
+  }
+
+  .pf-obj__list {
+    display: grid;
+    padding: 0.5rem 1.25rem 1.25rem;
+  }
+
+  .pf-obj__row {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 0.875rem;
+    border-bottom: 1px solid rgb(241 241 241 / 0.08);
+  }
+
+  .pf-obj__row dt {
+    color: #a7a7a7;
+  }
+
+  .pf-obj__row dd {
+    letter-spacing: var(--track-title);
+  }
+
+  .pf-obj__row--decision {
+    margin-top: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-bottom: 0;
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .pf-obj__row--decision dt {
+    color: rgb(255 255 255 / 0.8);
+  }
+
+  /* ---------- Every team, every horizon ---------- */
+  .pf-hz__table {
+    display: grid;
+  }
+
+  .pf-hz__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem var(--gutter);
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 56rem) {
+    .pf-hz__row {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 4fr) minmax(0, 4fr);
+      align-items: baseline;
+    }
+  }
+
+  .pf-hz__row--head {
+    padding-block: 0 0.75rem;
+    border-top: 0;
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  @media (max-width: 55.99rem) {
+    .pf-hz__row--head {
+      display: none;
+    }
+  }
+
+  .pf-hz__team {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: 0.25rem 0.5rem;
+    align-items: baseline;
+  }
+
+  .pf-hz__name {
+    font-size: var(--fs-h4);
+    letter-spacing: var(--track-title);
+  }
+
+  .pf-hz__horizon {
+    grid-column: 2;
+    color: var(--muted);
+  }
+
+  .pf-hz__q {
+    font-size: var(--fs-lead);
+    line-height: 1.4;
+    letter-spacing: var(--track-title);
+  }
+
+  .pf-hz__gets {
+    color: var(--ink-2);
+  }
+
+  /* ---------- In and out ---------- */
   .pf-io__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -161,11 +379,14 @@ const pad = (n: number) => String(n).padStart(3, '0');
     }
   }
 
-  .pf-io__note {
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-    max-width: 52ch;
+  /* ---------- Trust ---------- */
+  .pf-trust {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 62ch;
+  }
+
+  .pf-trust__text {
     font-size: var(--fs-lead);
     line-height: 1.5;
     letter-spacing: var(--track-title);

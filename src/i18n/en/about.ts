@@ -1,23 +1,18 @@
 import { external } from '../../data/routes';
 
-// /about, from "predicterra-11-about.md". Copy word for word; eyebrows left out.
+// /about, from "predicterra-03-about.md". Final copy; section eyebrows left out.
 // Photos stay in colour (site rule), whatever the brief's visual note says.
 export default {
   seo: {
     title: 'About Predicterra | European Deep-Tech for the Energy System',
     description:
-      'Predicterra builds the Cognitive Twin of the energy system. Built in Bilbao, independent of any vendor, and in operation on two of Spain’s largest grids.',
+      'Predicterra builds the Cognitive Twin of the energy system in Bilbao, European by design and independent of any vendor.',
   },
   hero: {
     label: 'About Predicterra',
     title: 'European deep-tech for the energy system.',
-    text: 'Predicterra started inside Woza Labs, running on real infrastructure for Spain’s largest grid operators. Once the technology had proven its value, it became an independent company.',
-    quote: 'Newly incorporated. Not new.',
-    facts: [
-      'Built in Bilbao',
-      'Independent of any energy company or vendor',
-      'In operation on two of Spain’s largest grids',
-    ],
+    text: 'Predicterra builds the Cognitive Twin of the energy system: a live model of energy assets, the physical world acting on them and how everything connects.',
+    note: 'Built in Bilbao, in operation with Iberdrola, Naturgy and Moeve.',
     photo: {
       src: '/about/bilbao-1.webp',
       w: 1200,
@@ -25,9 +20,13 @@ export default {
       alt: 'BAT Acceleration Tower on Gran Vía, Bilbao, home of the Predicterra office',
     },
   },
+  story: {
+    title: 'Built on real infrastructure from the first day.',
+    text: 'Predicterra started inside Woza Labs as a deployment of our core technology. From the first day it ran on real infrastructure, solving real operational problems for Spain’s largest grid operators, and its first milestones were deployments, published results and recognition from the industry it was built to serve. Once the technology had proven its value, Predicterra became an independent company, controlled by no utility, oil company, equipment maker or software vendor.',
+  },
   team: {
     title: 'Earth System Engineers.',
-    text: 'Engineers, scientists and energy specialists. We connect the platform to the reality of your assets, and stay until it works.',
+    text: 'Engineers, scientists and energy specialists who connect the platform to the reality of your assets and stay until it works.',
     people: [
       { name: 'Sebastián Priolo', role: 'Executive Chairman', photo: '/about/sebastian-priolo.webp' },
       { name: 'Fernando Tadakuma', role: 'Head of Predicterra', photo: '/about/fernando-tadakuma.webp' },
@@ -37,13 +36,15 @@ export default {
     ],
   },
   woza: {
-    text: 'Built by Woza Labs, a Bilbao deep-tech studio.',
+    text: 'Predicterra was born at Woza Labs, a Bilbao deep-tech studio, where its ontology, its simulation engine and its geospatial core were built from the ground up.',
     link: { label: 'Visit Woza Labs', href: external.woza },
   },
   contact: {
+    officeLabel: 'Office',
     address: 'BAT Acceleration Tower, Gran Vía 1, 48001 Bilbao',
+    emailLabel: 'Email',
     email: 'hello@predicterra.com',
-    join: 'Want to model the physical world with us?',
-    joinCta: 'Write to hello@predicterra.com',
+    joinLabel: 'Join us',
+    join: 'To model the physical world with us, write to',
   },
 } as const;

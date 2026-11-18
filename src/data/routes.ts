@@ -4,8 +4,6 @@
  */
 export const routes = {
   home: '/',
-  /** New home content, side by side with the current one for comparison. */
-  homeNew: '/home-new',
   platform: '/platform',
   cases: '/cases',
   /** Case detail pages from the earlier site (linked from the current home). */
@@ -16,7 +14,6 @@ export const routes = {
   engineer: '/contact?topic=engineer',
   privacy: '/privacy',
   legal: '/legal',
-  cookies: '/cookies',
   sectors: {
     grid: '/grid',
     solar: '/solar',
@@ -35,4 +32,10 @@ export const external = {
   woza: 'https://www.wozalabs.com',
   iberdrolaCoverage:
     'https://www.latitudemedia.com/news/iberdrola-turns-to-ai-for-power-line-resilience/',
+  /** Published articles behind each case (Cases page). */
+  caseIde:
+    'https://iberdrola.com/press-room/news/detail/iberdrola-teams-up-basque-startup-woza-shield-power-lines-climate-change',
+  /** E.DSO success cases listing, until the direct link to the UFD case is confirmed. */
+  caseUfd: 'https://www.edsoforsmartgrids.eu/success-cases/',
+  caseMoeve: 'https://www.moeveglobal.com/en/press/moeve-startups-energy-transition',
 } as const;

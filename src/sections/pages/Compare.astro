@@ -213,11 +213,11 @@ const hi = columns.length - 1;
     align-content: start;
     gap: 1rem;
     padding: 1.5rem;
-    border: 1px solid var(--line);
   }
 
-  .cp__card.is-hi {
-    border-color: transparent;
+  /* A filled card, no outline (the highlighted one is the dark o-corners block). */
+  .cp__card:not(.is-hi) {
+    background: var(--card);
   }
 
   .cp__card .cp__head {

@@ -5,18 +5,18 @@
  */
 import Icon from '../../components/Icon.astro';
 import AssetPanel from '../../components/AssetPanel.astro';
-import { getCopy, type Locale } from '../../i18n/config';
+import Button from '../../components/Button.astro';
+import { getCopy, localizePath, type Locale } from '../../i18n/config';
 import type { IconName } from '../../data/icons';
 
 interface Props {
   locale?: Locale;
-  /** Other copy for the same scene (the new home's incidents). Same steps, so the camera stays in sync. */
-  scene?: ReturnType<typeof getCopy>['home']['scene'];
 }
-const { locale = 'en', scene = getCopy(locale).home.scene } = Astro.props;
-// One stop per sector, then the capability stops (no overview). Only sectors
-// carry an at-risk asset, a marker and a panel.
-const steps = [...scene.sectors, ...scene.capabilities];
+const { locale = 'en' } = Astro.props;
+const { scene } = getCopy(locale).home;
+// One stop per sector (no overview), each with its at-risk asset, marker and
+// panel. The trace glides on past the last stop as the next section slides over.
+const steps = scene.sectors;
 const stops = steps.length;
 ---
 
@@ -47,6 +47,7 @@ const stops = steps.length;
               </h3>
             </div>
             <p class="step__text">{s.text}</p>
+            <Button class="step__link" href={localizePath(s.href, locale)} label={s.link} variant="secondary" />
           </article>
         ))
       }
@@ -206,6 +207,17 @@ const stops = steps.length;
     letter-spacing: var(--track-heading);
   }
 
+  /* The copy layer ignores the pointer; only the active step's link takes it. */
+  .step :global(.step__link) {
+    justify-self: start;
+    margin-top: 0.25rem;
+    pointer-events: none;
+  }
+
+  .step[data-active] :global(.step__link) {
+    pointer-events: auto;
+  }
+
   .step__text {
     max-width: 30ch;
     color: var(--ink-2);
@@ -309,7 +321,6 @@ const stops = steps.length;
     left: 0;
     width: 22.5rem;
     background: var(--surface);
-    border: 1px solid var(--line);
     box-shadow:
       0 1px 2px rgb(30 30 30 / 0.06),
       0 16px 40px -12px rgb(30 30 30 / 0.22);

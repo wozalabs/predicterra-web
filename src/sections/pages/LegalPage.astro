@@ -5,6 +5,7 @@
  * Templates with bracketed fields, so the pages stay out of search for now.
  */
 import PageLayout from '../../layouts/PageLayout.astro';
+import PageTitle from '../../components/PageTitle.astro';
 import type { LegalDoc } from '../../i18n/en/legal';
 import type { Locale } from '../../i18n/config';
 
@@ -20,7 +21,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
   <article class="lg" aria-labelledby="page-title">
     <div class="container lg__grid">
       <header class="lg__head">
-        <h1 id="page-title" class="lg__title">{doc.title}</h1>
+        <PageTitle class="lg__title" text={doc.title} />
         <p class="lg__updated t-small">{doc.updated}</p>
       </header>
 

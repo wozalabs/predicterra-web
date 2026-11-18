@@ -1,9 +1,9 @@
 ---
-import SectorPage from '../sections/pages/SectorPage.astro';
+import SolutionPage from '../sections/pages/SolutionPage.astro';
 import { getCopy } from '../i18n/config';
 
 const locale = 'en';
-const { solar } = getCopy(locale);
+const { solar: copy } = getCopy(locale);
 ---
 
-<SectorPage locale={locale} copy={solar} layout="split-reverse" />
+<SolutionPage locale={locale} copy={copy} layout="split-reverse" />

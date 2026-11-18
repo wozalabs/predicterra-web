@@ -1,7 +1,7 @@
 ---
 /**
- * Hero, app layout (default). No footage: the title, its line and the action
- * centred on the page canvas, and the platform capture (Showcase.astro, which
+ * Hero, app layout (default). No footage: the label, the title, its text and
+ * the two actions centred on the page canvas, and the platform capture (Showcase.astro, which
  * follows this section) peeking up from the bottom, barely tilted.
  * Follows the site theme (dark by default).
  */
@@ -12,17 +12,21 @@ interface Props {
   locale?: Locale;
 }
 const { locale = 'en' } = Astro.props;
-const { clean } = getCopy(locale).home.hero;
+const { main } = getCopy(locale).home.hero;
 ---
 
 <section class="hap" aria-labelledby="hap-title" data-hero-variant="app">
   <div class="hap__content container">
+    <p class="label hap__label">{main.label}</p>
     <h1 id="hap-title" class="hap__title">
-      <span class="hap__line"><span>{clean.titleLine1}</span></span>
-      <span class="hap__line"><span>{clean.titleLine2}</span></span>
+      <span class="hap__line"><span>{main.titleLine1}</span></span>
+      <span class="hap__line"><span>{main.titleLine2}</span></span>
     </h1>
-    <p class="hap__text">{clean.text}</p>
-    <Button class="hap__cta" href={localizePath(clean.cta.href, locale)} label={clean.cta.label} size="lg" />
+    <p class="hap__text">{main.text}</p>
+    <div class="hap__actions">
+      <Button href={localizePath(main.primary.href, locale)} label={main.primary.label} size="lg" />
+      <Button href={localizePath(main.secondary.href, locale)} label={main.secondary.label} size="lg" variant="secondary" />
+    </div>
   </div>
 </section>
 
@@ -51,22 +55,30 @@ const { clean } = getCopy(locale).home.hero;
     text-align: center;
   }
 
+  .hap__label {
+    margin-bottom: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
+  }
+
   .hap__title {
     display: grid;
-    font-size: clamp(2.75rem, 1rem + 4.6vw, 6rem);
+    font-size: clamp(2.5rem, 1rem + 4vw, 5.25rem);
     line-height: 0.96;
     letter-spacing: var(--track-display);
   }
 
   .hap__text {
-    max-width: 34rem;
+    max-width: 44rem;
     margin-top: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
     font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
     line-height: 1.45;
     color: var(--ink-2);
   }
 
-  .hap__content :global(.hap__cta) {
+  .hap__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
     margin-top: clamp(1.5rem, 1rem + 1.2vw, 2.25rem);
   }
 
@@ -95,14 +107,18 @@ const { clean } = getCopy(locale).home.hero;
     .hap__line:nth-child(2) > span {
       --d: 290ms;
     }
+    .hap__label,
     .hap__text,
-    .hap__content :global(.hap__cta) {
+    .hap__actions {
       animation: hap-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
+    .hap__label {
+      animation-delay: 120ms;
     }
     .hap__text {
       animation-delay: 460ms;
     }
-    .hap__content :global(.hap__cta) {
+    .hap__actions {
       animation-delay: 560ms;
     }
   }

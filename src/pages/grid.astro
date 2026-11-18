@@ -1,9 +1,9 @@
 ---
-import SectorPage from '../sections/pages/SectorPage.astro';
+import SolutionPage from '../sections/pages/SolutionPage.astro';
 import { getCopy } from '../i18n/config';
 
 const locale = 'en';
-const { grid } = getCopy(locale);
+const { grid: copy } = getCopy(locale);
 ---
 
-<SectorPage locale={locale} copy={grid} layout="split" />
+<SolutionPage locale={locale} copy={copy} layout="split" />

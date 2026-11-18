@@ -1,0 +1,49 @@
+---
+/**
+ * Home key figures: the title on the left, the four figures as rows on the
+ * right (label left, value large on the right). After the dark section it
+ * brings the light back (theme-scrub).
+ */
+import FigureList from '../pages/FigureList.astro';
+import { getCopy, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { metrics, metricsTitle } = getCopy(locale).home;
+---
+
+<section class="mt theme-scrub" aria-labelledby="mt-title">
+  <div class="container mt__grid">
+    <h2 id="mt-title" class="mt__title" data-render>{metricsTitle}</h2>
+    <FigureList items={metrics.map((m) => ({ value: m.value, label: m.text }))} />
+  </div>
+</section>
+
+<style>
+  .mt {
+    position: relative;
+    z-index: var(--z-cover);
+    padding-block: clamp(6rem, 4rem + 7vw, 12rem);
+  }
+
+  .mt__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem var(--gutter);
+  }
+
+  @media (min-width: 64rem) {
+    .mt__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+  }
+
+  .mt__title {
+    font-size: var(--fs-h2);
+    line-height: 1.08;
+    letter-spacing: var(--track-heading);
+  }
+</style>

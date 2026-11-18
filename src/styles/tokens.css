@@ -33,8 +33,14 @@
   --card: #f0f0f0;
   --surface: #ffffff;
   --ink: var(--grey-700);
-  --ink-2: var(--grey-600);
-  --muted: var(--grey-500);
+  /* Secondary and muted text: two clear steps down from the ink. */
+  --ink-2: #4d4d4d;
+  --muted: #6b6b6b;
+  /* The same two steps on dark surfaces (scrubbed sections, dark theme). */
+  --ink-2-dk: #a3a3a3;
+  --muted-dk: #7d7d7d;
+  --ink-2-lt: #4d4d4d;
+  --muted-lt: #6b6b6b;
   --muted-large: var(--grey-400); /* only for text >= 44px or hairlines */
   --line: rgb(30 30 30 / 0.16);
   --line-strong: rgb(30 30 30 / 0.32);
@@ -108,33 +114,33 @@
 
 /*
  * Dark theme (the default). Set on <html> before first paint (BaseLayout) and
- * switched from the header. Same brand ramp: the canvas sits one step below
- * #1E1E1E so flat cards can use the brand's darkest grey.
+ * switched from the header. A deep, near-black canvas; the sections that are
+ * dark in the light theme turn light here (#F1F1F1), with a straight edge.
  */
 :root[data-theme='dark'] {
-  --canvas: #161616;
-  --canvas-rgb: 22 22 22;
-  --card: #1e1e1e;
-  --surface: #262626;
+  --canvas: #0d0d0d;
+  --canvas-rgb: 13 13 13;
+  --card: #1a1a1a;
+  --surface: #242424;
   --ink: #f1f1f1;
-  --ink-2: #cecece;
-  --muted: #a7a7a7;
-  --muted-large: #818181;
+  --ink-2: #a3a3a3;
+  --muted: #7d7d7d;
+  --muted-large: #5e5e5e;
   --line: rgb(241 241 241 / 0.14);
   --line-strong: rgb(241 241 241 / 0.32);
   --chip-bg: rgb(129 129 129 / 0.16);
-  --dk-canvas: #161616;
-  --dk-card: #1e1e1e;
-  --dk-surface: #262626;
+  --dk-canvas: #0d0d0d;
+  --dk-card: #1a1a1a;
+  --dk-surface: #242424;
   --logo-inv: 1;
-  --cta-ground: #1e1e1e;
-  --cta-ground-rgb: 30 30 30;
-  --media: #262626;
-  --media-hover: #2e2e2e;
+  --cta-ground: #1a1a1a;
+  --cta-ground-rgb: 26 26 26;
+  --media: #1e1e1e;
+  --media-hover: #262626;
   /* Portraits are cut out on white: a light tile keeps them true to colour. */
   --portrait: #cfcfcf;
-  --tick-off: #3d3d3d;
-  --scene-dot: #2e2e2e;
-  --hero-dither: #363636;
+  --tick-off: #333333;
+  --scene-dot: #242424;
+  --hero-dither: #2e2e2e;
   color-scheme: dark;
 }

@@ -1,6 +1,5 @@
 import common from './common';
 import home from './home';
-import homeNew from './home-new';
 import about from './about';
 import cases from './cases';
 import casesPage from './cases-page';
@@ -18,7 +17,6 @@ import legal from './legal';
 export default {
   common,
   home,
-  homeNew,
   about,
   cases,
   casesPage,

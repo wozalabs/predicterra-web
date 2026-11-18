@@ -1,9 +1,9 @@
 ---
 /**
- * The sector's asset from the homepage 3D scene (white, the part at risk in
- * orange), turning slowly. Same builders, materials and light as the 3D section
- * (scripts/sector-scene/asset-preview.ts). three.js loads only when the view is
- * near the screen, and the turning stops while it is out of sight. Without
+ * The sector's asset from the homepage 3D scene (the part at risk in orange),
+ * standing still (turbine rotors keep turning). Same builders, materials and
+ * light as the 3D section (scripts/sector-scene/asset-preview.ts). three.js
+ * loads only when the view is near the screen. Without
  * WebGL it stays a plain canvas-coloured panel.
  */
 interface Props {
@@ -52,7 +52,7 @@ const { asset, class: className } = Astro.props;
     let on = false;
     const start = () => {
       if (!mod) return;
-      mod.showPreview(id, canvas, { reducedMotion: reduce });
+      mod.showPreview(id, canvas, { reducedMotion: reduce, turn: false });
       canvas.dataset.ready = '';
     };
     new IntersectionObserver(

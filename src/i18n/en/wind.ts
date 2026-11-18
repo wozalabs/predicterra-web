@@ -1,77 +1,49 @@
-import type { SectorCopy } from '../../sections/pages/types';
-import { actions, cta, cases } from './pages-shared';
+import type { SolutionCopy } from '../../sections/pages/types';
+import { actions, cta, proof } from './pages-shared';
 
-// /wind, from "predicterra-05-wind.md". Copy word for word; eyebrows left out.
+// /wind, from "predicterra-06-wind.md". Final copy; section eyebrows left out.
+// No wind case is published yet: the metrics are platform capabilities.
 export default {
   seo: {
     title: 'Climate Risk and Asset Intelligence for Wind Farms | Predicterra',
-    description:
-      'The Cognitive Twin for wind portfolios. Gusts, storms, fire, heat and flood risk per turbine and site, from the next 14 days to 2100.',
+    description: 'The Cognitive Twin for wind portfolios: gusts, storms, fire, heat and flood risk per turbine and site.',
   },
   hero: {
     label: 'Predicterra for Wind',
     title: 'See what’s coming to every turbine.',
-    text: 'Stop before the storm and restart as soon as it’s safe, book cranes for the right days, and repower where the future wind allows.',
+    text: 'Know which turbines will hit cut-out before the storm, book cranes for the right days, and repower where the future wind allows.',
     primary: actions.demo,
     secondary: actions.platform,
   },
   asset: 'wind',
-  // No wind case published yet: the first three figures are platform capability.
-  metrics: {
-    items: [
-      { value: '14 days', text: 'of turbine-level forecasts' },
-      { value: 'To 2100', text: 'climate scenarios for the whole asset life' },
-      { value: '6', text: 'hazards on one model, compound risk included' },
-      { value: '95%', text: 'less time producing climate and compliance reports' },
-    ],
-    backing: {
-      text: 'Proven in operation on 116,000 km of Spanish distribution grid, the kind of network your turbines export through.',
-      link: cases.all,
-    },
-  },
-  what: {
-    title: 'Every turbine, every lift, on one model.',
-    text: 'Predicterra models your turbines and the forces acting on them: wind, wildfire, heat, flood, vegetation and drought. It forecasts gusts and cut-out per turbine for the next 14 days, finds the windows to stop, restart, lift and climb, and tests siting, repowering and life extension against the wind of the next thirty years. O&M, development, asset management and compliance work from the same picture.',
-    uses: [
-      'Gust and storm forecasting',
-      'Shutdown and restart windows',
-      'Lifting windows',
-      'Safe crew access',
-      'Wildfire around farms',
-      'Production at risk',
-      'Siting, repowering and life extension',
-      'Insurance and lender due diligence',
-    ],
-  },
-  why: {
+  proof: proof.onTheGrids('turbines export through'),
+  metrics: [
+    { value: 'Up to 14 days', text: 'of turbine-level forecasts' },
+    { value: 'To 2100', text: 'climate scenarios for the whole asset life' },
+    { value: '30+', text: 'hazard models, ready on day one' },
+    { value: '6', text: 'hazards on one model, compound risk included' },
+  ],
+  solution: {
     title: 'Every wrong call on the weather costs production.',
-    items: [
-      {
-        icon: 'wind_power',
-        title: 'Turbine by turbine',
-        text: 'Risk resolved per turbine, not per region, with the reason and the time window.',
-      },
-      {
-        icon: 'groups',
-        title: 'One model, every team',
-        text: 'O&M, development, asset management and compliance read the same numbers.',
-      },
-      {
-        icon: 'api',
-        title: 'Works with what you have',
-        text: 'Reads your turbine SCADA, condition monitoring, met masts and LiDAR, and sends risk events back into them.',
-      },
-      {
-        icon: 'lock',
-        title: 'Built in Europe',
-        text: 'EU-hosted or on-premises, and independent of any energy company or vendor.',
-      },
+    paragraphs: [
+      'As portfolios grow and repower, those calls multiply. Predicterra represents every turbine as an object in one ontology, linked to the site, the grid it exports through and the forces acting on it: wind, wildfire, heat, flood and drought, plus the vegetation that fuels fire around each site. O&M, development, asset management and compliance work from that same model, with gusts and cut-out forecast up to 14 days ahead and repowering and life extension tested against the wind of each turbine’s whole life.',
+      'Predicterra reads your turbine SCADA, condition monitoring, met masts and LiDAR, and sends structured risk events back into the systems your teams already use.',
     ],
   },
-  cta: cta(
-    'Your SCADA knows how every turbine performs.',
-    'Predicterra knows',
-    'what’s coming to it.',
-    'See your wind portfolio in the Cognitive Twin. Start with one problem, on your own data.',
-  ),
-} satisfies SectorCopy;
+  list: {
+    title: 'Everything your turbines face, on one model.',
+    kind: 'uses',
+    items: [
+      { title: 'Gust and storm forecasting', text: 'Damaging gusts per turbine, with the time window.' },
+      {
+        title: 'Shutdown and restart windows',
+        text: 'When to stop each turbine ahead of high winds, and when it’s safe to bring it back.',
+      },
+      { title: 'Lifting windows', text: 'When the wind allows crane lifts for major component exchanges.' },
+      { title: 'Safe crew access', text: 'When roads and wind let crews reach and climb each turbine.' },
+      { title: 'Production at risk', text: 'Output lost to weather, across the portfolio.' },
+      { title: 'Siting, repowering and life extension', text: 'Each option tested against climate scenarios to 2100.' },
+    ],
+  },
+  cta: cta('See your wind portfolio', 'in the', 'Cognitive Twin.'),
+} satisfies SolutionCopy;

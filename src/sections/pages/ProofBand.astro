@@ -1,0 +1,180 @@
+---
+/**
+ * Logos of the clients in operation and of the recognition, with one line and
+ * the button to the cases (home). The logos run the full width of the page in
+ * an endless, slow horizontal loop that pauses under the pointer; with reduced
+ * motion they sit still, centred and wrapped.
+ */
+import Button from '../../components/Button.astro';
+import { localizePath, withBase, type Locale } from '../../i18n/config';
+import type { Proof } from '../../i18n/en/pages-shared';
+
+interface Props {
+  locale?: Locale;
+  proof: Proof;
+  class?: string;
+}
+const { locale = 'en', proof, class: className } = Astro.props;
+// Logos are scaled up a step for the band (the source heights suit the heroes).
+const scale = 1.25;
+---
+
+<section class:list={['pb', className]} aria-label="Clients and recognition">
+  <div class="pb__marquee" data-reveal>
+    {
+      [0, 1].map((copy) => (
+        <ul class="pb__track" aria-hidden={copy === 1 ? 'true' : undefined}>
+          {proof.groups.map((g) => (
+            <li class="pb__group">
+              <span class="pb__label">{g.label}</span>
+              <ul class="pb__logos">
+                {g.items.map((it) => (
+                  <li class="pb__item">
+                    {it.src ? (
+                      <img
+                        src={withBase(it.src)}
+                        alt={copy === 1 ? '' : it.name}
+                        width={Math.round(((it.w ?? 1) / (it.h0 ?? 1)) * (it.h ?? 20) * scale)}
+                        height={Math.round((it.h ?? 20) * scale)}
+                        style={`--h:${Math.round((it.h ?? 20) * scale)}px`}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <span class="pb__word">{it.name}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+
+  <div class="container pb__foot" data-reveal-group>
+    <p class="pb__text" data-reveal>{proof.text}</p>
+    <div data-reveal>
+      <Button href={localizePath(proof.link.href, locale)} label={proof.link.label} variant="secondary" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .pb {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2rem, 1.5rem + 2vw, 3rem);
+    padding-block: clamp(4rem, 3rem + 4vw, 7rem);
+    overflow-x: clip;
+  }
+
+  /* ---------- Endless band ---------- */
+  .pb__marquee {
+    --gap: clamp(3rem, 2rem + 4vw, 6rem);
+    display: flex;
+    width: 100%;
+    overflow: clip;
+    /* The band fades out at both edges instead of being cut. */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .pb__track {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--gap);
+    padding-right: var(--gap);
+    animation: pb-loop 48s linear infinite;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pb__marquee:hover .pb__track {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes pb-loop {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  .pb__group,
+  .pb__logos {
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+  }
+
+  .pb__label {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .pb__item {
+    display: flex;
+    align-items: center;
+    height: 3rem;
+  }
+
+  /* Monochrome, white in the dark theme. */
+  .pb__item img {
+    width: auto;
+    max-width: none;
+    height: var(--h);
+    filter: brightness(0) invert(var(--logo-inv, 0));
+    opacity: 0.7;
+  }
+
+  .pb__word {
+    font-size: 1.375rem;
+    letter-spacing: var(--track-title);
+    color: var(--ink);
+    opacity: 0.7;
+    white-space: nowrap;
+  }
+
+  /* Reduced motion: one still, centred, wrapped copy. */
+  @media (prefers-reduced-motion: reduce) {
+    .pb__marquee {
+      justify-content: center;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    .pb__track {
+      flex-wrap: wrap;
+      justify-content: center;
+      padding-inline: var(--gutter);
+      animation: none;
+    }
+    .pb__track[aria-hidden] {
+      display: none;
+    }
+    .pb__group {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+
+  /* ---------- Line and button ---------- */
+  .pb__foot {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+    text-align: center;
+  }
+
+  .pb__text {
+    max-width: 44ch;
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    letter-spacing: var(--track-title);
+    color: var(--ink-2);
+    text-wrap: balance;
+  }
+</style>

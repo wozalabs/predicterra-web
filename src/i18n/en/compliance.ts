@@ -1,43 +1,53 @@
-import { actions, cta } from './pages-shared';
+import type { SolutionCopy } from '../../sections/pages/types';
+import { actions, cta, proof } from './pages-shared';
+import { routes } from '../../data/routes';
 
-// /compliance, from "predicterra-08-compliance.md". Copy word for word; eyebrows left out.
+// /compliance, from "predicterra-10-compliance.md". Final copy; section eyebrows
+// left out. Pending: backing for the 95%, the current CSRD and Taxonomy scope,
+// and a report design can show.
 export default {
   seo: {
     title: 'CSRD, EU Taxonomy and CER Compliance for Energy Assets | Predicterra',
     description:
-      'CSRD physical risk, EU Taxonomy climate risk and vulnerability assessments and CER Directive risk assessments, from the same model your teams operate. Every figure traced to its data.',
+      'Audit-ready CSRD, EU Taxonomy and CER reporting from the same model your teams operate, with every figure traced to its data.',
   },
   hero: {
-    label: 'Compliance · Across every sector',
+    label: 'Compliance · Across all sectors',
     title: 'Prove it, from the model you operate.',
-    text: 'CSRD, EU Taxonomy and CER Directive evidence comes out of the same model your teams use every day, with the data behind every number.',
+    text: 'CSRD, EU Taxonomy and CER Directive reports come out of the same model your control center uses, with the evidence behind every number.',
     primary: actions.demo,
     secondary: actions.platform,
   },
+  proof: proof.standard,
   metrics: [
     { value: '95%', text: 'less time producing climate and compliance reports' },
     { value: 'To 2100', text: 'physical risk per asset, by scenario' },
     { value: '6', text: 'hazards on one model, compound risk included' },
   ],
-  covers: {
-    title: 'One model. Every framework.',
-    labels: { framework: 'Framework', get: 'What you get' },
-    items: [
-      { framework: 'CSRD (ESRS E1)', get: 'Physical climate risk, asset by asset and by scenario.' },
-      { framework: 'EU Taxonomy', get: 'Climate risk and vulnerability assessments per eligible asset.' },
-      { framework: 'CER Directive', get: 'Natural-hazard risk assessments, documented.' },
-      { framework: 'Resilience plans', get: 'Investment cases your regulator can follow.' },
-      { framework: 'Lenders and insurers', get: 'Exposure data for due diligence and cover.' },
-    ],
+  solution: {
+    title: 'Evidence for every framework, from the same assets, hazards and scenarios.',
+    table: {
+      head: ['Framework', 'What you get'],
+      rows: [
+        ['CSRD (ESRS E1)', 'Physical climate risk, asset by asset.'],
+        ['EU Taxonomy', 'Climate risk and vulnerability assessments per eligible asset, over its whole life.'],
+        [
+          'CER Directive',
+          'All-hazards risk assessments, due within nine months of being notified as a critical entity and every four years after.',
+        ],
+        ['Resilience plans', 'Investment cases regulators can follow.'],
+      ],
+    },
   },
-  why: {
-    title: 'Not a separate reporting exercise.',
-    text: 'Most climate reports are built once a year, by hand, apart from the data teams use every day. With Predicterra, the report comes from the model your operations run on. The numbers your teams act on are the numbers you report.',
+  list: {
+    title: 'The same evidence for every sector.',
+    kind: 'sectors',
     items: [
-      { icon: 'link', title: 'Traceable', text: 'Every figure linked to its data, model version and assumptions.' },
-      { icon: 'verified_user', title: 'Consistent', text: 'The same assets and scenarios, year after year.' },
-      { icon: 'fact_check', title: 'Ready for audit', text: 'A full record of exposure, reasoning and response.' },
+      { title: 'Grid', text: 'Quality of supply (TIEPI, NIEPI), CER and resilience plans.', href: routes.sectors.grid },
+      { title: 'Solar', text: 'EU Taxonomy for financing, plant by plant.', href: routes.sectors.solar },
+      { title: 'Wind', text: 'CSRD and lender due diligence, site by site.', href: routes.sectors.wind },
+      { title: 'Oil & Gas', text: 'CSRD, CER and natural-hazard inputs for safety reports.', href: routes.sectors.oilGas },
     ],
   },
   cta: cta('See your compliance evidence', 'in the', 'Cognitive Twin.'),
-} as const;
+} satisfies SolutionCopy;

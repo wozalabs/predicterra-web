@@ -1,26 +1,9 @@
 ---
-/**
- * Resilience (/resilience), from "predicterra-07-resilience.md".
- * hero · metrics · why now · how it works (stepped line) · not a score (dark) · CTA.
- */
-import PageLayout from '../layouts/PageLayout.astro';
-import PageHero from '../sections/pages/PageHero.astro';
-import Stats from '../sections/pages/Stats.astro';
-import Figures from '../sections/pages/Figures.astro';
-import Steps from '../sections/pages/Steps.astro';
-import Statement from '../sections/pages/Statement.astro';
-import Cta from '../sections/home/Cta.astro';
+import SolutionPage from '../sections/pages/SolutionPage.astro';
 import { getCopy } from '../i18n/config';
 
 const locale = 'en';
-const { resilience: c } = getCopy(locale);
+const { resilience: copy } = getCopy(locale);
 ---
 
-<PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
-  <PageHero locale={locale} {...c.hero} layout="centred" />
-  <Stats locale={locale} items={[...c.metrics]} />
-  <Figures id="now-title" title={c.now.title} text={c.now.text} items={c.now.figures} sources={c.now.sources} head="side" />
-  <Steps locale={locale} id="how-title" title={c.how.title} steps={c.how.steps} head="center" />
-  <Statement id="why-title" title={c.why.title} text={c.why.text} dark />
-  <Cta locale={locale} copy={c.cta} />
-</PageLayout>
+<SolutionPage locale={locale} copy={copy} />

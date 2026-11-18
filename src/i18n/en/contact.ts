@@ -1,6 +1,6 @@
 import { routes } from '../../data/routes';
 
-// /contact, from "predicterra-12-contact.md". Every "Request a demo" and "Talk
+// /contact, from "predicterra-11-contact.md". Every "Request a demo" and "Talk
 // to an engineer" on the site leads here. The reply time is still to be set:
 // the brief's placeholder "[two]" is kept visible on purpose.
 export default {
@@ -40,7 +40,7 @@ export default {
     address: 'BAT Acceleration Tower, Gran Vía 1, 48001 Bilbao',
   },
   done: {
-    title: 'Thanks. We’ve got it.',
+    title: 'Thanks, we’ve received your request.',
     text: 'An engineer will get back to you within [two] business days. In the meantime, see how the platform works.',
     link: { label: 'See the platform', href: routes.platform },
   },

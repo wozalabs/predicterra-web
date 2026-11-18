@@ -1,120 +1,93 @@
 ---
 /**
- * Quick proof: four large figures in a row, each on its own hairline with a
- * small running index (the homepage sub-hero rhythm, given more air). Optional
- * links under single figures and a backing line, centred under the row.
+ * Key figures: the title on the left, the figures as rows on the right (label
+ * left, value large on the right). An optional line and button close it
+ * (Solutions pages: the cases behind the numbers).
  */
-import TextLink from '../../components/TextLink.astro';
+import FigureList from './FigureList.astro';
+import Button from '../../components/Button.astro';
 import { localizePath, type Locale } from '../../i18n/config';
 import type { Stat, Link } from './types';
 
 interface Props {
   locale?: Locale;
-  items: Stat[];
+  items: readonly Stat[];
+  title?: string;
+  text?: string;
+  /** A closing line and its button, under the figures. */
   backing?: { text: string; link: Link };
-  link?: Link;
-  label?: string;
+  id?: string;
+  class?: string;
 }
-const { locale = 'en', items, backing, link, label = 'Key figures' } = Astro.props;
-const pad = (n: number) => String(n).padStart(3, '0');
+const { locale = 'en', items, title = 'Key figures', text, backing, id = 'figures-title', class: className } = Astro.props;
 ---
 
-<section class="st pg-sec" aria-label={label}>
-  <div class="container st__inner">
-    <ul class="st__list" data-reveal-group style={`--n:${items.length}`}>
+<section class:list={['st pg-sec', className]} aria-labelledby={id}>
+  <div class="container st__grid">
+    <div class="st__head">
+      <h2 id={id} class="st__title" data-render>{title}</h2>
+      {text && <p class="st__text" data-reveal>{text}</p>}
+    </div>
+    <div class="st__body">
+      <FigureList items={items.map((s) => ({ value: s.value, label: s.text, text: s.note }))} />
       {
-        items.map((s, i) => (
-          <li class="st__item" data-reveal>
-            <span class="pg-idx">{pad(i + 1)}</span>
-            <p class="st__value t-num">{s.value}</p>
-            <p class="st__text">{s.text}</p>
-            {s.link && <TextLink href={localizePath(s.link.href, locale)} label={s.link.label} class="st__link" />}
-          </li>
-        ))
+        backing && (
+          <div class="st__backing" data-reveal>
+            <p class="st__backing-text">{backing.text}</p>
+            <Button href={localizePath(backing.link.href, locale)} label={backing.link.label} variant="secondary" />
+          </div>
+        )
       }
-    </ul>
-    {
-      backing && (
-        <div class="st__backing" data-reveal>
-          <p class="st__backing-text">{backing.text}</p>
-          <TextLink href={localizePath(backing.link.href, locale)} label={backing.link.label} />
-        </div>
-      )
-    }
-    {
-      link && (
-        <div class="st__backing" data-reveal>
-          <TextLink href={localizePath(link.href, locale)} label={link.label} />
-        </div>
-      )
-    }
+    </div>
   </div>
 </section>
 
 <style>
-  .st {
-    padding-block: clamp(4rem, 2.5rem + 4vw, 7.5rem);
-  }
-
-  .st__inner {
+  .st__grid {
     display: grid;
-    gap: clamp(3rem, 2rem + 3vw, 5rem);
-  }
-
-  .st__list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 3rem var(--gutter);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem var(--gutter);
   }
 
   @media (min-width: 64rem) {
-    .st__list {
-      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    .st__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
     }
   }
 
-  .st__item {
+  .st__head {
     display: grid;
-    grid-template-rows: auto auto auto 1fr;
-    align-content: start;
-    gap: 0.75rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--line-strong);
+    gap: 1.25rem;
   }
 
-  .st__value {
-    margin-top: 1.5rem;
-    font-size: clamp(2rem, 1.5rem + 1.6vw, 3.25rem);
-    line-height: 1;
-    letter-spacing: -0.035em;
+  .st__title {
+    max-width: 18ch;
+    font-size: var(--fs-h2);
+    line-height: 1.08;
+    letter-spacing: var(--track-heading);
     text-wrap: balance;
   }
 
   .st__text {
-    max-width: 24ch;
-    font-size: var(--fs-small);
-    color: var(--ink-2);
-  }
-
-  .st__item :global(.st__link) {
-    align-self: end;
-    margin-top: 1rem;
-    min-width: 0;
-    justify-self: start;
-  }
-
-  .st__backing {
-    display: grid;
-    justify-items: center;
-    gap: 1.25rem;
-    text-align: center;
-  }
-
-  .st__backing-text {
-    max-width: 52ch;
+    max-width: 40ch;
     font-size: var(--fs-lead);
     line-height: 1.5;
     letter-spacing: var(--track-title);
+    color: var(--ink-2);
+  }
+
+  .st__backing {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+  }
+
+  .st__backing-text {
+    max-width: 44ch;
     color: var(--ink-2);
   }
 </style>

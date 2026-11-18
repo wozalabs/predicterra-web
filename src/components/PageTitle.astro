@@ -1,0 +1,26 @@
+---
+/**
+ * A page's h1 with the home hero's entrance: each line slides up out of a mask
+ * (1100ms, the hero's curve), one line after another. The words are masked one
+ * by one so the lines can wrap freely; scripts/title-lines.ts gives every word
+ * the delay of the line it lands on. Without the script all lines rise
+ * together; with reduced motion the title is simply there.
+ */
+interface Props {
+  text: string;
+  id?: string;
+  class?: string;
+}
+// `rest` carries the parent's scoped-style attribute.
+const { text, id = 'page-title', class: className, ...rest } = Astro.props;
+// Keep compound words whole ("deep-tech", "i-DE").
+const words = text.replace(/(\w)-(\w)/g, '$1‑$2').split(/\s+/).filter(Boolean);
+---
+
+<h1 id={id} class:list={['ttl', className]} data-title-lines {...rest}>
+  {words.map((w, i) => (
+    <>
+      <span class="ttl__w"><span>{w}</span></span>{i < words.length - 1 && ' '}
+    </>
+  ))}
+</h1>

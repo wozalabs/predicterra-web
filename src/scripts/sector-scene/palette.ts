@@ -35,15 +35,15 @@ const LIGHT: ScenePalette = {
 };
 
 const DARK: ScenePalette = {
-  bg: '#161616',
-  gridDot: '#303030',
-  shadow: '#0B0B0B',
+  bg: '#0D0D0D',
+  gridDot: '#262626',
+  shadow: '#050505',
   asset: '#3A3A3A',
   line: '#3D3D3D',
-  deco: '#2A2A2A',
-  stream: '#1F1F1F',
+  deco: '#222222',
+  stream: '#151515',
   idle: '#3D3D3D',
-  ctaGround: '#1E1E1E',
+  ctaGround: '#1A1A1A',
   // Quiet grey, a step above the assets: the asset itself carries the orange.
   hazard: '#4A4A4A',
 };

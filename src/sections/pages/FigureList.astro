@@ -1,0 +1,108 @@
+---
+/**
+ * Figures as rows (the "Key figures" layout): the label on the left, the value
+ * large and right-aligned on the right, an optional caption under the value
+ * and an optional line under the label. Rows sit on light hairlines.
+ * size "md" is for figures set inside a section's text column.
+ */
+import FigureValue from '../../components/FigureValue.astro';
+
+interface Props {
+  items: readonly { value: string; label: string; text?: string; caption?: string }[];
+  size?: 'lg' | 'md';
+  class?: string;
+}
+const { items, size = 'lg', class: className } = Astro.props;
+---
+
+<dl class:list={['fl', `fl--${size}`, className]} data-reveal-group>
+  {
+    items.map((f) => (
+      <div class="fl__row" data-reveal>
+        <dt class="fl__head">
+          <span class="fl__label">{f.label}</span>
+          {f.text && <span class="fl__text">{f.text}</span>}
+        </dt>
+        <dd class="fl__figure">
+          <FigureValue class="fl__value t-num" value={f.value} />
+          {f.caption && <span class="fl__caption">{f.caption}</span>}
+        </dd>
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  .fl {
+    display: grid;
+  }
+
+  .fl__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem var(--gutter);
+    padding-block: clamp(1.75rem, 1rem + 2.5vw, 3.5rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .fl__row:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .fl__row {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+  }
+
+  .fl__head {
+    display: grid;
+    gap: 0.5rem;
+    padding-top: 0.35rem;
+  }
+
+  .fl__label {
+    max-width: 26ch;
+    font-size: var(--fs-body);
+    line-height: 1.4;
+    letter-spacing: var(--track-title);
+    color: var(--ink);
+  }
+
+  .fl__text {
+    max-width: 38ch;
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .fl__figure {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 40rem) {
+    .fl__figure {
+      justify-items: end;
+      text-align: right;
+    }
+  }
+
+  .fl__value {
+    font-size: clamp(3rem, 1.2rem + 4.8vw, 7rem);
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
+  }
+
+  .fl--md .fl__value {
+    font-size: clamp(2.5rem, 1.4rem + 2.8vw, 4.5rem);
+  }
+
+  .fl__caption {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+</style>

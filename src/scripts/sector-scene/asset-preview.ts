@@ -212,7 +212,13 @@ onThemeChange(() => {
 });
 
 /** Starts the live view for a panel. Safe to call repeatedly. */
-export function showPreview(id: SectorId, canvas: HTMLCanvasElement, opts: { reducedMotion: boolean }) {
+export function showPreview(
+  id: SectorId,
+  canvas: HTMLCanvasElement,
+  /** turn: the model slowly turns on itself (asset panel); false keeps it still (page heroes). */
+  opts: { reducedMotion: boolean; turn?: boolean },
+) {
+  const turn = opts.turn !== false;
   hidePreview();
   let r: WebGLRenderer;
   try {
@@ -247,11 +253,13 @@ export function showPreview(id: SectorId, canvas: HTMLCanvasElement, opts: { red
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     if (!opts.reducedMotion) {
-      mini.pivot.rotation.y += dt * TURN_SPEED;
+      if (turn) mini.pivot.rotation.y += dt * TURN_SPEED;
       mini.rotors.forEach((m) => (m.rotation.z -= dt * 1.1));
     }
     draw();
-    if (active && active.canvas === canvas && !opts.reducedMotion) active.raf = requestAnimationFrame(frame);
+    // Keep drawing only while something moves (the model turning, or turbine rotors).
+    const moving = !opts.reducedMotion && (turn || mini.rotors.length > 0);
+    if (active && active.canvas === canvas && moving) active.raf = requestAnimationFrame(frame);
   };
 
   size();

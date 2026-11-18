@@ -12,11 +12,34 @@ export default {
     navLabel: 'Main',
     toLight: 'Switch to light theme',
     toDark: 'Switch to dark theme',
+    // Platform · Solutions ▾ · Cases · About, then the orange button. "Solutions"
+    // only opens its panel: it has no page of its own.
     nav: [
       { label: 'Platform', href: routes.platform },
+      {
+        label: 'Solutions',
+        groups: [
+          {
+            title: 'Sectors',
+            links: [
+              { label: 'Grid', href: routes.sectors.grid },
+              { label: 'Solar', href: routes.sectors.solar },
+              { label: 'Wind', href: routes.sectors.wind },
+              { label: 'Oil & Gas', href: routes.sectors.oilGas },
+            ],
+          },
+          {
+            title: 'Across all sectors',
+            links: [
+              { label: 'Resilience', href: routes.sectors.resilience },
+              { label: 'Digitalization', href: routes.sectors.digitalization },
+              { label: 'Compliance', href: routes.sectors.compliance },
+            ],
+          },
+        ],
+      },
       { label: 'Cases', href: routes.cases },
       { label: 'About', href: routes.about },
-      { label: 'Contact', href: routes.contact },
     ],
   },
 
@@ -25,10 +48,7 @@ export default {
     groups: [
       {
         title: 'Platform',
-        links: [
-          { label: 'Platform', href: routes.platform },
-          { label: 'Cases', href: routes.cases },
-        ],
+        links: [{ label: 'Platform', href: routes.platform }],
       },
       {
         title: 'Sectors',
@@ -40,19 +60,19 @@ export default {
         ],
       },
       {
-        title: 'Solutions',
+        title: 'Across all sectors',
         links: [
           { label: 'Resilience', href: routes.sectors.resilience },
-          { label: 'Compliance', href: routes.sectors.compliance },
           { label: 'Digitalization', href: routes.sectors.digitalization },
+          { label: 'Compliance', href: routes.sectors.compliance },
         ],
       },
       {
         title: 'Company',
         links: [
+          { label: 'Cases', href: routes.cases },
           { label: 'About', href: routes.about },
           { label: 'Contact', href: routes.contact },
-          { label: 'Explore on Azure', href: external.azure, external: true },
         ],
       },
     ],
@@ -81,7 +101,7 @@ export default {
     email: 'hello@predicterra.com',
   },
 
-  // Footer from the home brief (November 2026). "Methodology (PDF)" stays hidden
+  // Footer from the site map (November 2026). "Methodology (PDF)" stays hidden
   // until the PDF exists; "Cookie settings" waits for the cookie banner.
   footer: {
     tagline: 'The Cognitive Twin for energy',
@@ -100,11 +120,11 @@ export default {
         ],
       },
       {
-        title: 'Solutions',
+        title: 'Across all sectors',
         links: [
           { label: 'Resilience', href: routes.sectors.resilience },
-          { label: 'Compliance', href: routes.sectors.compliance },
           { label: 'Digitalization', href: routes.sectors.digitalization },
+          { label: 'Compliance', href: routes.sectors.compliance },
         ],
       },
       {
@@ -120,7 +140,6 @@ export default {
         links: [
           { label: 'Legal notice', href: routes.legal },
           { label: 'Privacy', href: routes.privacy },
-          { label: 'Cookies', href: routes.cookies },
         ],
       },
     ],
@@ -138,10 +157,11 @@ export default {
     builtByName: 'Woza Labs',
   },
 
-  // 404 (from the brief).
+  // 404 (from the brief). The page answers with a real 404 and is not indexed.
   notFound: {
-    title: 'This page isn’t in the model.',
-    text: 'The page you’re looking for doesn’t exist or has moved. Everything else is still running.',
+    label: '404',
+    title: 'Page not found.',
+    text: 'The page you’re looking for doesn’t exist or has moved.',
     primary: { label: 'Back to home', href: routes.home },
     secondary: { label: 'Request a demo', href: routes.demo },
     links: [
@@ -151,12 +171,5 @@ export default {
       { label: 'Wind', href: routes.sectors.wind },
       { label: 'Oil & Gas', href: routes.sectors.oilGas },
     ],
-  },
-
-  // Comparison switch between the current home and the new content.
-  compare: {
-    label: 'Home',
-    current: 'Current',
-    next: 'New content',
   },
 };

@@ -29,9 +29,10 @@ export default defineConfig({
   // URLs from the earlier site map that moved with the November 2026 briefs.
   redirects: {
     '/climate-resilience': '/resilience',
-    '/solutions': '/platform',
+    '/solutions': '/',
     '/success-stories': '/cases',
     '/about-new': '/about',
+    '/home-new': '/',
   },
   build: { inlineStylesheets: 'auto' },
   prefetch: { prefetchAll: false, defaultStrategy: 'hover' },

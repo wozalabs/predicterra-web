@@ -1,77 +1,63 @@
-import { actions, cta } from './pages-shared';
+import type { SolutionCopy } from '../../sections/pages/types';
+import { actions, cta, proof } from './pages-shared';
+import { routes } from '../../data/routes';
 
-// /digitalization, from "predicterra-09-digitalization.md". Copy word for word;
-// eyebrows left out. For CIO, CDO, digital transformation and data teams.
+// /digitalization, from "predicterra-09-digitalization.md". For those who decide
+// the architecture (CIO, CDO, digital transformation, data teams). Final copy;
+// section eyebrows left out.
 export default {
   seo: {
     title: 'Cognitive Digital Twin for Energy Operators | Predicterra',
     description:
-      'A cognitive digital twin of your assets and the physical world acting on them. Structured, governed and ready for every team, system and AI agent. EU-hosted, on any cloud or on-premises.',
+      'A cognitive digital twin of your assets and the physical world acting on them, ready for every team, system and AI agent, EU-hosted or on-premises.',
   },
   hero: {
-    label: 'Digitalization · Across every sector',
+    label: 'Digitalization · Across all sectors',
     title: 'A cognitive digital twin of the physical world, ready to consume.',
-    text: 'Not a data lake. Not another integration project. Predicterra fuses your systems and thousands of external sources into one living model of your assets, the world acting on them and how everything connects. Ready for every team, every system and every AI agent.',
+    text: 'Predicterra fuses your systems and thousands of external sources into a Cognitive Twin: a live model of your assets, the physical world acting on them and how everything connects, ready for every team, every system and every AI agent.',
     primary: actions.demo,
     secondary: actions.platform,
   },
+  proof: proof.standard,
   metrics: [
     { value: '11,000+', text: 'data sources, connected and maintained' },
     { value: '116,000 km', text: 'of UFD’s grid in one ontology' },
     { value: '14 vs 48', text: 'integrations for six asset types and eight use cases' },
-    { value: 'Weeks', text: 'for each new use case, not months' },
+    { value: 'Weeks', text: 'for each new use case' },
   ],
-  difference: {
-    title: 'Your systems generate data. Predicterra gives them a world to run on.',
-    columns: ['Data lake', 'Cognitive Twin · Predicterra'],
-    rows: [
-      {
-        label: 'Holds',
-        cells: ['Raw data from many systems', 'Your assets, the world around them and the decisions they drive'],
-      },
-      { label: 'Organized as', cells: ['Tables and files', 'Connected objects with meaning'] },
-      { label: 'Answers', cells: ['Whatever someone queries', 'What will happen, why, and what to do'] },
-      { label: 'Used by', cells: ['The data team', 'Every team, every system, every AI agent'] },
+  solution: {
+    title: 'The energy system is going digital, and the physical world has to come with it.',
+    paragraphs: [
+      'Operators are investing in data platforms, digital twins and AI, and Europe has asked its grid operators for a digital twin of the European electricity grid. Most models still describe the assets and leave out the world around them: the weather, the terrain, the vegetation and the dependencies with other sectors.',
+      'In Predicterra’s ontology, every asset keeps its ID from your systems and gains its relationships: what feeds it, what it feeds and what threatens it. Each system connects once through an open API, so six asset types and eight use cases need 14 integrations, compared with 48 built one by one. The same ontology gives AI agents the context they need, limits their actions to real objects and records what every proposal is based on.',
     ],
-    closing: 'Predicterra doesn’t replace your data lake or your twin. It reads them, and makes them cognitive.',
+    sources: 'Source: EU Action Plan for the Digitalisation of the Energy System (ENTSO-E and EU DSO Entity).',
   },
-  integrate: {
-    title: 'Integrate once. Build on everything.',
-    text: 'Six asset types and eight use cases, built one by one, mean 48 integrations. On one ontology, they mean 14. Each system connects once, and your data and innovation teams build new models and applications on top, through the API, on real data from day one.',
-    before: { value: '48', text: 'integrations, built one by one' },
-    after: { value: '14', text: 'on one ontology' },
-  },
-  fit: {
-    title: 'Fits your architecture. Beats what you’d build.',
+  list: {
+    title: 'It works with the systems each sector already runs.',
+    kind: 'sectors',
     items: [
-      { title: 'Open API', text: 'Risk, models and data flow into SCADA, GIS, EAM, ERP, OMS and your data lake.' },
       {
-        title: 'Structured risk events',
-        text: 'Every prediction becomes an object your systems can consume, with no one translating it by hand.',
+        title: 'Grid',
+        text: 'Reads your GIS, LiDAR, SCADA, ADMS and OMS, and returns risk per span, pole and substation.',
+        href: routes.sectors.grid,
       },
       {
-        title: 'Any cloud or on-premises',
-        text: 'Hosted in the EU and validated on Microsoft Azure, or in your own data center.',
+        title: 'Solar',
+        text: 'Reads your SCADA, performance monitoring and yield models, and returns risk per plant and per block.',
+        href: routes.sectors.solar,
       },
-      { title: 'Governed', text: 'Access, lineage and audit trail on every object and every result.' },
       {
-        title: 'AI-ready',
-        text: 'AI agents need to know what a span is. The ontology gives them context, guardrails and traceability, built around the AI Act.',
+        title: 'Wind',
+        text: 'Reads your turbine SCADA, condition monitoring and met masts, and returns risk per turbine and per site.',
+        href: routes.sectors.wind,
+      },
+      {
+        title: 'Oil & Gas',
+        text: 'Reads your DCS, SCADA, historians and integrity records, and returns risk per unit, tank and segment.',
+        href: routes.sectors.oilGas,
       },
     ],
-    code: {
-      label: 'risk_event.json',
-      json: {
-        asset_id: 'pumping_station_07',
-        hazard_type: 'wildfire',
-        severity: 'high',
-        confidence: 0.88,
-        time_window: '2026-08-03T10:00Z/2026-08-03T22:00Z',
-        drivers: ['fire_weather_index', 'fuel_dryness', 'wind_speed'],
-        downstream_assets: 23,
-        recommended_action: 'protect_perimeter_and_preposition_team',
-      },
-    },
   },
   cta: cta('Give your systems', 'a world', 'to run on.'),
-} as const;
+} satisfies SolutionCopy;

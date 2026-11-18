@@ -1,13 +1,18 @@
-import { routes, external } from '../../data/routes';
+import { routes } from '../../data/routes';
+import { actions, cta, proof } from './pages-shared';
+
+// Home (/), from "predicterra-01-home.md": hero · logos · sectors · metrics · CTA.
+// Final copy; section eyebrows left out. The hero layouts other than App are
+// test layouts (menu) and keep their own copy where the brief has none.
 
 export default {
   seo: {
-    title: 'Predicterra | Asset foresight software for energy infrastructure',
+    title: 'Predicterra | The Cognitive Twin for Energy',
     description:
-      'Predicterra turns satellite, weather and sensor data into asset-level foresight for grid, solar, wind and oil & gas operators. See the physical future of your assets before it happens.',
+      'The Cognitive Twin for grid, solar, wind and oil & gas: Predicterra models the physical world around your infrastructure.',
   },
 
-  // Platform capture between the hero and the 3D section (both homes).
+  // Platform capture under the hero (App layout), with the three pillars under it.
   showcase: {
     label: 'The Predicterra platform',
     alt: 'The Predicterra platform: an asset list, satellite view of a transmission tower in Zamora with a wind-speed forecast, and the tower’s risk panel with flood, economic and wildfire scores.',
@@ -17,6 +22,20 @@ export default {
   },
 
   hero: {
+    // App layout (default): title centred, the platform capture peeking below.
+    main: {
+      label: 'The Cognitive Twin for energy',
+      titleLine1: 'See what’s coming to',
+      titleLine2: 'every energy asset.',
+      text: 'Predicterra is the Cognitive Twin of the energy system: a live model of your assets, the physical world acting on them and how everything connects. From the control center to compliance, every team knows what will happen, why, and what to do first.',
+      primary: actions.demo,
+      secondary: actions.platform,
+      pillars: [
+        { title: 'Every asset', text: 'Grid, solar, wind and oil & gas on one ontology.' },
+        { title: 'Six hazards', text: 'Wildfire, flood, wind, heat, drought and vegetation encroachment, and how they combine.' },
+        { title: 'Every horizon', text: 'From the next storm to 2100, on the same objects.' },
+      ],
+    },
     eyebrow: 'Asset foresight for energy',
     titleLine1: 'Foresight infrastructure',
     titleLine2: 'for the energy transition',
@@ -44,9 +63,9 @@ export default {
     },
     // Clean layout (test): only the video, the title and one action.
     clean: {
-      titleLine1: 'Foresight for the',
-      titleLine2: 'energy transition',
-      text: 'Asset-level foresight from satellite, weather and sensor data, so operators act before the physical world does.',
+      titleLine1: 'See what’s coming to',
+      titleLine2: 'every energy asset.',
+      text: 'Predicterra is the Cognitive Twin of the energy system: a live model of your assets, the physical world acting on them and how everything connects.',
       cta: { label: 'Request a demo', href: routes.demo },
     },
     // Pixel layout (test): the video shows through a pixel mask that drifts
@@ -83,18 +102,13 @@ export default {
     ],
   },
 
-  claim: {
-    label: 'Why Predicterra',
-    text: 'Predicterra fuses satellite, sensor, weather and terrain data into one physics-based model, and runs it inside planning, control, risk and compliance.',
-    accent: 'We don’t describe risk. We govern it.',
-    link: { kicker: 'Learn more', label: 'How the platform works', href: routes.platform },
-  },
+  // Logos, their line and the link to the cases.
+  proof: proof.standard,
 
   scene: {
-    label: 'One system. Every asset.',
-    title: 'One operational view of your entire network',
-    intro:
-      'Grid, renewables and oil & gas, modeled together on one living map. Scroll to move across the network.',
+    label: 'Sectors',
+    title: 'One model for every sector.',
+    intro: 'Each sector sees its own assets on the same model.',
     hintPointer: 'Hover a marker to open its alert',
     hintTouch: 'Tap a marker to open its alert',
     progressLabel: 'Sectors',
@@ -125,7 +139,8 @@ export default {
         icon: 'bolt',
         index: '01',
         title: 'Grid',
-        text: 'Asset-level exposure across lines, towers and control operations. See grid stress coming before it reaches the network.',
+        text: 'Asset-level intelligence across lines, towers, substations and the control center.',
+        link: 'Predicterra for Grid',
         href: routes.sectors.grid,
         alert: {
           severity: 'Critical',
@@ -164,7 +179,8 @@ export default {
         icon: 'electrical_services',
         index: '02',
         title: 'Substations',
-        text: 'Flood depth, heat and access modeled for every substation, together with the downstream assets that depend on it.',
+        text: 'Flood depth, heat and access for every substation, with everything downstream that depends on it.',
+        link: 'Predicterra for Grid',
         href: routes.sectors.grid,
         alert: {
           severity: 'High',
@@ -203,7 +219,8 @@ export default {
         icon: 'solar_power',
         index: '03',
         title: 'Solar',
-        text: 'Forecast production risk, heat stress and site-level climate exposure across every plant in the portfolio.',
+        text: 'Plant-level intelligence across your entire solar portfolio.',
+        link: 'Predicterra for Solar',
         href: routes.sectors.solar,
         alert: {
           severity: 'High',
@@ -242,7 +259,8 @@ export default {
         icon: 'wind_power',
         index: '04',
         title: 'Wind',
-        text: 'Monitor wind, storm and access risk across turbines and sites, hours before the weather arrives.',
+        text: 'Turbine-level intelligence across every farm and site.',
+        link: 'Predicterra for Wind',
         href: routes.sectors.wind,
         alert: {
           severity: 'Critical',
@@ -280,8 +298,9 @@ export default {
         id: 'oilgas',
         icon: 'oil_barrel',
         index: '05',
-        title: 'Oil & gas',
-        text: 'Track weather, wildfire and flooding risk around tank farms, pipelines and process units.',
+        title: 'Oil & Gas',
+        text: 'Site-level intelligence for refineries, terminals, pipelines and gas networks.',
+        link: 'Predicterra for Oil & Gas',
         href: routes.sectors.oilGas,
         alert: {
           severity: 'High',
@@ -316,85 +335,38 @@ export default {
         },
       },
     ],
-    // Stops after the sectors in the trace (3D variant): capabilities, not exposed
-    // assets, so they have no orange asset, no marker and no panel.
-    capabilities: [
+  },
+
+  // Across all sectors: the dark section that slides over the 3D scene.
+  across: {
+    title: 'Across all sectors',
+    items: [
       {
-        id: 'digital',
-        icon: 'memory',
-        index: '06',
+        title: 'Resilience',
+        text: 'Exposure quantified for every asset, from today to 2100, to plan adaptation and defend every resilience investment.',
+        href: routes.sectors.resilience,
+      },
+      {
         title: 'Digitalization',
-        text: 'A living digital twin of your operation. SCADA, GIS, historians, satellite and climate feeds fused into one model your systems can query.',
+        text: 'One live model of your organization, built from the systems you already run.',
         href: routes.sectors.digitalization,
       },
       {
-        id: 'compliance',
-        icon: 'verified_user',
-        index: '07',
         title: 'Compliance',
-        text: 'Prove compliance from one source of truth. CSRD, TCFD and internal resilience reporting drawn from the same live model, in a fraction of the time.',
+        text: 'Audit-ready CSRD, EU Taxonomy and CER reporting from the same model.',
         href: routes.sectors.compliance,
       },
     ],
   },
 
-  solutions: {
-    title: 'Solutions',
-    caption: 'One engine for every sector that runs on the physical world.',
-    countLabel: 'sectors',
-    // Illustrative list; it scrolls continuously in the section.
-    sectors: [
-      'Energy & Electricity',
-      'Power Grid Infrastructure',
-      'Renewable Energy (Solar & Wind)',
-      'Oil & Gas',
-      'Agriculture',
-      'Forestry & Timber',
-      'Mining & Minerals',
-      'Transportation & Mobility',
-      'Logistics & Supply Chain',
-      'Manufacturing & Industrial Operations',
-      'Construction & Infrastructure',
-      'Telecommunications',
-      'Water & Waste Management',
-      'Insurance & Risk Management',
-      'Real Estate & Property Management',
-      'Government & Public Infrastructure',
-      'Environmental & Climate Monitoring',
-      'Defense & Security',
-    ],
-  },
+  // Pending: backing for €2.1M, 5× and 95% (client, network and method).
+  metricsTitle: 'Key figures',
+  metrics: [
+    { value: 'Up to 14 days', text: 'of asset-level forecasts' },
+    { value: '€2.1M', text: 'in outage costs avoided a year' },
+    { value: '5×', text: 'faster from data to decision' },
+    { value: '95%', text: 'less time producing climate and compliance reports' },
+  ],
 
-
-
-  benefits: {
-    title: 'Key figures',
-    stats: [
-      { label: 'Avoided outage costs', value: '€2.1M', caption: 'Per year, by turning risk into action sooner' },
-      { label: 'Faster decisions', value: '5×', caption: 'From raw climate and network data to a decision' },
-      { label: 'Less reporting time', value: '95%', caption: 'For climate and compliance reports' },
-      { label: 'Time to live', value: '8 weeks', caption: 'From license to running inside your systems' },
-    ],
-  },
-
-
-  cases: {
-    title: 'Success stories',
-    exploreKicker: 'Explore',
-    exploreLabel: 'All success stories',
-    exploreHref: routes.cases,
-    // Cards come from src/i18n/en/cases.ts (first three).
-  },
-
-
-  cta: {
-    label: 'Ready before the next event',
-    // Rendered on two lines.
-    titleLine1: 'Run your infrastructure',
-    titleLine2: 'on',
-    titleAccent: 'foresight.',
-    text: 'One live system across every asset, every feed, every team. Licenses start at USD 50,000.',
-    primary: { label: 'Request a demo', href: routes.demo },
-    secondary: { kicker: 'Procurement', label: 'Explore on Azure', href: external.azure },
-  },
+  cta: cta('See your system', 'in the', 'Cognitive Twin.'),
 };

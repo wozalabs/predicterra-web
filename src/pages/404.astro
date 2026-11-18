@@ -1,10 +1,10 @@
 ---
 /**
- * 404, from "predicterra-16-404.md": the model doesn't know this page, the
- * rest of the system is still running.
+ * 404, from "predicterra-15-404.md". Answers with a real 404 and is not indexed.
  */
 import PageLayout from '../layouts/PageLayout.astro';
 import Button from '../components/Button.astro';
+import PageTitle from '../components/PageTitle.astro';
 import { getCopy, localizePath } from '../i18n/config';
 
 const locale = 'en';
@@ -14,8 +14,8 @@ const { notFound: nf } = getCopy(locale).common;
 <PageLayout title="Page not found | Predicterra" description={nf.text} locale={locale} noindex>
   <section class="nf" aria-labelledby="page-title">
     <div class="container nf__inner">
-      <p class="nf__code t-num" aria-hidden="true">404</p>
-      <h1 id="page-title" class="nf__title">{nf.title}</h1>
+      <p class="nf__code t-num" aria-hidden="true">{nf.label}</p>
+      <PageTitle class="nf__title" text={nf.title} />
       <p class="nf__text">{nf.text}</p>
       <div class="nf__actions">
         <Button href={localizePath(nf.primary.href, locale)} label={nf.primary.label} size="lg" />

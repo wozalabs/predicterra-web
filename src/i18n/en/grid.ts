@@ -1,12 +1,12 @@
-import type { SectorCopy } from '../../sections/pages/types';
-import { actions, cta, cases } from './pages-shared';
+import type { SolutionCopy } from '../../sections/pages/types';
+import { actions, cta, proof } from './pages-shared';
 
-// /grid, from "predicterra-03-grid.md". Copy word for word; eyebrows left out.
+// /grid, from "predicterra-04-grid.md". Final copy; section eyebrows left out.
 export default {
   seo: {
     title: 'Grid Resilience and Asset Intelligence for DSOs and TSOs | Predicterra',
     description:
-      'The Cognitive Twin for transmission and distribution networks. Vegetation, wind, wildfire, flood and heat risk per span and substation, from the next 14 days to 2100.',
+      'The Cognitive Twin for transmission and distribution networks: fire, flood, wind, heat and vegetation risk per span and substation.',
   },
   hero: {
     label: 'Predicterra for Grid',
@@ -16,58 +16,39 @@ export default {
     secondary: actions.platform,
   },
   asset: 'grid',
-  metrics: {
+  proof: proof.grid,
+  metrics: [
+    { value: '73%', text: 'faster response to climate events at i-DE' },
+    { value: '116,000 km', text: 'of UFD’s grid in one model' },
+    { value: 'Up to 14 days', text: 'of asset-level forecasts' },
+    { value: '10 years', text: 'of real incidents backtested' },
+  ],
+  solution: {
+    title: 'Grids are being asked to do more than ever.',
+    figures: [
+      { value: '€1.2 trillion', text: 'needed in EU electricity grids by 2040' },
+      { value: '~393,000 ha', text: 'burned in Spain in 2025, the most since 1994' },
+      { value: '~180,000', text: 'customers left without power by the 2024 Valencia floods' },
+    ],
+    figuresFirst: true,
+    paragraphs: [
+      'Predicterra represents every span, pole, feeder, substation and transformer as an object in one ontology, linked to what feeds it, what it feeds and the risks acting on it: wind, wildfire, flood, heat, drought and vegetation encroachment. Control center, asset management, risk and regulation work from that same model, from span-level risk up to 14 days ahead to resilience plans to 2100.',
+      'Predicterra reads your GIS, LiDAR, SCADA, ADMS and OMS, and sends structured risk events back into the systems your teams already use.',
+    ],
+    sources:
+      'Sources: European Commission, European Grids Package (December 2025); EFFIS, 2025 burned area; i-DE, customers affected by the 2024 Valencia floods.',
+  },
+  list: {
+    title: 'Everything your grid faces, on one model.',
+    kind: 'uses',
     items: [
-      { value: '73%', text: 'faster response to climate events at i-DE' },
-      { value: '€2.1M', text: 'in outage costs avoided a year' },
-      { value: '116,000 km', text: 'of UFD’s grid in one model' },
-      { value: '95%', text: 'less time producing climate and compliance reports' },
-    ],
-    link: cases.all,
-  },
-  what: {
-    title: 'Every span, every substation, every hazard, on one model.',
-    text: 'Predicterra models your network and the forces acting on it: vegetation, wind, wildfire, flood, heat and drought. It ranks every span by failure risk for the next 14 days, prioritizes trimming, maintenance and hardening by real exposure, and shows which feeders and customers depend on each asset. Control center, asset management, risk and regulation work from the same picture.',
-    uses: [
-      'Storm impact',
-      'Vegetation risk',
-      'Wildfire ignition',
-      'Substation flooding',
-      'Crew pre-positioning',
-      'Preventive de-energization',
-      'Hardening and undergrounding',
-      'Quality of supply (TIEPI, NIEPI)',
+      { title: 'Storm and wind impact', text: 'Which spans and poles will fail, and when.' },
+      { title: 'Vegetation encroachment', text: 'Trimming prioritized by risk, span by span.' },
+      { title: 'Wildfire ignition', text: 'Where your lines could start a fire, and when to act.' },
+      { title: 'Substation flooding', text: 'Where the water will reach, and what goes dark with it.' },
+      { title: 'Crew pre-positioning', text: 'Crews and spares where the event will hit.' },
+      { title: 'Hardening and undergrounding', text: 'Reinforcement and undergrounding ranked by real exposure.' },
     ],
   },
-  why: {
-    title: 'Vegetation analytics tells you where the trees are. We tell you which span fails when the wind reaches them.',
-    items: [
-      {
-        icon: 'science',
-        title: 'Physics, not scores',
-        text: 'The forces on every span are simulated, then calibrated on your own incident history, up to ten years back.',
-      },
-      {
-        icon: 'groups',
-        title: 'One model, every team',
-        text: 'Control center, asset management, risk and regulation read the same numbers.',
-      },
-      {
-        icon: 'api',
-        title: 'Works with what you have',
-        text: 'Reads your GIS, LiDAR, SCADA, ADMS and OMS, and sends risk events back into them.',
-      },
-      {
-        icon: 'lock',
-        title: 'Built in Europe',
-        text: 'EU-hosted or on-premises, and independent of any energy company or vendor.',
-      },
-    ],
-  },
-  cta: cta(
-    'Your twin knows your network.',
-    'Predicterra knows',
-    'what’s coming to it.',
-    'See your network in the Cognitive Twin. Start with one problem, on your own data.',
-  ),
-} satisfies SectorCopy;
+  cta: cta('See your network', 'in the', 'Cognitive Twin.'),
+} satisfies SolutionCopy;

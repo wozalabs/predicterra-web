@@ -1,12 +1,14 @@
-import type { SectorCopy } from '../../sections/pages/types';
-import { actions, cta, cases } from './pages-shared';
+import type { SolutionCopy } from '../../sections/pages/types';
+import { actions, cta, proof } from './pages-shared';
 
-// /oil-gas, from "predicterra-06-oil-gas.md". Copy word for word; eyebrows left out.
+// /oil-gas, from "predicterra-07-oil-gas.md". Final copy; section eyebrows left out.
+// Pending: how the Moeve relationship can be mentioned; the metrics are platform
+// capabilities until the Moeve case is published.
 export default {
   seo: {
     title: 'Physical Risk and Asset Intelligence for Oil & Gas | Predicterra',
     description:
-      'The Cognitive Twin for refineries, terminals, pipelines and gas networks. Fire, flood, heat, wind and drought risk per unit and corridor, from the next 14 days to 2100.',
+      'The Cognitive Twin for refineries, terminals, pipelines and gas networks: fire, flood, heat, wind and drought risk per unit and corridor.',
   },
   hero: {
     label: 'Predicterra for Oil & Gas',
@@ -16,63 +18,34 @@ export default {
     secondary: actions.platform,
   },
   asset: 'oilgas',
-  // No oil & gas case published yet: the first three figures are platform capability.
-  metrics: {
-    items: [
-      { value: '14 days', text: 'of site-level forecasts' },
-      { value: 'To 2100', text: 'climate scenarios for the whole asset life' },
-      { value: '6', text: 'hazards on one model, compound risk included' },
-      { value: '95%', text: 'less time producing climate and compliance reports' },
-    ],
-    backing: {
-      text: 'Selected by Moeve for its Light Up program. Proven in operation on 116,000 km of Spanish distribution grid, the kind of network your sites depend on for power.',
-      link: cases.all,
-    },
-  },
-  what: {
-    title: 'Every unit, tank and segment, on one model.',
-    text: 'Predicterra models your refineries, terminals, pipelines and gas networks, and the forces acting on them: wildfire, flood, heat, wind, drought and vegetation along every right-of-way. It sends alerts per unit and segment for the next 14 days, places turnarounds and inspections around real risk, and quantifies business interruption by scenario. Operations, integrity, risk and compliance work from the same picture.',
-    uses: [
-      'Wildfire around sites and corridors',
-      'Flooding of units and tank farms',
-      'Heat and process limits',
-      'Drought and cooling water',
-      'Wind at terminals and jetties',
-      'Right-of-way vegetation',
-      'Turnaround scheduling',
-      'Security of supply',
-      'Business interruption and insurance',
-    ],
-  },
-  why: {
+  proof: proof.oilGas,
+  metrics: [
+    { value: 'Up to 14 days', text: 'of site-level forecasts' },
+    { value: 'To 2100', text: 'climate scenarios for the whole asset life' },
+    { value: '30+', text: 'hazard models, ready on day one' },
+    { value: '6', text: 'hazards on one model, compound risk included' },
+  ],
+  solution: {
     title: 'Make every stop one you chose.',
+    paragraphs: [
+      'Refineries, terminals, pipelines and gas networks run around the clock, across long corridors and exposed coastlines. Predicterra represents every unit, tank, terminal and pipeline segment as an object in one ontology, linked to the power, water and transport it depends on and to the forces acting on it: wildfire, flood, heat, wind and drought, plus vegetation encroachment along every right-of-way. Operations, integrity, risk and compliance work from that same model, with site alerts up to 14 days ahead and turnarounds and business interruption planned by scenario.',
+      'Predicterra reads your DCS, SCADA, historians and integrity records, and sends structured risk events back into the systems your teams already use.',
+    ],
+  },
+  list: {
+    title: 'Everything your sites face, on one model.',
+    kind: 'uses',
     items: [
+      { title: 'Wildfire around sites and corridors', text: 'Fire risk at the fence line and along every segment.' },
+      { title: 'Flooding of units and tank farms', text: 'Where the water will reach, and what has to stop.' },
+      { title: 'Heat and process limits', text: 'When heat pushes units and storage close to their limits.' },
+      { title: 'Drought and cooling water', text: 'When water stress threatens cooling and throughput.' },
+      { title: 'Turnaround scheduling', text: 'Planned stops scheduled for the windows with the least weather risk.' },
       {
-        icon: 'science',
-        title: 'Physics, not scores',
-        text: 'Every unit, tank and segment is modeled with what it depends on: power, cooling water and transport.',
-      },
-      {
-        icon: 'groups',
-        title: 'One model, every team',
-        text: 'Operations, integrity, risk and compliance read the same numbers.',
-      },
-      {
-        icon: 'api',
-        title: 'Works with what you have',
-        text: 'Reads your DCS, SCADA, historians and integrity records, and sends risk events back into them.',
-      },
-      {
-        icon: 'lock',
-        title: 'Built in Europe',
-        text: 'EU-hosted or on-premises, and independent of any energy company or vendor.',
+        title: 'Security of supply',
+        text: 'Which segments and stations an event could take offline, and what depends on them.',
       },
     ],
   },
-  cta: cta(
-    'Your control systems know how your assets run.',
-    'Predicterra knows',
-    'what’s coming to them.',
-    'See your sites and networks in the Cognitive Twin. Start with one problem, on your own data.',
-  ),
-} satisfies SectorCopy;
+  cta: cta('See your sites and networks', 'in the', 'Cognitive Twin.'),
+} satisfies SolutionCopy;

@@ -368,7 +368,6 @@ const stops = scene.sectors.length + 1; // overview + one stop per sector
     left: 0;
     width: 22.5rem;
     background: var(--surface);
-    border: 1px solid var(--line);
     box-shadow:
       0 1px 2px rgb(30 30 30 / 0.06),
       0 16px 40px -12px rgb(30 30 30 / 0.22);
@@ -409,7 +408,6 @@ const stops = scene.sectors.length + 1; // overview + one stop per sector
     padding: 0.5rem 0.25rem;
     background: rgb(var(--canvas-rgb) / 0.82);
     backdrop-filter: blur(8px);
-    border: 1px solid var(--line);
   }
 
   .sectors__progress ol {
@@ -430,10 +428,8 @@ const stops = scene.sectors.length + 1; // overview + one stop per sector
   .progress__sq {
     width: 0.5rem;
     height: 0.5rem;
-    border: 1px solid currentColor;
-    transition:
-      background-color 200ms ease,
-      border-color 200ms ease;
+    background: color-mix(in oklab, currentColor 45%, transparent);
+    transition: background-color 200ms ease;
   }
 
   .progress__item[aria-current='step'] {
@@ -442,7 +438,6 @@ const stops = scene.sectors.length + 1; // overview + one stop per sector
 
   .progress__item[aria-current='step'] .progress__sq {
     background: var(--accent);
-    border-color: var(--accent);
   }
 
   @media (hover: hover) and (pointer: fine) {

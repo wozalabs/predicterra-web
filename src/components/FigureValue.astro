@@ -1,0 +1,45 @@
+---
+/**
+ * A key figure's value with its unit picked out: the number (or a text value)
+ * in the ink colour, the unit in orange. "73%", "116,000 km", "€2.1M",
+ * "Up to 14 days", "11,000+": %, km, €, M, days, + are the units. Words that
+ * are not units ("Up to", "vs", "Weeks") stay in ink.
+ */
+interface Props {
+  value: string;
+  class?: string;
+}
+// `rest` carries the parent's scoped-style attribute.
+const { value, class: className, ...rest } = Astro.props;
+
+const WORDS = 'km|days|years|hours|ha|trillion|billion|million|MW|GW|TWh';
+const re = new RegExp(`([€$£]?)(~?\\d[\\d,.]*)([%×+]|[kKMB](?![a-z]))?(\\s+)?(${WORDS})?\\b|([%×+])`, 'g');
+
+type Part = { t: string; unit: boolean };
+const parts: Part[] = [];
+const push = (t: string | undefined, unit: boolean) => {
+  if (!t) return;
+  const last = parts[parts.length - 1];
+  if (last && last.unit === unit) last.t += t;
+  else parts.push({ t, unit });
+};
+let at = 0;
+for (const m of value.matchAll(re)) {
+  const [all, cur, num, suffix, space, word, lone] = m;
+  push(value.slice(at, m.index), false);
+  if (lone) push(lone, true);
+  else {
+    push(cur, true);
+    push(num, false);
+    push(suffix, true);
+    if (word) {
+      push(space, false);
+      push(word, true);
+    } else push(space, false);
+  }
+  at = (m.index ?? 0) + all.length;
+}
+push(value.slice(at), false);
+---
+
+<span class={className} {...rest}>{parts.map((p) => (p.unit ? <span class="fig-unit">{p.t}</span> : p.t))}</span>

@@ -8,6 +8,7 @@
  */
 import Button from '../../components/Button.astro';
 import LogoBand from './LogoBand.astro';
+import PageTitle from '../../components/PageTitle.astro';
 import { localizePath, type Locale } from '../../i18n/config';
 import type { LogoGroup } from '../../i18n/en/pages-shared';
 import type { Link } from './types';
@@ -17,6 +18,8 @@ interface Props {
   label: string;
   title: string;
   text: string;
+  /** A short line under the text (About: where it's built, who runs it). */
+  note?: string;
   primary?: Link;
   secondary?: Link;
   layout?: 'stack' | 'centred' | 'split' | 'split-reverse';
@@ -27,6 +30,7 @@ const {
   label,
   title,
   text,
+  note,
   primary,
   secondary,
   layout: rawLayout = 'centred',
@@ -35,16 +39,22 @@ const {
 const layout = rawLayout === 'stack' ? 'centred' : rawLayout;
 const split = layout !== 'centred';
 const hasVisual = Astro.slots.has('visual');
-// Keep compound words whole ("deep-tech", "i-DE").
-const nb = (s: string) => s.replace(/(\w)-(\w)/g, '$1‑$2');
 ---
 
 <section class:list={['ph-hero', `ph-hero--${layout}`, !hasVisual && 'ph-hero--type']} aria-labelledby="page-title">
   <div class="container ph-hero__inner">
     <div class="ph-hero__copy">
       <p class="label ph-hero__label" data-reveal>{label}</p>
-      <h1 id="page-title" class="ph-hero__title" data-render>{nb(title)}</h1>
+      <PageTitle class="ph-hero__title" text={title} />
       <p class="ph-hero__text" data-reveal>{text}</p>
+      {
+        note && (
+          <p class="ph-hero__note" data-reveal>
+            <span class="pg-dot" aria-hidden="true" />
+            {note}
+          </p>
+        )
+      }
       {
         (primary || secondary) && (
           <div class="ph-hero__actions" data-reveal>
@@ -98,6 +108,13 @@ const nb = (s: string) => s.replace(/(\w)-(\w)/g, '$1‑$2');
     line-height: 1.5;
     letter-spacing: var(--track-title);
     color: var(--ink-2);
+  }
+
+  .ph-hero__note {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.625rem;
+    color: var(--muted);
   }
 
   .ph-hero__actions {

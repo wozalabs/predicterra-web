@@ -1,19 +1,23 @@
 ---
+/**
+ * Home (/), from "predicterra-01-home.md": hero (with the platform capture and
+ * the three pillars) · logos · sectors (the 3D scene, then across all sectors)
+ * · metrics · CTA. The hero layouts other than App are test layouts (menu).
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../sections/home/Hero.astro';
+import HeroApp from '../sections/home/HeroApp.astro';
 import HeroCutout from '../sections/home/HeroCutout.astro';
 import HeroPixel from '../sections/home/HeroPixel.astro';
 import HeroClean from '../sections/home/HeroClean.astro';
-import HeroApp from '../sections/home/HeroApp.astro';
-import Claim from '../sections/home/Claim.astro';
 import Showcase from '../sections/home/Showcase.astro';
+import ProofBand from '../sections/pages/ProofBand.astro';
+import SectorsIntro from '../sections/home/SectorsIntro.astro';
 import SectorTrail from '../sections/home/SectorTrail.astro';
 import SectorScene from '../sections/home/SectorScene.astro';
-import Solutions from '../sections/home/Solutions.astro';
-import Benefits from '../sections/home/Benefits.astro';
-import Cases from '../sections/home/Cases.astro';
+import Across from '../sections/home/Across.astro';
+import Metrics from '../sections/home/Metrics.astro';
 import Cta from '../sections/home/Cta.astro';
-import PageCompare from '../components/PageCompare.astro';
 import { getCopy } from '../i18n/config';
 import { softwareJsonLd } from '../data/seo';
 
@@ -30,19 +34,25 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
 >
   <!-- Default hero: title centred, the platform capture peeking up from the bottom. -->
   <HeroApp locale={locale} />
+  <!-- Test only: the other hero layouts, shown when selected in the menu. -->
   <Hero locale={locale} />
-  <!-- Test only: cutout hero, shown when selected in the menu (Hero layout). -->
   <HeroCutout locale={locale} />
   <HeroPixel locale={locale} />
   <HeroClean locale={locale} />
-  <Showcase locale={locale} peek />
-  <Claim locale={locale} />
+  <Showcase locale={locale} peek pillars={home.hero.main.pillars} />
+  <ProofBand locale={locale} proof={home.proof} class="home-proof" />
+  <SectorsIntro locale={locale} />
   <SectorTrail locale={locale} />
   <!-- Test only: previous 3D variant, shown when selected in the menu (3D view). -->
   <SectorScene locale={locale} />
-  <Solutions locale={locale} />
-  <Benefits locale={locale} />
-  <Cases locale={locale} />
-  <Cta locale={locale} />
-  <PageCompare locale={locale} current="current" />
+  <Across locale={locale} />
+  <Metrics locale={locale} />
+  <Cta locale={locale} copy={home.cta} />
 </BaseLayout>
+
+<style>
+  .home-proof {
+    z-index: var(--z-cover);
+    background: var(--canvas);
+  }
+</style>

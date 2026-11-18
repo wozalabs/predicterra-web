@@ -24,15 +24,56 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
 
     <div class="site-header__actions">
       <nav class="site-header__nav" aria-label={header.navLabel}>
-        <ul>
+        <ul class="site-header__list">
           {
-            header.nav.map((link) => (
-              <li>
-                <a href={localizePath(link.href, locale)} aria-current={isCurrent(link.href) ? 'page' : undefined}>
-                  {link.label}
-                </a>
-              </li>
-            ))
+            header.nav.map((item) =>
+              item.groups ? (
+                <li class="sol" data-sol>
+                  <button
+                    class="site-header__link sol__trigger"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="solutions-panel"
+                    data-current={item.groups!.some((g) => g.links.some((l) => isCurrent(l.href))) ? '' : undefined}
+                    data-sol-trigger
+                  >
+                    {item.label}
+                    <Icon name="expand_more" class="sol__chev" />
+                  </button>
+                  <div class="sol__panel" id="solutions-panel" data-sol-panel>
+                    {item.groups!.map((g) => (
+                      <div class="sol__group">
+                        <p class="sol__title">{g.title}</p>
+                        <ul>
+                          {g.links.map((l) => (
+                            <li>
+                              <a
+                                class="sol__link"
+                                href={localizePath(l.href, locale)}
+                                aria-current={isCurrent(l.href) ? 'page' : undefined}
+                              >
+                                <span>{l.label}</span>
+                                <span class="sol__sq" aria-hidden="true" />
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </li>
+              ) : (
+                <li>
+                  <a
+                    class="site-header__link"
+                    href={localizePath(item.href ?? '/', locale)}
+                    aria-current={item.href && isCurrent(item.href) ? 'page' : undefined}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ),
+            )
           }
         </ul>
       </nav>
@@ -152,7 +193,7 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
      header fades out into a gradient that is fully opaque at the top, instead
      of colliding with the logo and links. Dark or light like the header text. */
   .site-header::before {
-    --fade: color-mix(in oklab, #161616 var(--hpct), #fafafa);
+    --fade: color-mix(in oklab, #0d0d0d var(--hpct), #fafafa);
     content: '';
     position: absolute;
     inset: 0 0 auto;
@@ -237,27 +278,31 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     }
   }
 
-  .site-header__nav ul {
+  .site-header__list {
     display: flex;
     gap: 1.75rem;
   }
 
-  .site-header__nav a {
+  .site-header__link {
     position: relative;
     display: inline-flex;
     align-items: center;
+    gap: 0.25rem;
     height: 2.5rem;
     font-size: 0.9375rem;
     opacity: 0.72;
     transition: opacity 160ms ease;
   }
 
-  .site-header__nav a[aria-current='page'] {
+  .site-header__link[aria-current='page'],
+  .site-header__link[data-current],
+  .site-header__link[aria-expanded='true'] {
     opacity: 1;
   }
 
   /* Current page: a small orange square under the label */
-  .site-header__nav a[aria-current='page']::after {
+  .site-header__link[aria-current='page']::after,
+  .site-header__link[data-current]::after {
     content: '';
     position: absolute;
     left: 50%;
@@ -268,9 +313,130 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     background: var(--accent);
   }
 
+  .sol__trigger[data-current]::after {
+    /* centred under the label, not the label and its chevron */
+    margin-left: calc(-2px - 0.5rem);
+  }
+
   @media (hover: hover) and (pointer: fine) {
-    .site-header__nav a:hover {
+    .site-header__link:hover {
       opacity: 1;
+    }
+  }
+
+  /* ---------- Solutions panel ----------
+     Opens from its trigger (origin top left): on hover with a fine pointer, on
+     click or Enter otherwise. A quick fade and a short drop, faster to close. */
+  .sol {
+    position: relative;
+  }
+
+  .sol__trigger :global(.sol__chev) {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .sol__trigger[aria-expanded='true'] :global(.sol__chev) {
+    transform: rotate(180deg);
+  }
+
+  .sol__panel {
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    left: -1.25rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(11rem, 1fr));
+    gap: 1.5rem;
+    padding: 1.25rem 1.25rem 1rem;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow:
+      0 0 0 1px var(--line),
+      0 1px 2px rgb(0 0 0 / 0.06),
+      0 18px 48px -12px rgb(0 0 0 / 0.28);
+    transform-origin: 1.5rem 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px) scale(0.98);
+    transition:
+      opacity 140ms ease,
+      transform 160ms var(--ease-out),
+      visibility 0s linear 160ms;
+  }
+
+  /* Bridges the gap so the pointer can travel from the trigger to the panel. */
+  .sol__panel::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 0.75rem;
+  }
+
+  .sol[data-open] .sol__panel {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity 180ms ease,
+      transform 220ms var(--ease-out),
+      visibility 0s;
+  }
+
+  .sol__group {
+    display: grid;
+    align-content: start;
+    gap: 0.5rem;
+  }
+
+  .sol__title {
+    padding-inline: 0.625rem;
+    font-size: var(--fs-caption);
+    color: var(--muted);
+  }
+
+  .sol__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 2.5rem;
+    padding-inline: 0.625rem;
+    font-size: 0.9375rem;
+    transition: background-color 140ms ease;
+  }
+
+  .sol__sq {
+    width: 0.375rem;
+    height: 0.375rem;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 140ms ease;
+  }
+
+  .sol__link[aria-current='page'] .sol__sq {
+    opacity: 1;
+  }
+
+  .sol__link:focus-visible {
+    outline-offset: -2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .sol__link:hover {
+      background: var(--chip-bg);
+    }
+    .sol__link:hover .sol__sq {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sol__panel,
+    .sol[data-open] .sol__panel {
+      transform: none;
     }
   }
 
@@ -503,7 +669,6 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
   .seg {
     display: inline-flex;
     flex-wrap: wrap;
-    border: 1px solid var(--line);
     background: var(--chip-bg);
   }
 
@@ -565,6 +730,40 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
   onThemeChange(syncTheme);
   syncTheme();
 
+  // Solutions panel: hover (fine pointer) or click/Enter; Escape, a click
+  // outside or focus leaving it closes it.
+  const sol = document.querySelector<HTMLElement>('[data-sol]');
+  const solTrigger = sol?.querySelector<HTMLButtonElement>('[data-sol-trigger]');
+  if (sol && solTrigger) {
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    let closeTimer = 0;
+    const setOpen = (open: boolean) => {
+      clearTimeout(closeTimer);
+      sol.toggleAttribute('data-open', open);
+      solTrigger.setAttribute('aria-expanded', String(open));
+    };
+    solTrigger.addEventListener('click', () => setOpen(!sol.hasAttribute('data-open')));
+    sol.addEventListener('pointerenter', (e) => {
+      if (e.pointerType === 'mouse' && fine.matches) setOpen(true);
+    });
+    sol.addEventListener('pointerleave', (e) => {
+      if (e.pointerType !== 'mouse' || !fine.matches) return;
+      closeTimer = window.setTimeout(() => setOpen(false), 160);
+    });
+    sol.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sol.hasAttribute('data-open')) {
+        setOpen(false);
+        solTrigger.focus();
+      }
+    });
+    sol.addEventListener('focusout', (e) => {
+      if (!sol.contains(e.relatedTarget as Node | null)) setOpen(false);
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (sol.hasAttribute('data-open') && !sol.contains(e.target as Node)) setOpen(false);
+    });
+  }
+
   const header = document.querySelector<HTMLElement>('[data-site-header]');
   const dialog = document.querySelector<HTMLDialogElement>('[data-menu]');
   const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
@@ -575,14 +774,21 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
   if (header) {
     let ticking = false;
     const darkSections = Array.from(document.querySelectorAll<HTMLElement>('[data-header-dark]'));
+    const lightSections = Array.from(document.querySelectorAll<HTMLElement>('[data-dark], [data-theme-dark]'));
     const update = () => {
       header.toggleAttribute('data-scrolled', window.scrollY > 8);
       const line = header.offsetHeight / 2;
-      const dark = isDarkTheme() || darkSections.some((el) => {
+      const under = (el: HTMLElement) => {
         const r = el.getBoundingClientRect();
-        const isDark = el.dataset.headerDark === 'scrub' ? el.hasAttribute('data-is-dark') : true;
-        return isDark && r.height > 0 && r.top <= line && r.bottom > line;
-      });
+        return r.height > 0 && r.top <= line && r.bottom > line;
+      };
+      // Dark theme: light text, except over the sections that turn light there.
+      const dark = isDarkTheme()
+        ? !lightSections.some(under)
+        : darkSections.some((el) => {
+            const isDark = el.dataset.headerDark === 'scrub' ? el.hasAttribute('data-is-dark') : true;
+            return isDark && under(el);
+          });
       header.style.setProperty('--hd', dark ? '1' : '0');
       ticking = false;
     };

@@ -1,4 +1,4 @@
-// Legal notice, Privacy policy and Cookie policy, from briefs 13–15. They are
+// Legal notice and Privacy policy, from briefs 12 and 13 (the cookie policy is left out for now). They are
 // templates: the bracketed fields stay visible until they are filled in and
 // validated with legal counsel (the pages are not indexed meanwhile).
 
@@ -119,38 +119,4 @@ const privacy: LegalDoc = {
   updated: 'Last updated: [date]',
 };
 
-const cookies: LegalDoc = {
-  seo: {
-    title: 'Cookie policy | Predicterra',
-    description: 'Which cookies the Predicterra website uses, what for, and how to accept or reject them.',
-  },
-  title: 'Cookie policy',
-  blocks: [
-    {
-      title: 'What cookies are',
-      paragraphs: [
-        'Cookies are small files a website stores in your browser to make it work, remember your choices or measure how it’s used.',
-      ],
-    },
-    {
-      title: 'Which cookies we use',
-      table: {
-        head: ['Cookie', 'Provider', 'Purpose', 'Type', 'Duration'],
-        rows: [
-          ['[name]', 'Predicterra', 'Remember your cookie choices', 'Necessary', '[duration]'],
-          ['[name]', '[analytics provider]', 'Measure how the website is used', 'Analytics', '[duration]'],
-          ['[name]', '[provider]', '[purpose]', '[type]', '[duration]'],
-        ],
-      },
-    },
-    {
-      title: 'How to accept or reject them',
-      paragraphs: [
-        'Necessary cookies are always on. All others are used only if you accept them in the cookie banner. You can change your choice at any time from Cookie settings, at the bottom of every page, or delete cookies from your browser settings.',
-      ],
-    },
-  ],
-  updated: 'Last updated: [date]',
-};
-
-export default { legal, privacy, cookies };
+export default { legal, privacy };

@@ -17,7 +17,7 @@ export function setTheme(theme: Theme) {
   // One frame without transitions, so the switch is a clean cut, not a cascade.
   root.classList.add('theme-switching');
   root.dataset.theme = theme;
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#161616' : '#FAFAFA');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0D0D0D' : '#FAFAFA');
   try {
     localStorage.setItem(THEME_KEY, theme);
   } catch {

@@ -1,0 +1,51 @@
+---
+/**
+ * Opens the sectors part of the home: the title and its line, on the left,
+ * right before the 3D scene walks through each sector.
+ */
+import { getCopy, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { scene } = getCopy(locale).home;
+---
+
+<section class="si" aria-labelledby="si-title">
+  <div class="container si__inner">
+    <h2 id="si-title" class="si__title" data-render>{scene.title}</h2>
+    <p class="si__text" data-reveal>{scene.intro}</p>
+  </div>
+</section>
+
+<style>
+  .si {
+    position: relative;
+    z-index: var(--z-cover);
+    background: var(--canvas);
+    padding-block: clamp(6rem, 4rem + 7vw, 12rem) clamp(4rem, 3rem + 4vw, 7rem);
+  }
+
+  .si__inner {
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+  }
+
+  .si__title {
+    max-width: 16ch;
+    font-size: clamp(2.25rem, 1.2rem + 2.9vw, 4rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+
+  .si__text {
+    max-width: 40ch;
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    letter-spacing: var(--track-title);
+    color: var(--ink-2);
+  }
+</style>

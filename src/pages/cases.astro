@@ -1,12 +1,14 @@
 ---
 /**
- * Cases (/cases), from "predicterra-10-cases.md".
- * hero · i-DE · UFD · recognition · CTA. Signed quotes, the i-DE PDF and the
- * link to the E.DSO case are pending, so they are left out for now.
+ * Cases (/cases), from "predicterra-16-cases.md".
+ * hero · the cases (i-DE, UFD, Moeve), each with the link to its published
+ * article · recognition · CTA. Moeve's figure waits for Moeve's validation.
  */
 import PageLayout from '../layouts/PageLayout.astro';
 import PageHero from '../sections/pages/PageHero.astro';
 import SectionHead from '../sections/pages/SectionHead.astro';
+import Button from '../components/Button.astro';
+import FigureValue from '../components/FigureValue.astro';
 import Cta from '../sections/home/Cta.astro';
 import { getCopy, withBase } from '../i18n/config';
 
@@ -18,43 +20,49 @@ const pad = (n: number) => String(n).padStart(3, '0');
 <PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
   <PageHero locale={locale} {...c.hero} layout="centred" />
 
-  {
-    c.cases.map((k, n) => (
-      <section class:list={['cs pg-sec', n % 2 === 1 && 'cs--alt']} aria-labelledby={`${k.id}-title`}>
-        <div class="container pg-body">
-          <div class="cs__head">
-            <div class="cs__brand" data-reveal>
-              <img
-                src={withBase(k.logo.src)}
-                alt=""
-                width={Math.round((k.logo.w / k.logo.h0) * k.logo.h)}
-                height={k.logo.h}
-                style={`--h:${k.logo.h}px`}
-                loading="lazy"
-                decoding="async"
-              />
-              <span class="cs__client t-small">{k.client}</span>
-            </div>
-            <h2 id={`${k.id}-title`} class="cs__title" data-render>
-              <span class="cs__value t-num">{k.value}</span>
-              <span class="cs__claim">{k.title}</span>
-            </h2>
-          </div>
-          <dl class="cs__blocks" data-reveal-group>
-            {k.blocks.map((b, i) => (
-              <div class="cs__block" data-reveal>
-                <dt>
-                  <span class="pg-idx">{pad(i + 1)}</span>
-                  <span class="cs__label">{b.title}</span>
-                </dt>
-                <dd class="cs__text">{b.text}</dd>
+  <section class="cs pg-sec" aria-label="Cases">
+    <div class="container">
+      <ol class="cs__list">
+        {
+          c.cases.map((k, i) => (
+            <li class="cs__case" aria-labelledby={`${k.id}-title`} data-reveal-group>
+              <div class="cs__brand" data-reveal>
+                <span class="pg-idx">{pad(i + 1)}</span>
+                <img
+                  src={withBase(k.logo.src)}
+                  alt=""
+                  width={Math.round((k.logo.w / k.logo.h0) * k.logo.h)}
+                  height={k.logo.h}
+                  style={`--h:${k.logo.h}px`}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <h2 id={`${k.id}-title`} class="cs__client">
+                  {k.client}
+                </h2>
               </div>
-            ))}
-          </dl>
-        </div>
-      </section>
-    ))
-  }
+              <div class="cs__main" data-reveal>
+                {k.value ? (
+                  <p class="cs__figure">
+                    <FigureValue class="cs__value t-num" value={k.value} />
+                    <span class="cs__label">{k.label}</span>
+                  </p>
+                ) : null}
+                <p class:list={['cs__text', !k.value && 'cs__text--lead']}>{k.text}</p>
+              </div>
+              <div class="cs__meta" data-reveal>
+                <p class="cs__badge t-small">
+                  <span aria-hidden="true" />
+                  {k.badge}
+                </p>
+                <Button href={k.link.href} label={k.link.label} variant="secondary" external />
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
 
   <section class="rc pg-sec" aria-labelledby="recognition-title">
     <div class="container pg-body">
@@ -63,23 +71,8 @@ const pad = (n: number) => String(n).padStart(3, '0');
         {
           c.recognition.items.map((r) => (
             <li class="rc__item" data-reveal>
-              <div class="rc__mark">
-                {'logo' in r && r.logo ? (
-                  <img
-                    src={withBase(r.logo.src)}
-                    alt={r.name}
-                    width={Math.round((r.logo.w / r.logo.h0) * r.logo.h)}
-                    height={r.logo.h}
-                    style={`--h:${r.logo.h}px`}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : (
-                  <span class="rc__word">{r.name}</span>
-                )}
-              </div>
-              {'logo' in r && r.logo && <p class="rc__name t-small">{r.name}</p>}
-              <p class="rc__text">{r.text}</p>
+              <span class="rc__name">{r.name}</span>
+              {r.text && <span class="rc__text">{r.text}</span>}
             </li>
           ))
         }
@@ -91,107 +84,126 @@ const pad = (n: number) => String(n).padStart(3, '0');
 </PageLayout>
 
 <style>
-  /* ---------- A case: the figure large, the four blocks in a row ---------- */
-  .cs__head {
+  /* ---------- Cases: one wide row each, on hairlines ---------- */
+  .cs__list {
     display: grid;
-    gap: 2rem;
+  }
+
+  .cs__case {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.75rem var(--gutter);
+    padding-block: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .cs__case:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (min-width: 64rem) {
+    .cs__case {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 6fr) minmax(0, 3fr);
+      align-items: start;
+    }
   }
 
   .cs__brand {
-    display: flex;
-    align-items: center;
+    display: grid;
+    justify-items: start;
     gap: 1rem;
   }
 
   .cs__brand img {
     width: auto;
     height: var(--h);
+    margin-top: 0.75rem;
     filter: brightness(0) invert(var(--logo-inv, 0));
-    opacity: 0.7;
+    opacity: 0.75;
   }
 
   .cs__client {
+    font-size: var(--fs-small);
     color: var(--muted);
   }
 
-  .cs__title {
+  .cs__main {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .cs__figure {
     display: grid;
     gap: 0.5rem;
   }
 
-  /* Orange only at display size (contrast). */
+  /* The number in ink, its unit in orange (FigureValue). */
   .cs__value {
-    font-size: clamp(4rem, 2.5rem + 6vw, 9rem);
+    font-size: clamp(3.5rem, 2.25rem + 5vw, 7.5rem);
     line-height: 0.9;
     letter-spacing: -0.05em;
-    color: var(--accent);
-  }
-
-  .cs__claim {
-    max-width: 22ch;
-    font-size: var(--fs-h2);
-    line-height: 1.08;
-    letter-spacing: -0.025em;
-    text-wrap: balance;
-  }
-
-  .cs__blocks {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0 var(--gutter);
-  }
-
-  @media (min-width: 40rem) {
-    .cs__blocks {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 64rem) {
-    .cs__blocks {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-  }
-
-  .cs__block {
-    display: grid;
-    align-content: start;
-    gap: 1rem;
-    padding-block: 1.25rem 2.5rem;
-    border-top: 1px solid var(--line);
-  }
-
-  .cs__block dt {
-    display: grid;
-    gap: 0.75rem;
+    white-space: nowrap;
   }
 
   .cs__label {
-    font-size: var(--fs-h4);
-    letter-spacing: var(--track-title);
+    font-size: var(--fs-h3);
+    line-height: 1.15;
+    letter-spacing: var(--track-heading);
   }
 
   .cs__text {
-    max-width: 34ch;
+    max-width: 46ch;
     color: var(--ink-2);
   }
 
-  /* The second case mirrors the first: the figure on the right. */
+  .cs__text--lead {
+    max-width: 30ch;
+    font-size: var(--fs-h3);
+    line-height: 1.25;
+    letter-spacing: var(--track-heading);
+    color: var(--ink);
+  }
+
+  .cs__meta {
+    display: grid;
+    justify-items: start;
+    gap: 1.5rem;
+  }
+
   @media (min-width: 64rem) {
-    .cs--alt .cs__head {
+    .cs__meta {
       justify-items: end;
       text-align: right;
     }
-    .cs--alt .cs__title {
-      justify-items: end;
-    }
+  }
+
+  .cs__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2rem;
+    padding: 0 0.75rem;
+    background: var(--chip-bg);
+    color: var(--ink-2);
+  }
+
+  .cs__badge span {
+    width: 0.375rem;
+    height: 0.375rem;
+    background: var(--accent);
   }
 
   /* ---------- Recognition ---------- */
   .rc__list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.75rem;
+  }
+
+  @media (min-width: 40rem) {
+    .rc__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (min-width: 64rem) {
@@ -202,36 +214,19 @@ const pad = (n: number) => String(n).padStart(3, '0');
 
   .rc__item {
     display: grid;
-    grid-template-rows: 1fr auto auto;
-    gap: 0.375rem;
-    min-height: clamp(11rem, 9rem + 5vw, 15rem);
+    align-content: space-between;
+    gap: 2.5rem;
+    min-height: clamp(9rem, 7rem + 4vw, 12rem);
     padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
     background: var(--card);
   }
 
-  .rc__mark {
-    display: flex;
-    align-items: flex-start;
-  }
-
-  .rc__mark img {
-    width: auto;
-    height: var(--h);
-    max-width: 100%;
-    filter: brightness(0) invert(var(--logo-inv, 0));
-    opacity: 0.7;
-  }
-
-  .rc__word {
+  .rc__name {
     font-size: var(--fs-h4);
     letter-spacing: var(--track-title);
   }
 
-  .rc__name {
-    color: var(--muted);
-  }
-
   .rc__text {
-    max-width: 30ch;
+    color: var(--muted);
   }
 </style>

@@ -7,6 +7,7 @@
  */
 import PageLayout from '../layouts/PageLayout.astro';
 import Button from '../components/Button.astro';
+import PageTitle from '../components/PageTitle.astro';
 import { getCopy, localizePath } from '../i18n/config';
 import { icons } from '../data/icons';
 
@@ -20,7 +21,7 @@ const f = c.form;
     <div class="container ct__grid">
       <div class="ct__intro">
         <p class="label" data-reveal>{c.hero.label}</p>
-        <h1 id="page-title" class="ct__title" data-render>{c.hero.title}</h1>
+        <PageTitle class="ct__title" text={c.hero.title} />
         <p class="ct__text" data-reveal>{c.hero.text}</p>
 
         <div class="ct__other" data-reveal>
@@ -256,27 +257,28 @@ const f = c.form;
     font: inherit;
     font-size: 1rem;
     color: var(--ink);
+    /* A filled field on the form's card, no outline. */
     background: var(--surface);
-    border: 1px solid var(--line);
+    border: 0;
     border-radius: 0;
-    transition: border-color 150ms ease;
+    transition: background-color 150ms ease;
     appearance: none;
   }
 
   @media (hover: hover) and (pointer: fine) {
     .fld__input:hover {
-      border-color: var(--line-strong);
+      background: color-mix(in oklab, var(--surface), var(--ink) 4%);
     }
   }
 
   .fld__input:focus-visible {
     outline: 2px solid var(--ink);
     outline-offset: 0;
-    border-color: var(--ink);
   }
 
+  /* Invalid: an orange rule along the bottom of the field. */
   .fld__input[aria-invalid] {
-    border-color: var(--accent);
+    box-shadow: inset 0 -2px 0 var(--accent);
   }
 
   .fld__area {

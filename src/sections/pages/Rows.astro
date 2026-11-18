@@ -1,9 +1,9 @@
 ---
 /**
- * A list of points as quiet hairline rows (icon or running index, title, text).
- *  - without a side visual: the section head on top, the rows in two columns
- *  - with a side visual (diagram, code panel, mock-up): head and rows on one
- *    side, the visual held in place on the other while the rows pass
+ * A section of points as a list: the section title on the left, the rows on
+ * the right, each row with its title (and running index or orange icon) on the
+ * left and its text on the right. Anything in the default slot follows the
+ * list (a closing line, seals). `dark` turns the page dark around it.
  */
 import Icon from '../../components/Icon.astro';
 import SectionHead from './SectionHead.astro';
@@ -16,57 +16,34 @@ interface Props {
   items: readonly { icon?: IconName | string; title: string; text: string }[];
   marker?: 'icon' | 'num';
   dark?: boolean;
-  rule?: number;
-  head?: 'center' | 'stack' | 'side';
-  /** With a side visual: put the visual first (on the left). */
-  sideFirst?: boolean;
 }
-const { id, title, text, items, marker = 'icon', dark = false, head = 'side', sideFirst = false } = Astro.props;
-const hasSide = Astro.slots.has('side');
+const { id, title, text, items, marker = 'icon', dark = false } = Astro.props;
 const pad = (n: number) => String(n).padStart(3, '0');
 ---
 
-<section
-  class:list={['rw pg-sec', hasSide ? 'rw--side' : 'rw--plain', sideFirst && 'rw--side-first']}
-  aria-labelledby={id}
-  data-dark={dark ? '' : undefined}
->
-  <div class="container">
-    <div class="pg-body">
-      {!hasSide && <SectionHead id={id} title={title} text={text} align={head} />}
-      <div class="rw__grid">
+<section class="rw pg-sec" aria-labelledby={id} data-dark={dark ? '' : undefined}>
+  <div class="container rw__grid">
+    <div class="rw__head">
+      <SectionHead id={id} title={title} text={text} align="stack" />
+    </div>
+    <div class="rw__body">
+      <ol class="rw__list" data-reveal-group>
         {
-          hasSide && (
-            <div class="rw__head">
-              <SectionHead id={id} title={title} text={text} align="stack" />
-            </div>
-          )
-        }
-        <ol class:list={['rw__list', `rw__list--${marker}`]} data-reveal-group>
-          {
-            items.map((it, i) => (
-              <li class="rw__row" data-reveal>
+          items.map((it, i) => (
+            <li class="rw__row" data-reveal>
+              <h3 class="rw__title">
                 {marker === 'icon' && it.icon ? (
-                  <Icon name={it.icon as IconName} boxed size="2.5rem" />
+                  <Icon name={it.icon as IconName} boxed size="2.25rem" />
                 ) : (
                   <span class="pg-idx rw__num">{pad(i + 1)}</span>
                 )}
-                <h3 class="rw__title">{it.title}</h3>
-                <p class="rw__text">{it.text}</p>
-              </li>
-            ))
-          }
-        </ol>
-        {
-          hasSide && (
-            <div class="rw__side" data-reveal>
-              <div class="rw__side-sticky">
-                <slot name="side" />
-              </div>
-            </div>
-          )
+                <span>{it.title}</span>
+              </h3>
+              <p class="rw__text">{it.text}</p>
+            </li>
+          ))
         }
-      </div>
+      </ol>
       <slot />
     </div>
   </div>
@@ -76,45 +53,23 @@ const pad = (n: number) => String(n).padStart(3, '0');
   .rw__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 3rem clamp(3rem, 1rem + 5vw, 7rem);
+    gap: clamp(2rem, 1.5rem + 2vw, 3.5rem) clamp(3rem, 1rem + 6vw, 8rem);
   }
 
-  /* Plain: two columns of rows under the head. */
-  @media (min-width: 48rem) {
-    .rw--plain .rw__list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: clamp(2rem, 1rem + 4vw, 6rem);
-    }
-  }
-
-  /* Side: head and rows on one side, the visual held on the other. */
   @media (min-width: 64rem) {
-    .rw--side .rw__grid {
+    .rw__grid {
       grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-      grid-template-areas:
-        'head side'
-        'list side';
-      row-gap: clamp(2.5rem, 1.5rem + 2vw, 4rem);
+      align-items: start;
     }
-    .rw--side .rw__head {
-      grid-area: head;
-    }
-    .rw--side .rw__list {
-      grid-area: list;
-    }
-    .rw--side .rw__side {
-      grid-area: side;
-    }
-    .rw--side .rw__side-sticky {
+    .rw__head {
       position: sticky;
-      top: calc(var(--header-h) + 3rem);
+      top: calc(var(--header-h) + 2.5rem);
     }
-    .rw--side-first .rw__grid {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      grid-template-areas:
-        'side head'
-        'side list';
-    }
+  }
+
+  .rw__body {
+    display: grid;
+    gap: clamp(2rem, 1.5rem + 2vw, 3rem);
   }
 
   .rw__list {
@@ -123,35 +78,46 @@ const pad = (n: number) => String(n).padStart(3, '0');
 
   .rw__row {
     display: grid;
-    grid-template-columns: 3.75rem minmax(0, 1fr);
-    grid-template-areas:
-      'm title'
-      'm text';
-    gap: 0.5rem 0.5rem;
-    padding-block: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem var(--gutter);
+    padding-block: 1.75rem;
     border-top: 1px solid var(--line);
   }
 
-  .rw__row > :global(.ibox),
-  .rw__num {
-    grid-area: m;
+  .rw__row:first-child {
+    padding-top: 0;
+    border-top: 0;
   }
 
-  .rw__num {
-    padding-top: 0.35rem;
+  @media (min-width: 48rem) {
+    .rw__row {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: baseline;
+    }
   }
 
   .rw__title {
-    grid-area: title;
-    align-self: center;
-    font-size: var(--fs-h4);
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    font-size: var(--fs-h3);
     line-height: 1.2;
-    letter-spacing: var(--track-title);
+    letter-spacing: var(--track-heading);
+    text-wrap: balance;
+  }
+
+  .rw__title > :global(.ibox) {
+    align-self: center;
+  }
+
+  .rw__num {
+    flex: none;
+    width: 2rem;
+    transform: translateY(-0.2em);
   }
 
   .rw__text {
-    grid-area: text;
-    max-width: 44ch;
+    max-width: 42ch;
     color: var(--ink-2);
   }
 </style>
