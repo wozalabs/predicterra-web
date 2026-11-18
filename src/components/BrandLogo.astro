@@ -1,0 +1,34 @@
+---
+/**
+ * A partner logo in its own colours, inlined from public/logos. The white parts
+ * of a logo (BIND's wordmark, "Microsoft Partner", "Grupo Naturgy") take the
+ * text colour instead, so they read on light and on dark grounds alike.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+
+interface Props {
+  /** Path under public/, e.g. /logos/iberdrola.svg */
+  src: string;
+  name: string;
+  /** Rendered height in px; the width follows the file's proportions. */
+  height: number;
+  /** Source proportions (width / height of the drawing). */
+  w: number;
+  h0: number;
+  /** A repeated copy: hidden from assistive tech. */
+  decorative?: boolean;
+  class?: string;
+}
+// `rest` carries the parent's scoped-style attribute.
+const { src, name, height, w, h0, decorative = false, class: className, ...rest } = Astro.props;
+const width = Math.round((w / h0) * height);
+const label = decorative ? 'aria-hidden="true"' : `role="img" aria-label="${name.replace(/"/g, '&quot;')}"`;
+const svg = fs
+  .readFileSync(path.join(process.cwd(), 'public', src), 'utf8')
+  .replace(/<\?xml[^>]*>|<!--[\s\S]*?-->/g, '')
+  .replace(/fill="#(?:fff|ffffff)"/gi, 'fill="currentColor"')
+  .replace('<svg ', `<svg ${label} focusable="false" width="${width}" height="${height}" `);
+---
+
+<span class:list={['brand-logo', className]} {...rest} set:html={svg} />

@@ -11,7 +11,6 @@ import HeroCutout from '../sections/home/HeroCutout.astro';
 import HeroPixel from '../sections/home/HeroPixel.astro';
 import HeroClean from '../sections/home/HeroClean.astro';
 import Showcase from '../sections/home/Showcase.astro';
-import ProofBand from '../sections/pages/ProofBand.astro';
 import SectorsIntro from '../sections/home/SectorsIntro.astro';
 import SectorTrail from '../sections/home/SectorTrail.astro';
 import SectorScene from '../sections/home/SectorScene.astro';
@@ -39,8 +38,8 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   <HeroCutout locale={locale} />
   <HeroPixel locale={locale} />
   <HeroClean locale={locale} />
-  <Showcase locale={locale} peek pillars={home.hero.main.pillars} />
-  <ProofBand locale={locale} proof={home.proof} class="home-proof" />
+  <!-- The platform and, under it, who runs it: one screen once scrolled to. -->
+  <Showcase locale={locale} peek logos={home.proof.groups} />
   <SectorsIntro locale={locale} />
   <SectorTrail locale={locale} />
   <!-- Test only: previous 3D variant, shown when selected in the menu (3D view). -->
@@ -50,9 +49,3 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   <Cta locale={locale} copy={home.cta} />
 </BaseLayout>
 
-<style>
-  .home-proof {
-    z-index: var(--z-cover);
-    background: var(--canvas);
-  }
-</style>

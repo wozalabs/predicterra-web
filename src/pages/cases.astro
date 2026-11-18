@@ -9,8 +9,9 @@ import PageHero from '../sections/pages/PageHero.astro';
 import SectionHead from '../sections/pages/SectionHead.astro';
 import Button from '../components/Button.astro';
 import FigureValue from '../components/FigureValue.astro';
+import BrandLogo from '../components/BrandLogo.astro';
 import Cta from '../sections/home/Cta.astro';
-import { getCopy, withBase } from '../i18n/config';
+import { getCopy } from '../i18n/config';
 
 const locale = 'en';
 const { casesPage: c } = getCopy(locale);
@@ -28,15 +29,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
             <li class="cs__case" aria-labelledby={`${k.id}-title`} data-reveal-group>
               <div class="cs__brand" data-reveal>
                 <span class="pg-idx">{pad(i + 1)}</span>
-                <img
-                  src={withBase(k.logo.src)}
-                  alt=""
-                  width={Math.round((k.logo.w / k.logo.h0) * k.logo.h)}
-                  height={k.logo.h}
-                  style={`--h:${k.logo.h}px`}
-                  loading="lazy"
-                  decoding="async"
-                />
+                <BrandLogo src={k.logo.src} name={k.client} height={k.logo.h} w={k.logo.w} h0={k.logo.h0} decorative class="cs__logo" />
                 <h2 id={`${k.id}-title`} class="cs__client">
                   {k.client}
                 </h2>
@@ -114,12 +107,9 @@ const pad = (n: number) => String(n).padStart(3, '0');
     gap: 1rem;
   }
 
-  .cs__brand img {
-    width: auto;
-    height: var(--h);
+  /* In its own colours (BrandLogo). */
+  .cs__brand :global(.cs__logo) {
     margin-top: 0.75rem;
-    filter: brightness(0) invert(var(--logo-inv, 0));
-    opacity: 0.75;
   }
 
   .cs__client {

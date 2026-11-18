@@ -1,12 +1,12 @@
 ---
 /**
  * Logos of the clients in operation and of the recognition, with one line and
- * the button to the cases (home). The logos run the full width of the page in
- * an endless, slow horizontal loop that pauses under the pointer; with reduced
- * motion they sit still, centred and wrapped.
+ * the button to the cases (home). The logos sit still in their own colours,
+ * one row per screen width, centred and wrapping on narrow screens.
  */
 import Button from '../../components/Button.astro';
-import { localizePath, withBase, type Locale } from '../../i18n/config';
+import BrandLogo from '../../components/BrandLogo.astro';
+import { localizePath, type Locale } from '../../i18n/config';
 import type { Proof } from '../../i18n/en/pages-shared';
 
 interface Props {
@@ -20,38 +20,32 @@ const scale = 1.25;
 ---
 
 <section class:list={['pb', className]} aria-label="Clients and recognition">
-  <div class="pb__marquee" data-reveal>
+  <ul class="container pb__groups" data-reveal-group>
     {
-      [0, 1].map((copy) => (
-        <ul class="pb__track" aria-hidden={copy === 1 ? 'true' : undefined}>
-          {proof.groups.map((g) => (
-            <li class="pb__group">
-              <span class="pb__label">{g.label}</span>
-              <ul class="pb__logos">
-                {g.items.map((it) => (
-                  <li class="pb__item">
-                    {it.src ? (
-                      <img
-                        src={withBase(it.src)}
-                        alt={copy === 1 ? '' : it.name}
-                        width={Math.round(((it.w ?? 1) / (it.h0 ?? 1)) * (it.h ?? 20) * scale)}
-                        height={Math.round((it.h ?? 20) * scale)}
-                        style={`--h:${Math.round((it.h ?? 20) * scale)}px`}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <span class="pb__word">{it.name}</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
+      proof.groups.map((g) => (
+        <li class="pb__group" data-reveal>
+          <span class="pb__label">{g.label}</span>
+          <ul class="pb__logos">
+            {g.items.map((it) => (
+              <li class="pb__item">
+                {it.src ? (
+                  <BrandLogo
+                    src={it.src}
+                    name={it.name}
+                    height={Math.round((it.h ?? 20) * scale)}
+                    w={it.w ?? 1}
+                    h0={it.h0 ?? 1}
+                  />
+                ) : (
+                  <span class="pb__word">{it.name}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </li>
       ))
     }
-  </div>
+  </ul>
 
   <div class="container pb__foot" data-reveal-group>
     <p class="pb__text" data-reveal>{proof.text}</p>
@@ -68,46 +62,24 @@ const scale = 1.25;
     grid-template-columns: minmax(0, 1fr);
     gap: clamp(2rem, 1.5rem + 2vw, 3rem);
     padding-block: clamp(4rem, 3rem + 4vw, 7rem);
-    overflow-x: clip;
   }
 
-  /* ---------- Endless band ---------- */
-  .pb__marquee {
-    --gap: clamp(3rem, 2rem + 4vw, 6rem);
+  /* ---------- Still logos, centred ---------- */
+  .pb__groups {
     display: flex;
-    width: 100%;
-    overflow: clip;
-    /* The band fades out at both edges instead of being cut. */
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  }
-
-  .pb__track {
-    display: flex;
-    flex: none;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    gap: var(--gap);
-    padding-right: var(--gap);
-    animation: pb-loop 48s linear infinite;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .pb__marquee:hover .pb__track {
-      animation-play-state: paused;
-    }
-  }
-
-  @keyframes pb-loop {
-    to {
-      transform: translateX(-100%);
-    }
+    gap: 1.5rem clamp(2.5rem, 1.5rem + 3vw, 5rem);
   }
 
   .pb__group,
   .pb__logos {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    gap: var(--gap);
+    gap: 1rem clamp(1.75rem, 1rem + 2vw, 3rem);
   }
 
   .pb__label {
@@ -122,43 +94,11 @@ const scale = 1.25;
     height: 3rem;
   }
 
-  /* Monochrome, white in the dark theme. */
-  .pb__item img {
-    width: auto;
-    max-width: none;
-    height: var(--h);
-    filter: brightness(0) invert(var(--logo-inv, 0));
-    opacity: 0.7;
-  }
-
   .pb__word {
     font-size: 1.375rem;
     letter-spacing: var(--track-title);
     color: var(--ink);
-    opacity: 0.7;
     white-space: nowrap;
-  }
-
-  /* Reduced motion: one still, centred, wrapped copy. */
-  @media (prefers-reduced-motion: reduce) {
-    .pb__marquee {
-      justify-content: center;
-      -webkit-mask-image: none;
-      mask-image: none;
-    }
-    .pb__track {
-      flex-wrap: wrap;
-      justify-content: center;
-      padding-inline: var(--gutter);
-      animation: none;
-    }
-    .pb__track[aria-hidden] {
-      display: none;
-    }
-    .pb__group {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
   }
 
   /* ---------- Line and button ---------- */

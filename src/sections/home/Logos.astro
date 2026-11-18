@@ -1,5 +1,6 @@
 ---
-import { getCopy, withBase, type Locale } from '../../i18n/config';
+import BrandLogo from '../../components/BrandLogo.astro';
+import { getCopy, type Locale } from '../../i18n/config';
 
 interface Props {
   locale?: Locale;
@@ -14,15 +15,7 @@ const { logos } = getCopy(locale).home;
     {
       logos.items.map((item) => (
         <li class="logos__item">
-          <img
-            src={withBase(item.src)}
-            alt={item.name}
-            width={Math.round((item.w / item.h0) * item.h)}
-            height={item.h}
-            style={`--h:${item.h}px`}
-            loading="eager"
-            decoding="async"
-          />
+          <BrandLogo src={item.src} name={item.name} height={item.h} w={item.w} h0={item.h0} />
         </li>
       ))
     }
@@ -48,13 +41,9 @@ const { logos } = getCopy(locale).home;
     align-items: center;
   }
 
-  /* Monochrome, whatever the original logo colours. */
-  .logos__item img {
-    width: auto;
-    height: calc(var(--h) * var(--logo-scale));
-    max-width: 100%;
-    filter: brightness(0) invert(var(--logo-inv, 0));
-    opacity: 0.55;
+  /* In their own colours (BrandLogo), scaled together. */
+  .logos__item {
+    zoom: var(--logo-scale);
   }
 
   @media (max-width: 40rem) {

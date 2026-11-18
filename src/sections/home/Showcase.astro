@@ -4,52 +4,54 @@
  * straightens as it reaches the middle of the viewport (scroll-linked, see the
  * script below). Reduced motion: shown flat, no movement.
  *
+ * The capture runs the width of the content (1440px at most), unless that
+ * would make it too tall to share one screen with what sits under it: with
+ * `logos` (homepage), the client and recognition logos, so once scrolled to,
+ * the screen holds only the platform and who runs it, no title.
+ *
  * `peek` (homepage only): with the App hero layout (the default) the capture
  * is pulled up into the bottom of the hero, barely tilted, so it is already in
  * view on load.
  */
+import LogoBand from '../pages/LogoBand.astro';
 import { getCopy, withBase, type Locale } from '../../i18n/config';
+import type { LogoGroup } from '../../i18n/en/pages-shared';
 
 interface Props {
   locale?: Locale;
   peek?: boolean;
-  /** Short points under the capture (the home hero's three pillars). */
-  pillars?: readonly { title: string; text: string }[];
+  /** Logo groups under the capture (homepage). */
+  logos?: LogoGroup[];
 }
-const { locale = 'en', peek = false, pillars } = Astro.props;
-const pad = (n: number) => String(n).padStart(2, '0');
+const { locale = 'en', peek = false, logos } = Astro.props;
 const { showcase: s } = getCopy(locale).home;
 const src = (w: number) => withBase(`${s.src}-${w}.webp`);
 ---
 
-<section class="sc" aria-label={s.label} data-showcase data-peek={peek ? '' : undefined}>
+<section
+  class:list={['sc', logos && 'sc--logos']}
+  aria-label={s.label}
+  data-showcase
+  data-peek={peek ? '' : undefined}
+  style={`--ratio:${s.w / s.h}`}
+>
   {peek && <canvas class="sc__dither" aria-hidden="true" data-dither />}
   <div class="container sc__stage">
-    <figure class="sc__frame" data-showcase-frame>
-      <img
-        src={src(1600)}
-        srcset={`${src(960)} 960w, ${src(1600)} 1600w, ${src(2400)} 2400w`}
-        sizes="(min-width: 80rem) 76rem, (min-width: 48rem) calc(100vw - 4rem), 150vw"
-        alt={s.alt}
-        width={s.w}
-        height={s.h}
-        decoding="async"
-      />
-    </figure>
+    <div class="sc__group" data-showcase-group>
+      <figure class="sc__frame" data-showcase-frame>
+        <img
+          src={src(1600)}
+          srcset={`${src(960)} 960w, ${src(1600)} 1600w, ${src(2400)} 2400w`}
+          sizes="(min-width: 90rem) 90rem, (min-width: 48rem) calc(100vw - 4rem), 150vw"
+          alt={s.alt}
+          width={s.w}
+          height={s.h}
+          decoding="async"
+        />
+      </figure>
+      {logos && <LogoBand groups={logos} class="sc__logos" />}
+    </div>
   </div>
-  {
-    pillars && (
-      <ul class="container sc__pillars" data-reveal-group>
-        {pillars.map((p, i) => (
-          <li class="sc__pillar" data-reveal>
-            <span class="sc__idx t-num">{pad(i + 1)}</span>
-            <h2 class="sc__ptitle">{p.title}</h2>
-            <p class="sc__ptext">{p.text}</p>
-          </li>
-        ))}
-      </ul>
-    )
-  }
 </section>
 
 <style>
@@ -126,10 +128,34 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
     perspective-origin: 50% 30%;
   }
 
+  /* The capture (and the logos under it) as wide as the content, unless the
+     pair would then be taller than one screen under the header. */
+  .sc {
+    --below: 0rem;
+  }
+
+  .sc--logos {
+    --below: 8.5rem;
+  }
+
+  .sc__group {
+    width: min(100%, calc((100svh - var(--header-h) - 2rem - var(--below)) * var(--ratio)));
+    margin-inline: auto;
+  }
+
+  .sc__group :global(.sc__logos) {
+    position: relative;
+    padding-top: clamp(1.25rem, 0.75rem + 1.5vh, 2rem);
+    pointer-events: auto;
+  }
+
+  /* Room under the pair, so the next section's title stays out of that screen. */
+  .sc--logos {
+    padding-bottom: clamp(5rem, 3rem + 12vh, 10rem);
+  }
+
   .sc__frame {
     position: relative;
-    max-width: 76rem;
-    margin-inline: auto;
     background: #161616;
     box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.55);
     transform-origin: 50% 100%;
@@ -140,49 +166,6 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
   .sc__frame img {
     width: 100%;
     height: auto;
-  }
-
-  /* ---------- Pillars under the capture ---------- */
-  .sc__pillars {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0 var(--gutter);
-    max-width: calc(76rem + 2 * var(--gutter));
-    margin-top: clamp(3rem, 2rem + 3vw, 5rem);
-    pointer-events: auto;
-  }
-
-  @media (min-width: 48rem) {
-    .sc__pillars {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .sc__pillar {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-content: start;
-    gap: 0.5rem 1rem;
-    padding-block: 1.25rem 1.5rem;
-    border-top: 1px solid var(--line);
-  }
-
-  .sc__idx {
-    grid-row: span 2;
-    padding-top: 0.3rem;
-    font-size: var(--fs-caption);
-    color: var(--accent);
-  }
-
-  .sc__ptitle {
-    font-size: var(--fs-h4);
-    letter-spacing: var(--track-title);
-  }
-
-  .sc__ptext {
-    max-width: 34ch;
-    color: var(--ink-2);
   }
 
   /* Phones: wider than the screen, cropped at the sides, so the interface
@@ -319,7 +302,7 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
 
   /* ---------- Scroll: tilt → flat ---------- */
   const section = document.querySelector<HTMLElement>('[data-showcase]');
-  const frame = section?.querySelector<HTMLElement>('[data-showcase-frame]');
+  const frame = section?.querySelector<HTMLElement>('[data-showcase-group]');
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   if (section && frame && !reduce.matches) {
@@ -333,7 +316,7 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
     const update = () => {
       raf = 0;
       const vh = window.innerHeight;
-      const top = section.getBoundingClientRect().top + window.scrollY + frame.offsetTop; // untransformed
+      const top = frame.getBoundingClientRect().top + window.scrollY; // the group is never transformed
       const h = frame.offsetHeight;
       const start = Math.max(0, top - vh);
       const end = Math.max(start + 1, top - Math.max(0, (vh - h) / 2));

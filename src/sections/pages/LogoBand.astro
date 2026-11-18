@@ -1,6 +1,6 @@
 ---
 /** Logo strip under the heroes, in two labelled groups (clients in operation, recognition). */
-import { withBase } from '../../i18n/config';
+import BrandLogo from '../../components/BrandLogo.astro';
 import type { LogoGroup } from '../../i18n/en/pages-shared';
 
 interface Props {
@@ -19,15 +19,7 @@ const { groups, class: className } = Astro.props;
           {g.items.map((it) => (
             <li class="lb__item">
               {it.src ? (
-                <img
-                  src={withBase(it.src)}
-                  alt={it.name}
-                  width={Math.round(((it.w ?? 1) / (it.h0 ?? 1)) * (it.h ?? 20))}
-                  height={it.h}
-                  style={`--h:${it.h}px`}
-                  loading="lazy"
-                  decoding="async"
-                />
+                <BrandLogo src={it.src} name={it.name} height={it.h ?? 20} w={it.w ?? 1} h0={it.h0 ?? 1} />
               ) : (
                 <span class="lb__word">{it.name}</span>
               )}
@@ -71,18 +63,10 @@ const { groups, class: className } = Astro.props;
     height: 2.25rem;
   }
 
-  /* Monochrome, and white while the page is dark. */
-  .lb__item img {
-    width: auto;
-    height: var(--h);
-    filter: brightness(0) invert(var(--logo-inv, 0));
-    opacity: 0.6;
-  }
-
+  /* The logos keep their colours (BrandLogo); the names without a file are set in ink. */
   .lb__word {
     font-size: 1.125rem;
     letter-spacing: var(--track-title);
     color: var(--ink);
-    opacity: 0.6;
   }
 </style>

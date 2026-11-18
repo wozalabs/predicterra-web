@@ -582,3 +582,14 @@ html.js-render-wait [data-render-step] {
 .pnl > :last-child {
   background: var(--canvas-mix, var(--canvas));
 }
+
+/* Partner logos in colour (components/BrandLogo.astro); white parts follow the ink. */
+.brand-logo {
+  display: inline-flex;
+  color: var(--ink);
+}
+
+.brand-logo svg {
+  display: block;
+  max-width: none;
+}
