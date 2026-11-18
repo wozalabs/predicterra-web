@@ -1,6 +1,6 @@
 ---
 import Logo from './Logo.astro';
-import { getCopy, localizePath, type Locale } from '../i18n/config';
+import { getCopy, localizePath, withBase, type Locale } from '../i18n/config';
 import { external } from '../data/routes';
 
 interface Props {
@@ -27,10 +27,36 @@ const { footer } = getCopy(locale).common;
               ))
             }
           </span>
-          <a class="footer__link" href={footer.contact.linkedin.href} target="_blank" rel="noopener">
-            {footer.contact.linkedin.label}
+          <!-- LinkedIn as its mark: the square in the link colour, the letters cut out of it. -->
+          <a
+            class="footer__link footer__social"
+            href={footer.contact.linkedin.href}
+            target="_blank"
+            rel="noopener"
+            aria-label={footer.contact.linkedin.label}
+          >
+            <svg viewBox="0 0 32 32" width="24" height="24" aria-hidden="true" focusable="false">
+              <path
+                d="M3.55556 32H28.4444C30.4081 32 32 30.4081 32 28.4444V3.55556C32 1.59188 30.4081 0 28.4444 0H3.55556C1.59188 0 0 1.59188 0 3.55556V28.4444C0 30.4081 1.59188 32 3.55556 32Z"
+                fill="currentColor"></path>
+              <path
+                class="footer__social-cut"
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M27.9 27.9H23.092V19.711C23.092 17.4657 22.2389 16.211 20.4618 16.211C18.5286 16.211 17.5185 17.5167 17.5185 19.711V27.9H12.885V12.3H17.5185V14.4013C17.5185 14.4013 18.9117 11.8234 22.2221 11.8234C25.5311 11.8234 27.9 13.844 27.9 18.023V27.9ZM7.35721 10.2573C5.77893 10.2573 4.5 8.96835 4.5 7.37865C4.5 5.78896 5.77893 4.5 7.35721 4.5C8.93549 4.5 10.2137 5.78896 10.2137 7.37865C10.2137 8.96835 8.93549 10.2573 7.35721 10.2573ZM4.96465 27.9H9.79623V12.3H4.96465V27.9Z"
+              ></path>
+            </svg>
           </a>
         </address>
+        <ul class="footer__badges" aria-label={footer.certificationsLabel}>
+          {
+            footer.certifications.map((c) => (
+              <li>
+                <img src={withBase(c.src)} alt={c.name} width={c.w} height={c.h} loading="lazy" decoding="async" />
+              </li>
+            ))
+          }
+        </ul>
       </div>
 
       <nav class="footer__cols" aria-label="Footer" data-reveal-group>
@@ -127,6 +153,33 @@ const { footer } = getCopy(locale).common;
     .footer__link:hover {
       color: var(--ink);
     }
+  }
+
+  /* LinkedIn mark: follows the link colour, the letters in the footer's ground. */
+  .footer__social {
+    display: inline-flex;
+    margin-top: 0.5rem;
+  }
+
+  .footer__social svg {
+    display: block;
+  }
+
+  .footer__social-cut {
+    fill: var(--canvas);
+  }
+
+  /* Certification marks, at their own colours. */
+  .footer__badges {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .footer__badges img {
+    width: auto;
+    height: 3.5rem;
   }
 
   .footer__address {

@@ -593,3 +593,9 @@ html.js-render-wait [data-render-step] {
   display: block;
   max-width: none;
 }
+
+/* Words lit one by one as a statement scrolls in (scripts/lit.ts). */
+[data-lit].is-lit .w {
+  opacity: var(--o, 0.16);
+  transition: opacity 200ms linear;
+}

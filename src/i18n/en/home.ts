@@ -25,9 +25,9 @@ export default {
     // App layout (default): title centred, the platform capture peeking below.
     main: {
       label: 'The Cognitive Twin for energy',
-      titleLine1: 'See what’s coming to',
-      titleLine2: 'every energy asset.',
-      text: 'Predicterra is the Cognitive Twin of the energy system: a live model of your assets, the physical world acting on them and how everything connects. From the control center to compliance, every team knows what will happen, why, and what to do first.',
+      titleLine1: 'The Cognitive Twin of',
+      titleLine2: 'the Energy System',
+      text: 'The cognitive digital twin of the energy system: simulated physics, a physical ontology and AI in one live model of your energy assets and operations.',
       primary: actions.demo,
       secondary: actions.platform,
       pillars: [
@@ -63,9 +63,9 @@ export default {
     },
     // Clean layout (test): only the video, the title and one action.
     clean: {
-      titleLine1: 'See what’s coming to',
-      titleLine2: 'every energy asset.',
-      text: 'Predicterra is the Cognitive Twin of the energy system: a live model of your assets, the physical world acting on them and how everything connects.',
+      titleLine1: 'The Cognitive Twin of',
+      titleLine2: 'the Energy System',
+      text: 'The cognitive digital twin of the energy system: simulated physics, a physical ontology and AI in one live model of your energy assets and operations.',
       cta: { label: 'Request a demo', href: routes.demo },
     },
     // Pixel layout (test): the video shows through a pixel mask that drifts
@@ -104,6 +104,13 @@ export default {
 
   // Logos, their line and the link to the cases.
   proof: proof.standard,
+
+  // Why us: what sets Predicterra apart from the single-layer tools on the
+  // market (vegetation from satellite, 3D line models), without naming them.
+  why: {
+    title: 'Why us',
+    text: 'Where other tools watch the vegetation or model the lines, Predicterra runs the whole energy system as one live model, forecasting every hazard on every asset and proving each forecast against real incidents.',
+  },
 
   scene: {
     label: 'Sectors',

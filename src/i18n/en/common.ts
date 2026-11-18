@@ -152,6 +152,12 @@ export default {
       ],
       linkedin: { label: 'LinkedIn', href: external.linkedin },
     },
+    // Certification marks (public/badges), under the contact details.
+    certificationsLabel: 'Certifications',
+    certifications: [
+      { name: 'GDPR', src: '/badges/gdpr.svg', w: 74, h: 74 },
+      { name: 'CCPA ready', src: '/badges/ccpa-ready.svg', w: 56, h: 74 },
+    ],
     copyright: '© 2026 Predicterra SL',
     builtBy: 'Built by',
     builtByName: 'Woza Labs',

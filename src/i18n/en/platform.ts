@@ -35,7 +35,7 @@ export default {
         ],
       },
     ],
-    closing: 'Predicterra is the Cognitive Twin of the energy system.',
+    closing: 'The cognitive digital twin of the energy system: simulated physics, a physical ontology and AI in one live model of your energy assets and operations.',
   },
 
   architecture: {

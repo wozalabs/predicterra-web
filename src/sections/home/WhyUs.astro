@@ -1,0 +1,66 @@
+---
+/**
+ * Why us (home), right after the platform and its logos: the title on the
+ * left, one differentiating sentence on the right, set like the Platform
+ * page's closing statements and lit word by word as it scrolls in
+ * (scripts/lit.ts).
+ */
+import { getCopy, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { why } = getCopy(locale).home;
+---
+
+<section class="why" aria-labelledby="why-title">
+  <div class="container why__grid">
+    <h2 id="why-title" class="why__title" data-render>{why.title}</h2>
+    <p class="why__text" data-lit>
+      {why.text.split(' ').map((w) => <span class="w">{w} </span>)}
+    </p>
+  </div>
+</section>
+
+<style>
+  .why {
+    position: relative;
+    z-index: var(--z-cover);
+    background: var(--canvas);
+    padding-block: clamp(6rem, 4rem + 7vw, 12rem) 0;
+  }
+
+  .why__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem clamp(3rem, 1rem + 6vw, 8rem);
+  }
+
+  @media (min-width: 64rem) {
+    .why__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+  }
+
+  .why__title {
+    font-size: var(--fs-h2);
+    line-height: 1.08;
+    letter-spacing: var(--track-heading);
+  }
+
+  .why__text {
+    max-width: 40ch;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    text-wrap: pretty;
+  }
+</style>
+
+<script>
+  import { mountLit } from '../../scripts/lit';
+  const why = document.querySelector<HTMLElement>('.why');
+  if (why) mountLit(why);
+</script>

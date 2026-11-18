@@ -11,11 +11,13 @@ import HeroCutout from '../sections/home/HeroCutout.astro';
 import HeroPixel from '../sections/home/HeroPixel.astro';
 import HeroClean from '../sections/home/HeroClean.astro';
 import Showcase from '../sections/home/Showcase.astro';
+import WhyUs from '../sections/home/WhyUs.astro';
 import SectorsIntro from '../sections/home/SectorsIntro.astro';
 import SectorTrail from '../sections/home/SectorTrail.astro';
 import SectorScene from '../sections/home/SectorScene.astro';
 import Across from '../sections/home/Across.astro';
-import Metrics from '../sections/home/Metrics.astro';
+// Key figures are hidden for now; to bring them back, restore this import and <Metrics /> below.
+// import Metrics from '../sections/home/Metrics.astro';
 import Cta from '../sections/home/Cta.astro';
 import { getCopy } from '../i18n/config';
 import { softwareJsonLd } from '../data/seo';
@@ -40,12 +42,14 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   <HeroClean locale={locale} />
   <!-- The platform and, under it, who runs it: one screen once scrolled to. -->
   <Showcase locale={locale} peek logos={home.proof.groups} />
+  <!-- Why us: what sets Predicterra apart, in one sentence. -->
+  <WhyUs locale={locale} />
   <SectorsIntro locale={locale} />
   <SectorTrail locale={locale} />
   <!-- Test only: previous 3D variant, shown when selected in the menu (3D view). -->
   <SectorScene locale={locale} />
   <Across locale={locale} />
-  <Metrics locale={locale} />
+  {/* <Metrics locale={locale} /> */}
   <Cta locale={locale} copy={home.cta} />
 </BaseLayout>
 

@@ -26,7 +26,8 @@ const width = Math.round((w / h0) * height);
 const label = decorative ? 'aria-hidden="true"' : `role="img" aria-label="${name.replace(/"/g, '&quot;')}"`;
 const svg = fs
   .readFileSync(path.join(process.cwd(), 'public', src), 'utf8')
-  .replace(/<\?xml[^>]*>|<!--[\s\S]*?-->/g, '')
+  .replace(/<\?xml[^>]*>|<!--[\s\S]*?-->|<metadata[\s\S]*?<\/metadata>/g, '')
+  .replace(/\s+xmlns:c2pa="[^"]*"/, '')
   .replace(/fill="#(?:fff|ffffff)"/gi, 'fill="currentColor"')
   .replace('<svg ', `<svg ${label} focusable="false" width="${width}" height="${height}" `);
 ---

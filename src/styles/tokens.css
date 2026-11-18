@@ -111,7 +111,7 @@
 
 @media (min-width: 64rem) {
   :root {
-    --hero-peek: clamp(14rem, 36vh, 24rem);
+    --hero-peek: clamp(16rem, 42vh, 28rem);
   }
 }
 

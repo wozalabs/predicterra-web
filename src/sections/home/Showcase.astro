@@ -4,17 +4,25 @@
  * straightens as it reaches the middle of the viewport (scroll-linked, see the
  * script below). Reduced motion: shown flat, no movement.
  *
+ * `logos` (homepage): the client and recognition logos follow the capture,
+ * larger, spread across the full content width, after it rather than in the
+ * same screen.
+ *
  * `peek` (homepage only): with the App hero layout (the default) the capture
  * is pulled up into the bottom of the hero, barely tilted, so it is already in
  * view on load.
  */
+import LogoBand from '../pages/LogoBand.astro';
 import { getCopy, withBase, type Locale } from '../../i18n/config';
+import type { LogoGroup } from '../../i18n/en/pages-shared';
 
 interface Props {
   locale?: Locale;
   peek?: boolean;
+  /** Logo groups after the capture (homepage). */
+  logos?: LogoGroup[];
 }
-const { locale = 'en', peek = false } = Astro.props;
+const { locale = 'en', peek = false, logos } = Astro.props;
 const { showcase: s } = getCopy(locale).home;
 const src = (w: number) => withBase(`${s.src}-${w}.webp`);
 ---
@@ -34,6 +42,13 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
       />
     </figure>
   </div>
+  {
+    logos && (
+      <div class="container sc__after" data-reveal>
+        <LogoBand groups={logos} scale={1.4} class="sc__logos" />
+      </div>
+    )
+  }
 </section>
 
 <style>
@@ -115,9 +130,7 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
     max-width: 76rem;
     margin-inline: auto;
     background: #161616;
-    box-shadow:
-      0 0 0 1px rgb(241 241 241 / 0.12),
-      0 30px 80px -20px rgb(0 0 0 / 0.55);
+    box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.55);
     transform-origin: 50% 100%;
     transform: rotateX(calc(var(--q) * var(--tilt, 22deg))) scale(calc(1 - var(--q) * 0.06));
     will-change: transform;
@@ -127,6 +140,50 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
     width: 100%;
     height: auto;
   }
+
+  /* ---------- Logos after the capture: the full content width, spread out ---------- */
+  .sc__after {
+    position: relative;
+    padding-top: clamp(3rem, 2rem + 4vw, 6rem);
+    pointer-events: auto;
+  }
+
+  /* The two groups share the width; the logos spread inside each. */
+  .sc__after :global(.sc__logos) {
+    justify-content: space-between;
+    gap: 2rem clamp(3rem, 1rem + 5vw, 7rem);
+  }
+
+  .sc__after :global(.sc__logos .lb__group) {
+    flex: 1 1 auto;
+    gap: 1rem clamp(1.5rem, 0.5rem + 2vw, 3rem);
+  }
+
+  .sc__after :global(.sc__logos .lb__list) {
+    flex: 1 1 auto;
+    justify-content: space-between;
+    gap: 1rem clamp(1.5rem, 0.5rem + 2vw, 3rem);
+  }
+
+  .sc__after :global(.sc__logos .lb__item) {
+    height: 3rem;
+  }
+
+  .sc__after :global(.sc__logos .lb__word) {
+    font-size: 1.5rem;
+  }
+
+  /* Phones: the logos wrap left-aligned, a step smaller. */
+  @media (max-width: 47.99rem) {
+    .sc__after :global(.sc__logos .lb__list) {
+      justify-content: flex-start;
+      gap: 1rem 2rem;
+    }
+    .sc__after :global(.sc__logos .lb__item) {
+      zoom: 0.8;
+    }
+  }
+
 
   /* Phones: wider than the screen, cropped at the sides, so the interface
      stays legible instead of shrinking to a thumbnail. */

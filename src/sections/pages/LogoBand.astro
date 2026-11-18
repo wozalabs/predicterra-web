@@ -5,9 +5,11 @@ import type { LogoGroup } from '../../i18n/en/pages-shared';
 
 interface Props {
   groups: LogoGroup[];
+  /** Scale on the logos' tuned heights (the home's band after the capture is larger). */
+  scale?: number;
   class?: string;
 }
-const { groups, class: className } = Astro.props;
+const { groups, scale = 1, class: className } = Astro.props;
 ---
 
 <div class:list={['lb', className]}>
@@ -19,7 +21,7 @@ const { groups, class: className } = Astro.props;
           {g.items.map((it) => (
             <li class="lb__item">
               {it.src ? (
-                <BrandLogo src={it.src} name={it.name} height={it.h ?? 20} w={it.w ?? 1} h0={it.h0 ?? 1} />
+                <BrandLogo src={it.src} name={it.name} height={Math.round((it.h ?? 20) * scale)} w={it.w ?? 1} h0={it.h0 ?? 1} />
               ) : (
                 <span class="lb__word">{it.name}</span>
               )}

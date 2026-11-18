@@ -1,8 +1,8 @@
 ---
 /**
- * Hero, app layout (default). No footage: the label, the title, its text and
- * the two actions centred on the page canvas, and the platform capture (Showcase.astro, which
- * follows this section) peeking up from the bottom, barely tilted.
+ * Hero, app layout (default). No footage: the title and its text centred on
+ * the page canvas, sitting just above the platform capture (Showcase.astro,
+ * which follows this section) that peeks up from the bottom, barely tilted.
  * Follows the site theme (dark by default).
  */
 import Button from '../../components/Button.astro';
@@ -17,16 +17,15 @@ const { main } = getCopy(locale).home.hero;
 
 <section class="hap" aria-labelledby="hap-title" data-hero-variant="app">
   <div class="hap__content container">
-    <p class="label hap__label">{main.label}</p>
     <h1 id="hap-title" class="hap__title">
       <span class="hap__line"><span>{main.titleLine1}</span></span>
       <span class="hap__line"><span>{main.titleLine2}</span></span>
     </h1>
     <p class="hap__text">{main.text}</p>
-    <div class="hap__actions">
+    <!-- <div class="hap__actions">
       <Button href={localizePath(main.primary.href, locale)} label={main.primary.label} size="lg" />
       <Button href={localizePath(main.secondary.href, locale)} label={main.secondary.label} size="lg" variant="secondary" />
-    </div>
+    </div> -->
   </div>
 </section>
 
@@ -51,12 +50,10 @@ const { main } = getCopy(locale).home.hero;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    /* The copy sits on the capture rather than floating mid-screen. */
+    justify-content: flex-end;
+    padding-bottom: clamp(2.5rem, 1.5rem + 4vh, 5rem);
     text-align: center;
-  }
-
-  .hap__label {
-    margin-bottom: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
   }
 
   .hap__title {
@@ -107,13 +104,9 @@ const { main } = getCopy(locale).home.hero;
     .hap__line:nth-child(2) > span {
       --d: 290ms;
     }
-    .hap__label,
     .hap__text,
     .hap__actions {
       animation: hap-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) both;
-    }
-    .hap__label {
-      animation-delay: 120ms;
     }
     .hap__text {
       animation-delay: 460ms;

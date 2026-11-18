@@ -8,6 +8,8 @@
  * [data-spy]        marks the item nearest the middle of the viewport, and the
  *                   matching [data-spy-node] (same index) inside the container
  */
+import { mountLit } from './lit';
+
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
@@ -73,19 +75,8 @@ export function mountPageMotion() {
 
   if (reduce) return;
 
-  // Statements lit word by word.
-  document.querySelectorAll<HTMLElement>('[data-lit]').forEach((lit) => {
-    const words = Array.from(lit.querySelectorAll<HTMLElement>('.w'));
-    if (!words.length) return;
-    lit.parentElement?.classList.add('lit-on');
-    whileNear(lit, () => {
-      const vh = window.innerHeight;
-      const top = lit.getBoundingClientRect().top;
-      const p = clamp01((vh * 0.9 - top) / (vh * 0.55));
-      const on = p * words.length;
-      words.forEach((w, i) => w.style.setProperty('--o', Math.min(1, Math.max(0.16, on - i + 0.16)).toFixed(3)));
-    });
-  });
+  // Statements lit word by word (scripts/lit.ts).
+  mountLit();
 
   // Pinned steppers: the stage holds while the steps take turns.
   document.querySelectorAll<HTMLElement>('[data-stepper]').forEach((sec) => {
