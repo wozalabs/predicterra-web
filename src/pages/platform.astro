@@ -55,26 +55,6 @@ const pad = (n: number) => String(n).padStart(3, '0');
   <section class="pf-ont pg-sec" aria-labelledby="ont-title">
     <div class="container pf-ont__grid">
       <SectionHead id="ont-title" title={c.ontology.title} text={c.ontology.text} align="stack" class="pf-ont__head" />
-      <figure class="pf-obj" data-reveal>
-        <figcaption class="pf-obj__bar t-caption">
-          <span class="pf-obj__live" aria-hidden="true"></span>
-          {c.ontology.label}
-        </figcaption>
-        <dl class="pf-obj__list">
-          {
-            c.ontology.nodes.map((n) => (
-              <div class="pf-obj__row">
-                <dt class="t-small">{n.label}</dt>
-                <dd>{n.value}</dd>
-              </div>
-            ))
-          }
-          <div class="pf-obj__row pf-obj__row--decision">
-            <dt class="t-small">{c.ontology.decision.label}</dt>
-            <dd>{c.ontology.decision.value}</dd>
-          </div>
-        </dl>
-      </figure>
       <!-- The same asset as every team sees it: the 3D section's asset panel. -->
       <AssetCard sector="solar" locale={locale} class="pf-ont__card" data-reveal />
     </div>
@@ -201,96 +181,22 @@ const pad = (n: number) => String(n).padStart(3, '0');
   }
 
   /* ---------- The ontology in action ---------- */
-  /* The story, then the object and its relationships beside the asset panel
-     (side by side from tablets; all three in a row on wide screens). */
+  /* The story on the left, the asset as every team sees it on the right. */
   .pf-ont__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 3rem clamp(1.5rem, 1rem + 2vw, 3rem);
+    gap: 3rem clamp(3rem, 1rem + 6vw, 8rem);
   }
 
   @media (min-width: 56rem) {
     .pf-ont__grid {
       grid-template-columns: minmax(0, 1fr) 22.5rem;
-      align-items: start;
-    }
-    .pf-ont__grid :global(.pf-ont__head) {
-      grid-column: 1 / -1;
-    }
-  }
-
-  @media (min-width: 80rem) {
-    .pf-ont__grid {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 4fr) 22.5rem;
-    }
-    .pf-ont__grid :global(.pf-ont__head) {
-      grid-column: auto;
-      padding-right: clamp(1rem, 2vw, 3rem);
+      align-items: center;
     }
   }
 
   .pf-ont__grid :global(.pf-ont__card) {
     justify-self: center;
-  }
-
-  /* The object card: the brand's dark panel, one row per relationship, the
-     decision in orange at the end. */
-  .pf-obj {
-    background: #1a1a1a;
-    color: #f1f1f1;
-  }
-
-  .pf-obj__bar {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    padding: 0.875rem 1.25rem;
-    border-bottom: 1px solid rgb(241 241 241 / 0.1);
-    color: #a7a7a7;
-  }
-
-  .pf-obj__live {
-    width: 0.375rem;
-    height: 0.375rem;
-    background: var(--accent);
-  }
-
-  .pf-obj__list {
-    display: grid;
-    padding: 0.5rem 1.25rem 1.25rem;
-  }
-
-  .pf-obj__row {
-    display: grid;
-    grid-template-columns: 7.5rem minmax(0, 1fr);
-    align-items: baseline;
-    gap: 1rem;
-    padding-block: 0.875rem;
-    border-bottom: 1px solid rgb(241 241 241 / 0.08);
-  }
-
-  .pf-obj__row dt {
-    color: #a7a7a7;
-  }
-
-  .pf-obj__row dd {
-    letter-spacing: var(--track-title);
-  }
-
-  .pf-obj__row--decision {
-    margin-top: 0.75rem;
-    padding: 0.875rem 1rem;
-    border-bottom: 0;
-    background: var(--accent);
-    background: var(--grad-accent);
-    background-size: var(--grad-accent-size);
-    animation: var(--fire-motion);
-    box-shadow: var(--fire-edge);
-    color: var(--on-accent);
-  }
-
-  .pf-obj__row--decision dt {
-    color: rgb(255 255 255 / 0.8);
   }
 
   /* ---------- Every team, every horizon ---------- */

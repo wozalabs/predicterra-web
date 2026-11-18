@@ -30,7 +30,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
     items.map((it, i) => (
       <li class="lr__item" data-reveal data-btn-host={it.href ? '' : undefined}>
         <h3 class="lr__name">
-          <span class="lr__i t-small t-num">{pad(i + 1)}</span>
+          <span class="pg-idx lr__i">{pad(i + 1)}</span>
           {it.href ? (
             <a class="lr__link" href={localizePath(it.href, locale)}>
               {it.title}
@@ -80,17 +80,8 @@ const pad = (n: number) => String(n).padStart(3, '0');
   }
 
   .lr__i {
-    flex: none;
-    min-width: 2rem;
-    color: var(--accent);
-    background: var(--grad-text);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-    background-size: var(--grad-text-size);
-    animation: var(--fire-text-motion);
+    align-self: center;
+    transform: translateY(-0.1em);
   }
 
   /* The whole item follows its title's link. */

@@ -156,7 +156,8 @@ const v = s.video;
 
   @media (prefers-reduced-motion: no-preference) {
     :global(html[data-hero='app']) .sc[data-peek] .sc__glow {
-      animation: sc-glow 2200ms cubic-bezier(0.19, 1, 0.22, 1) 200ms both;
+      /* After the title and the capture have arrived. */
+      animation: sc-glow 2400ms cubic-bezier(0.19, 1, 0.22, 1) 1100ms both;
     }
   }
 

@@ -133,7 +133,7 @@
   --logo-inv: 0;
   /* Inset CTA card ground (matches the CTA 3D scene). */
   /* App hero: how much of the platform capture shows at the bottom on load. */
-  --hero-peek: clamp(10rem, 30vh, 16rem);
+  --hero-peek: clamp(11rem, 36vh, 18rem);
   --cta-ground: #eaeaea;
   --cta-ground-rgb: 234 234 234;
   /* Image frames, idle score ticks, the 3D section's dot pattern. */
@@ -167,7 +167,7 @@
 
 @media (min-width: 64rem) {
   :root {
-    --hero-peek: clamp(16rem, 42vh, 28rem);
+    --hero-peek: clamp(18rem, 50vh, 32rem);
   }
 }
 

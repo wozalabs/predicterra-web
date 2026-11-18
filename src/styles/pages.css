@@ -44,12 +44,7 @@
   gap: var(--pg-gap);
 }
 
-/* Small running index (001, 002…) on rows and chapters. */
-.pg-idx {
-  font-size: var(--fs-caption);
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-}
+/* Small running index (001, 002…): see .pg-idx in global.css. */
 
 .pg-title {
   max-width: 30rem;

@@ -61,15 +61,17 @@ const show = (v: unknown) =>
     }
   }
 
+  /* Long values wrap instead of running out of the panel (no side scroll). */
   .code__body {
-    overflow-x: auto;
+    overflow-x: visible;
     margin: 0;
     padding: 1.25rem 1.25rem 1.5rem;
     font-family: var(--font-sans);
     font-size: var(--fs-small);
     line-height: 1.75;
     font-variant-numeric: tabular-nums;
-    white-space: pre;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
     tab-size: 2;
   }
 
