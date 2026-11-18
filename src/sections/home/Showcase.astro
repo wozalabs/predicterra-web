@@ -113,28 +113,36 @@ const v = s.video;
      and the brand orange, and is brightest (warm amber) at the bottom of the
      first screen, with a soft film grain over it. The capture sits in front,
      so it shows above and beside it. It rises in on load and is gone once
-     the page has scrolled a little over half a screen (--g, set below). The
+     the capture reaches the middle of the screen (--g, set below). The
      hero's copy sits above it. */
   .sc__glow {
     --a: var(--hero-glow-a);
     display: none;
     position: absolute;
     left: 0;
-    top: calc(-0.5 * var(--peek));
+    top: calc(-0.15 * var(--peek));
     width: 100%;
-    height: calc(1.9 * var(--peek));
+    height: calc(1.55 * var(--peek));
     pointer-events: none;
     opacity: calc(1 - var(--g, 0));
     background:
-      radial-gradient(in oklab 70% 34% at 50% 79%, rgb(var(--sun-light) / calc(var(--a) * 0.45)) 0%, rgb(var(--sun-light) / 0) 100%),
-      linear-gradient(in oklab to bottom,
+      /* Rings around a point above the box: the light rises in a U, higher
+         at the sides and lowest in the middle. */
+      radial-gradient(in oklab 82% 96% at 50% -12%,
         rgb(var(--sun-ember) / 0) 0%,
-        rgb(var(--sun-ember) / calc(var(--a) * 0.5)) 32%,
-        rgb(var(--sun-core) / calc(var(--a) * 0.8)) 55%,
-        rgb(var(--sun-warm) / calc(var(--a) * 0.92)) 70%,
-        rgb(var(--sun-light) / var(--a)) 79%,
-        rgb(var(--sun-warm) / calc(var(--a) * 0.5)) 90%,
-        rgb(var(--sun-core) / 0) 100%);
+        rgb(var(--sun-ember) / 0) 32%,
+        rgb(var(--sun-ember) / calc(var(--a) * 0.12)) 46%,
+        rgb(var(--sun-ember) / calc(var(--a) * 0.34)) 58%,
+        rgb(var(--sun-core) / calc(var(--a) * 0.58)) 70%,
+        rgb(var(--sun-core) / calc(var(--a) * 0.76)) 80%,
+        rgb(var(--sun-warm) / calc(var(--a) * 0.88)) 90%,
+        rgb(var(--sun-light) / calc(var(--a) * 0.95)) 100%,
+        rgb(var(--sun-warm) / calc(var(--a) * 0.7)) 114%,
+        rgb(var(--sun-core) / calc(var(--a) * 0.3)) 130%,
+        rgb(var(--sun-core) / 0) 150%);
+    /* Fades in from nothing at the top edge, so the U has no hard line. */
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgb(0 0 0 / 0.35) 25%, #000 60%);
+    mask-image: linear-gradient(to bottom, transparent 0%, rgb(0 0 0 / 0.35) 25%, #000 60%);
   }
 
   /* Film grain, only where the light is. */
@@ -146,11 +154,12 @@ const v = s.video;
     background-size: 160px 160px;
     mix-blend-mode: overlay;
     opacity: var(--hero-grain);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 20%, #000 70%, #000 84%, transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 20%, #000 70%, #000 84%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 15%, #000 55%, #000 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 15%, #000 55%, #000 82%, transparent 100%);
   }
 
-  :global(html[data-hero='app']) .sc[data-peek] .sc__glow {
+  /* Dark theme only (hidden in the light one). */
+  :global(html[data-hero='app'][data-theme='dark']) .sc[data-peek] .sc__glow {
     display: block;
   }
 
@@ -282,8 +291,10 @@ const v = s.video;
     let raf = 0;
     const dim = () => {
       raf = 0;
-      const g = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.6)));
-      glow.style.setProperty('--g', g.toFixed(3));
+      // Gone by the time the capture reaches the middle of the screen.
+      const g = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.35)));
+      const e = g * g * (3 - 2 * g);
+      glow.style.setProperty('--g', e.toFixed(3));
     };
     window.addEventListener('scroll', () => raf || (raf = requestAnimationFrame(dim)), { passive: true });
     dim();

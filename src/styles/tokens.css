@@ -151,14 +151,14 @@
   /* Sunrise behind the App hero capture: ember, core, warm and light (rgb
      triplets, the brand fire from deep red to amber), its strength on this
      canvas and its grain. */
-  /* Light canvas: no dark ember (it reads as grey mud on white), the ramp
-     starts straight from the brand orange. */
-  --sun-ember: 255 84 28;
-  --sun-core: 255 55 0;
-  --sun-warm: 255 106 26;
-  --sun-light: 255 143 52;
-  --hero-glow-a: 0.55;
-  --hero-grain: 0.25;
+  /* Light canvas: a warm amber dawn rather than the red fire (red over white
+     turns pink and muddy), strongest at the bottom like the dark one. */
+  --sun-ember: 255 178 102;
+  --sun-core: 255 128 44;
+  --sun-warm: 255 112 30;
+  --sun-light: 255 96 22;
+  --hero-glow-a: 0.9;
+  --hero-grain: 0.2;
   /* Notched top edge of a container that comes in over the one before it
      (the CTA card's cut, used wherever the content changes container). */
   --notch-top: polygon(0 18px, calc(42% - 18px) 18px, 42% 0, 100% 0, 100% 100%, 0 100%);
@@ -202,6 +202,9 @@
   --scene-dot: #242424;
   --glow-a: 0.72;
   --sun-ember: 140 22 0;
+  --sun-core: 255 55 0;
+  --sun-warm: 255 106 26;
+  --sun-light: 255 143 52;
   --hero-glow-a: 1;
   --hero-grain: 0.45;
   color-scheme: dark;
