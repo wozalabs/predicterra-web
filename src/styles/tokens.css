@@ -72,7 +72,10 @@
   --gutter: clamp(1rem, 0.6rem + 1.6vw, 2rem);
   --section-y: clamp(4rem, 2.5rem + 4vw, 7rem);
   --header-h: 4rem;
-  --max-w: 120rem;
+  /* Content width: 1440px at most (the gutters sit outside it), 1200px for
+     reading layouts (.container--narrow: contact, legal). */
+  --max-w: calc(90rem + 2 * var(--gutter));
+  --max-w-narrow: calc(75rem + 2 * var(--gutter));
 
   /* Motion (custom curves, see emil-design-eng) */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);

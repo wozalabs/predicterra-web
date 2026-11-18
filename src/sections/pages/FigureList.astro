@@ -90,16 +90,14 @@ const { items, size = 'lg', class: className } = Astro.props;
     }
   }
 
+  /* 64px at most. */
   .fl__value {
-    font-size: clamp(3rem, 1.2rem + 4.8vw, 7rem);
+    font-size: clamp(2.75rem, 2rem + 2.4vw, 4rem);
     line-height: 0.9;
     letter-spacing: -0.045em;
     text-wrap: balance;
   }
 
-  .fl--md .fl__value {
-    font-size: clamp(2.5rem, 1.4rem + 2.8vw, 4.5rem);
-  }
 
   .fl__caption {
     font-size: var(--fs-small);

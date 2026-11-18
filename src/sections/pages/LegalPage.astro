@@ -19,7 +19,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
 
 <PageLayout title={doc.seo.title} description={doc.seo.description} locale={locale} noindex>
   <article class="lg" aria-labelledby="page-title">
-    <div class="container lg__grid">
+    <div class="container container--narrow lg__grid">
       <header class="lg__head">
         <PageTitle class="lg__title" text={doc.title} />
         <p class="lg__updated t-small">{doc.updated}</p>
