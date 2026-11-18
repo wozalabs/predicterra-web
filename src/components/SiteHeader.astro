@@ -22,61 +22,62 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
       <Logo />
     </a>
 
+    <!-- The pages, centred between the logo and the actions. -->
+    <nav class="site-header__nav" aria-label={header.navLabel}>
+      <ul class="site-header__list">
+        {
+          header.nav.map((item) =>
+            item.groups ? (
+              <li class="sol" data-sol>
+                <button
+                  class="site-header__link sol__trigger"
+                  type="button"
+                  aria-expanded="false"
+                  aria-controls="solutions-panel"
+                  data-current={item.groups!.some((g) => g.links.some((l) => isCurrent(l.href))) ? '' : undefined}
+                  data-sol-trigger
+                >
+                  {item.label}
+                  <Icon name="expand_more" class="sol__chev" />
+                </button>
+                <div class="sol__panel" id="solutions-panel" data-sol-panel>
+                  {item.groups!.map((g) => (
+                    <div class="sol__group">
+                      <p class="sol__title">{g.title}</p>
+                      <ul>
+                        {g.links.map((l) => (
+                          <li>
+                            <a
+                              class="sol__link"
+                              href={localizePath(l.href, locale)}
+                              aria-current={isCurrent(l.href) ? 'page' : undefined}
+                            >
+                              <span>{l.label}</span>
+                              <span class="sol__sq" aria-hidden="true" />
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </li>
+            ) : (
+              <li>
+                <a
+                  class="site-header__link"
+                  href={localizePath(item.href ?? '/', locale)}
+                  aria-current={item.href && isCurrent(item.href) ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ),
+          )
+        }
+      </ul>
+    </nav>
     <div class="site-header__actions">
-      <nav class="site-header__nav" aria-label={header.navLabel}>
-        <ul class="site-header__list">
-          {
-            header.nav.map((item) =>
-              item.groups ? (
-                <li class="sol" data-sol>
-                  <button
-                    class="site-header__link sol__trigger"
-                    type="button"
-                    aria-expanded="false"
-                    aria-controls="solutions-panel"
-                    data-current={item.groups!.some((g) => g.links.some((l) => isCurrent(l.href))) ? '' : undefined}
-                    data-sol-trigger
-                  >
-                    {item.label}
-                    <Icon name="expand_more" class="sol__chev" />
-                  </button>
-                  <div class="sol__panel" id="solutions-panel" data-sol-panel>
-                    {item.groups!.map((g) => (
-                      <div class="sol__group">
-                        <p class="sol__title">{g.title}</p>
-                        <ul>
-                          {g.links.map((l) => (
-                            <li>
-                              <a
-                                class="sol__link"
-                                href={localizePath(l.href, locale)}
-                                aria-current={isCurrent(l.href) ? 'page' : undefined}
-                              >
-                                <span>{l.label}</span>
-                                <span class="sol__sq" aria-hidden="true" />
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </li>
-              ) : (
-                <li>
-                  <a
-                    class="site-header__link"
-                    href={localizePath(item.href ?? '/', locale)}
-                    aria-current={item.href && isCurrent(item.href) ? 'page' : undefined}
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ),
-            )
-          }
-        </ul>
-      </nav>
       <!-- Theme switch: shows the theme it switches to. Label kept in sync by the script. -->
       <button
         class="site-header__theme"
@@ -105,6 +106,9 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     </div>
   </div>
 </header>
+<!-- Blur veil under the header (its own layer: the header's view-transition-name
+     would keep a backdrop blur from seeing the page). Shown once scrolled. -->
+<div class="header-veil" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
 
 <dialog id="site-menu" class="menu" aria-label={menu.title} data-menu>
   <div class="menu__panel">
@@ -190,29 +194,40 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
   }
 
   /* Faded backdrop: once the page has scrolled, the content running under the
-     header fades out into a gradient that is fully opaque at the top, instead
-     of colliding with the logo and links. Dark or light like the header text. */
-  .site-header::before {
-    --fade: color-mix(in oklab, #0d0d0d var(--hpct), #fafafa);
-    content: '';
-    position: absolute;
+     header is blurred away behind the logo and links, strongest at the top and
+     fading out below them. No colour of its own, so nothing changes or flashes
+     when the header passes from a dark section into a light one. */
+  /* Progressive blur: six stacked layers, each blurring a little more than the
+     one below and masked to its own overlapping band, so the blur ramps up
+     smoothly from nothing at the bottom edge to its strongest at the top,
+     with no visible step where it ends. */
+  .header-veil {
+    position: fixed;
     inset: 0 0 auto;
-    z-index: -1;
+    z-index: calc(var(--z-header) - 1);
     height: calc(var(--header-h) + 3rem);
-    /* Solid behind the logo and links, then fading out below them. */
-    background: linear-gradient(
-      180deg,
-      var(--fade) 0%,
-      var(--fade) 45%,
-      color-mix(in srgb, var(--fade) 60%, transparent) 72%,
-      transparent 100%
-    );
     opacity: 0;
     transition: opacity 240ms ease;
     pointer-events: none;
   }
 
-  .site-header[data-scrolled]::before {
+  .header-veil > span {
+    position: absolute;
+    inset: 0;
+    -webkit-backdrop-filter: blur(var(--b));
+    backdrop-filter: blur(var(--b));
+    -webkit-mask-image: linear-gradient(to top, transparent var(--m0), #000 var(--m1), #000 var(--m2), transparent var(--m3));
+    mask-image: linear-gradient(to top, transparent var(--m0), #000 var(--m1), #000 var(--m2), transparent var(--m3));
+  }
+
+  .header-veil > span:nth-child(1) { --b: 0.5px; --m0: 0%; --m1: 12.5%; --m2: 25%; --m3: 37.5%; }
+  .header-veil > span:nth-child(2) { --b: 1px; --m0: 12.5%; --m1: 25%; --m2: 37.5%; --m3: 50%; }
+  .header-veil > span:nth-child(3) { --b: 2px; --m0: 25%; --m1: 37.5%; --m2: 50%; --m3: 62.5%; }
+  .header-veil > span:nth-child(4) { --b: 4px; --m0: 37.5%; --m1: 50%; --m2: 62.5%; --m3: 75%; }
+  .header-veil > span:nth-child(5) { --b: 8px; --m0: 50%; --m1: 62.5%; --m2: 75%; --m3: 87.5%; }
+  .header-veil > span:nth-child(6) { --b: 16px; --m0: 62.5%; --m1: 75%; --m2: 100%; --m3: 100%; }
+
+  .site-header[data-scrolled] + .header-veil {
     opacity: 1;
   }
 
@@ -239,10 +254,11 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     }
   }
 
+  /* Logo on the left, the pages centred, the theme switch and the demo button on the right. */
   .site-header__inner {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    justify-content: space-between;
     height: 100%;
     max-width: var(--max-w);
     margin-inline: auto;
@@ -259,7 +275,13 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     height: 1.125rem;
   }
 
+  .site-header__home {
+    justify-self: start;
+  }
+
   .site-header__actions {
+    grid-column: 3;
+    justify-self: end;
     display: flex;
     align-items: stretch;
     height: 2.5rem;
@@ -272,9 +294,9 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
 
   @media (min-width: 56rem) {
     .site-header__nav {
+      grid-column: 2;
       display: flex;
       align-items: center;
-      margin-right: 1.75rem;
     }
   }
 
@@ -344,15 +366,14 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
   .sol__panel {
     position: absolute;
     top: calc(100% + 0.75rem);
-    left: -1.25rem;
+    left: -0.875rem;
     display: grid;
     grid-template-columns: repeat(2, minmax(11rem, 1fr));
-    gap: 1.5rem;
-    padding: 1.25rem 1.25rem 1rem;
+    gap: 0.5rem;
+    padding: 0.25rem;
     background: var(--surface);
     color: var(--ink);
     box-shadow:
-      0 0 0 1px var(--line),
       0 1px 2px rgb(0 0 0 / 0.06),
       0 18px 48px -12px rgb(0 0 0 / 0.28);
     transform-origin: 1.5rem 0;
@@ -388,11 +409,11 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
   .sol__group {
     display: grid;
     align-content: start;
-    gap: 0.5rem;
+    gap: 0.125rem;
   }
 
   .sol__title {
-    padding-inline: 0.625rem;
+    padding: 0.625rem 0.625rem 0.25rem;
     font-size: var(--fs-caption);
     color: var(--muted);
   }
@@ -402,7 +423,7 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    min-height: 2.5rem;
+    min-height: 2.25rem;
     padding-inline: 0.625rem;
     font-size: 0.9375rem;
     transition: background-color 140ms ease;
@@ -501,6 +522,14 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
 
   .site-header__menu:active {
     transform: scale(0.97);
+  }
+
+  /* Hidden for now where the links are in the header (wide screens); phones keep
+     it, as it is their only way to the pages. */
+  @media (min-width: 56rem) {
+    .site-header__menu {
+      display: none;
+    }
   }
 
   .burger {

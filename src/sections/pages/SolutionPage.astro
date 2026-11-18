@@ -6,16 +6,17 @@
  *  - sector pages: the sector's asset from the home's 3D scene in the hero,
  *    on alternating sides, standing still
  *  - pages across all sectors: a type-only hero
- * Every section reads title on the left, content on the right; use cases and
- * sectors are a list of rows (title left, text right).
+ * The solution reads title on the left, content on the right; use cases and
+ * sectors are the home's rows (components/LinkRows).
  */
 import PageLayout from '../../layouts/PageLayout.astro';
 import PageHero from './PageHero.astro';
 import Stats from './Stats.astro';
 import FigureList from './FigureList.astro';
+import LinkRows from '../../components/LinkRows.astro';
 import AssetView from '../../components/AssetView.astro';
 import Cta from '../home/Cta.astro';
-import { localizePath, type Locale } from '../../i18n/config';
+import { type Locale } from '../../i18n/config';
 import type { SolutionCopy } from './types';
 
 interface Props {
@@ -25,7 +26,6 @@ interface Props {
   layout?: 'split' | 'split-reverse';
 }
 const { locale = 'en', copy: c, layout = 'split' } = Astro.props;
-const pad = (n: number) => String(n).padStart(3, '0');
 const s = c.solution;
 ---
 
@@ -80,35 +80,11 @@ const s = c.solution;
   </section>
   </div>
 
+  <!-- Use cases or sectors: the same rows as the home's Across all sectors. -->
   <section class="ls pg-sec" aria-labelledby="list-title">
     <div class="container ls__grid">
       <h2 id="list-title" class="ls__head" data-render>{c.list.title}</h2>
-      <ol class="ls__list" data-reveal-group>
-        {
-          c.list.items.map((it, i) => (
-            <li class:list={['ls__row', it.href && 'ls__row--link']} data-reveal>
-              <h3 class="ls__title">
-                <span class="pg-idx">{pad(i + 1)}</span>
-                {it.href ? (
-                  <a class="ls__link" href={localizePath(it.href, locale)}>
-                    {it.title}
-                  </a>
-                ) : (
-                  <span>{it.title}</span>
-                )}
-              </h3>
-              <p class="ls__text">{it.text}</p>
-              {it.href && (
-                <span class="ls__go" aria-hidden="true">
-                  <svg viewBox="0 -960 960 960">
-                    <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
-                  </svg>
-                </span>
-              )}
-            </li>
-          ))
-        }
-      </ol>
+      <LinkRows items={c.list.items} locale={locale} />
     </div>
   </section>
 
@@ -119,16 +95,21 @@ const s = c.solution;
 
 <style>
   /* ---------- The solution: title left, everything else on the right ---------- */
-  .so__grid,
-  .ls__grid {
+  .so__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: clamp(2rem, 1.5rem + 2vw, 3.5rem) clamp(3rem, 1rem + 6vw, 8rem);
   }
 
+  /* Use cases and sectors: the title above, the rows across the full width
+     (components/LinkRows, as on the home). */
+  .ls__grid {
+    display: grid;
+    gap: clamp(2.5rem, 2rem + 3vw, 5rem);
+  }
+
   @media (min-width: 64rem) {
-    .so__grid,
-    .ls__grid {
+    .so__grid {
       grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
       align-items: start;
     }
@@ -144,8 +125,7 @@ const s = c.solution;
   }
 
   @media (min-width: 64rem) {
-    .so__title,
-    .ls__head {
+    .so__title {
       position: sticky;
       top: calc(var(--header-h) + 2.5rem);
     }
@@ -217,112 +197,4 @@ const s = c.solution;
     color: var(--ink-2);
   }
 
-  /* ---------- Use cases and sectors: a list, title left, text right ---------- */
-  .ls__list {
-    display: grid;
-  }
-
-  .ls__row {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.75rem var(--gutter);
-    padding-block: 1.75rem;
-    border-top: 1px solid var(--line);
-  }
-
-  .ls__row:first-child {
-    padding-top: 0;
-    border-top: 0;
-  }
-
-  @media (min-width: 48rem) {
-    .ls__row {
-      grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
-      align-items: baseline;
-    }
-    .ls__row--link {
-      grid-template-columns: minmax(0, 6fr) minmax(0, 6fr) auto;
-    }
-  }
-
-  .ls__title {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-    font-size: var(--fs-h3);
-    line-height: 1.2;
-    letter-spacing: var(--track-heading);
-    text-wrap: balance;
-  }
-
-  .ls__title .pg-idx {
-    flex: none;
-    width: 2rem;
-    transform: translateY(-0.2em);
-  }
-
-  .ls__text {
-    max-width: 40ch;
-    color: var(--ink-2);
-  }
-
-  /* Linked rows: the whole row follows the title's link. */
-  .ls__link::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-
-  .ls__link:focus-visible {
-    outline: none;
-  }
-
-  .ls__row:has(.ls__link:focus-visible) {
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
-  }
-
-  .ls__go {
-    display: grid;
-    place-items: center;
-    align-self: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    background: #e4e4e4;
-    color: var(--ink);
-    transition:
-      background-color 200ms ease,
-      color 200ms ease;
-  }
-
-  :global(:root[data-theme='dark']) .ls__go {
-    background: var(--grey-600);
-  }
-
-  .ls__go svg {
-    width: 1rem;
-    height: 1rem;
-    fill: currentColor;
-    transition: transform 200ms var(--ease-out);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .ls__row--link:hover .ls__go {
-      background: var(--accent);
-      color: var(--on-accent);
-    }
-    .ls__row--link:hover .ls__go svg {
-      transform: translateX(2px);
-    }
-    .ls__row--link:hover .ls__link {
-      color: var(--accent);
-    }
-  }
-
-  @media (max-width: 47.99rem) {
-    .ls__go {
-      display: none;
-    }
-  }
 </style>

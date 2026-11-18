@@ -16,9 +16,19 @@ export default {
   showcase: {
     label: 'The Predicterra platform',
     alt: 'The Predicterra platform: an asset list, satellite view of a transmission tower in Zamora with a wind-speed forecast, and the tower’s risk panel with flood, economic and wildfire scores.',
+    // Still capture, kept for other uses (public/showcase/predicterra-app-{960,1600,2400}.webp).
     src: '/showcase/predicterra-app',
     w: 3000,
     h: 1600,
+    // The capture shown: a silent loop of the platform in use (public/showcase).
+    video: {
+      large: '/showcase/predicterra-show-1920.mp4',
+      small: '/showcase/predicterra-show-960.mp4',
+      poster: '/showcase/predicterra-show-poster.webp',
+      label: 'The Predicterra platform in use: from a satellite view of Spain down to a transmission tower, with its asset list, risk panel and wind forecast.',
+      w: 1920,
+      h: 1076,
+    },
   },
 
   hero: {
@@ -105,11 +115,10 @@ export default {
   // Logos, their line and the link to the cases.
   proof: proof.standard,
 
-  // Why us: what sets Predicterra apart from the single-layer tools on the
-  // market (vegetation from satellite, 3D line models), without naming them.
+  // Why us: what sets Predicterra apart (European, independent, yours end to end).
   why: {
     title: 'Why us',
-    text: 'Where other tools watch the vegetation or model the lines, Predicterra runs the whole energy system as one live model, forecasting every hazard on every asset and proving each forecast against real incidents.',
+    text: 'Predicterra is built and hosted in Europe under European rules, independent of every energy company, equipment maker and software vendor, and yours from end to end, with your data in your own cloud or data center and every model calibrated on your own incidents.',
   },
 
   scene: {
@@ -182,49 +191,9 @@ export default {
         },
       },
       {
-        id: 'substation',
-        icon: 'electrical_services',
-        index: '02',
-        title: 'Substations',
-        text: 'Flood depth, heat and access for every substation, with everything downstream that depends on it.',
-        link: 'Predicterra for Grid',
-        href: routes.sectors.grid,
-        alert: {
-          severity: 'High',
-          hazard: 'Flood risk',
-          hazardIcon: 'water_drop',
-          asset: 'Substation SE-42',
-          context: '184 downstream assets',
-          metricLabel: 'Water depth',
-          metric: '0.6 m',
-          window: 'In 18 h',
-          confidence: '0.91',
-          action: 'Inspect the transformer yard and pre-position crews before the peak.',
-        },
-        // Asset panel shown on hover (illustrative values).
-        panel: {
-          name: 'Substation SE-42',
-          place: 'Basauri, Bizkaia, Spain',
-          type: 'Substation',
-          year: '2024',
-          registration: '132-0042',
-          geohash: 'ezwnp5',
-          coordinates: '43.2386, -2.8853',
-          assetType: 'Transformer T2',
-          tile: '0313333001130',
-          rows: [
-            { label: 'Flood risk', value: 'High', score: 8, alert: true },
-            { label: 'T10 economic risk', value: 'Medium', score: 5 },
-            { label: 'T100 economic risk', value: 'High', score: 7 },
-            { label: 'Heat stress', value: 'Low', score: 2 }
-          ],
-          cover: { bare: 12, crops: 8, built: 46, water: 6, rangeland: 10, forest: 18 }
-        },
-      },
-      {
         id: 'solar',
         icon: 'solar_power',
-        index: '03',
+        index: '02',
         title: 'Solar',
         text: 'Plant-level intelligence across your entire solar portfolio.',
         link: 'Predicterra for Solar',
@@ -264,7 +233,7 @@ export default {
       {
         id: 'wind',
         icon: 'wind_power',
-        index: '04',
+        index: '03',
         title: 'Wind',
         text: 'Turbine-level intelligence across every farm and site.',
         link: 'Predicterra for Wind',
@@ -304,7 +273,7 @@ export default {
       {
         id: 'oilgas',
         icon: 'oil_barrel',
-        index: '05',
+        index: '04',
         title: 'Oil & Gas',
         text: 'Site-level intelligence for refineries, terminals, pipelines and gas networks.',
         link: 'Predicterra for Oil & Gas',
@@ -341,12 +310,54 @@ export default {
           cover: { bare: 22, crops: 0, built: 38, water: 6, rangeland: 18, forest: 16 }
         },
       },
+      {
+        id: 'substation',
+        icon: 'electrical_services',
+        index: '05',
+        title: 'Substations',
+        text: 'Flood depth, heat and access for every substation, with everything downstream that depends on it.',
+        link: 'Predicterra for Grid',
+        href: routes.sectors.grid,
+        alert: {
+          severity: 'High',
+          hazard: 'Flood risk',
+          hazardIcon: 'water_drop',
+          asset: 'Substation SE-42',
+          context: '184 downstream assets',
+          metricLabel: 'Water depth',
+          metric: '0.6 m',
+          window: 'In 18 h',
+          confidence: '0.91',
+          action: 'Inspect the transformer yard and pre-position crews before the peak.',
+        },
+        // Asset panel shown on hover (illustrative values).
+        panel: {
+          name: 'Substation SE-42',
+          place: 'Basauri, Bizkaia, Spain',
+          type: 'Substation',
+          year: '2024',
+          registration: '132-0042',
+          geohash: 'ezwnp5',
+          coordinates: '43.2386, -2.8853',
+          assetType: 'Transformer T2',
+          tile: '0313333001130',
+          rows: [
+            { label: 'Flood risk', value: 'High', score: 8, alert: true },
+            { label: 'T10 economic risk', value: 'Medium', score: 5 },
+            { label: 'T100 economic risk', value: 'High', score: 7 },
+            { label: 'Heat stress', value: 'Low', score: 2 }
+          ],
+          cover: { bare: 12, crops: 8, built: 46, water: 6, rangeland: 10, forest: 18 }
+        },
+      },
     ],
   },
 
   // Across all sectors: the dark section that slides over the 3D scene.
   across: {
     title: 'Across all sectors',
+    // Button on each row: "Discover Resilience", "Discover Digitalization"…
+    discover: 'Discover',
     items: [
       {
         title: 'Resilience',

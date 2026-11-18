@@ -49,15 +49,16 @@ import {
   type Bucket,
   type ChipSide,
 } from './geometry';
-import { createGroundMaterial, createFlowMaterial, HAZARD_SLOTS } from './materials';
+import { createGroundMaterial, createFireMaterial, createFlowMaterial, HAZARD_SLOTS } from './materials';
 import { scenePalette } from './palette';
 import type { SectorId, World } from './world';
 
 const AZIMUTH = Math.PI / 4;
 const DEG = Math.PI / 180;
 /** Camera angle at each stop (degrees): small variations make each arrival feel different. */
-const STOP_AZIMUTH = [45, 33, 56, 38, 50, 40, 40];
-const STOP_ELEVATION = [34, 29, 41, 27, 36, 44, 38];
+// Per stop: grid, solar, wind, oil & gas, substation, digitalization, compliance.
+const STOP_AZIMUTH = [45, 56, 38, 50, 33, 40, 40];
+const STOP_ELEVATION = [34, 41, 27, 36, 29, 44, 38];
 /** Mouse tilt range (degrees) for the decorative parallax. */
 const TILT_ELEVATION = 3.5;
 const TILT_AZIMUTH = 2.5;
@@ -88,7 +89,7 @@ const HOP_DV = 42;
 /** Five sectors, then Digitalization and Compliance. */
 const STOPS = 7;
 
-export const TRAIL_ORDER: SectorId[] = ['grid', 'substation', 'solar', 'wind', 'oilgas'];
+export const TRAIL_ORDER: SectorId[] = ['grid', 'solar', 'wind', 'oilgas', 'substation'];
 
 export function createTrailWorld(
   canvas: HTMLCanvasElement,
@@ -166,11 +167,8 @@ export function createTrailWorld(
     towers[i].tips.forEach((a, k) => statics.push(cable(a, towers[i + 1].tips[k], 0.75)));
   }
 
-  // 02 Substation: middle transformer at risk.
-  const sub = substation(statics, s1[0], s1[1], risky, 1);
-
-  // 03 Solar: a 2×2 group of tables at risk.
-  const solar = solarPlant(statics, s2[0] - 1, s2[1], 5, 4, {
+  // 02 Solar: a 2×2 group of tables at risk.
+  const solar = solarPlant(statics, s1[0] - 1, s1[1], 5, 4, {
     bucket: risky,
     tables: [
       [1, 2],
@@ -180,18 +178,21 @@ export function createTrailWorld(
     ],
   });
 
-  // 04 Wind: the middle turbine is at risk.
+  // 03 Wind: the middle turbine is at risk.
   const facing = AZIMUTH + 0.18;
   const turbineSpots: [number, number, number][] = [
-    [s3[0] - 9, s3[1] - 5, 10],
-    [s3[0], s3[1], 11],
-    [s3[0] + 9, s3[1] + 3, 10.5],
-    [s3[0] - 2, s3[1] + 10, 9.8],
+    [s2[0] - 9, s2[1] - 5, 10],
+    [s2[0], s2[1], 11],
+    [s2[0] + 9, s2[1] + 3, 10.5],
+    [s2[0] - 2, s2[1] + 10, 9.8],
   ];
   const turbines = turbineSpots.map(([u, v, h], i) => windTurbine(i === 1 ? risky : statics, u, v, facing, h));
 
-  // 05 Oil & gas: one tank at risk.
-  const og = oilGas(statics, s4[0] - 2, s4[1], risky, 1);
+  // 04 Oil & gas: one tank at risk.
+  const og = oilGas(statics, s3[0] - 2, s3[1], risky, 1);
+
+  // 05 Substation, the last sector: middle transformer at risk.
+  const sub = substation(statics, s4[0], s4[1], risky, 1);
 
   // 06 Digitalization: a chip on the trace; the cable bundle runs into its core
   // and traces fan in from every side. Nothing at risk: the orange core is an
@@ -248,7 +249,7 @@ export function createTrailWorld(
   }
 
   const whiteMat = new MeshLambertMaterial({ color: 0xffffff });
-  const riskMat = new MeshLambertMaterial({ color: new Color('#FF3700') });
+  const riskMat = createFireMaterial();
   const merged = mergeGeometries(statics, false);
   const mergedRisk = mergeGeometries(risky, false);
   [...statics, ...risky].forEach((g) => g.dispose());
@@ -326,13 +327,14 @@ export function createTrailWorld(
     wind: turbines[1].top.clone().add(new Vector3(0, 0.4, 0)),
     oilgas: og.anchor.clone().add(new Vector3(0, 0.4, 0)),
   };
-  const lift = [4.2, 1.8, 0.6, 5, 2.4, 0.8, 1.2];
-  const views = [24, 22, 24, 28, 24, 30, 32];
+  // Per stop, in TRAIL_ORDER (then digitalization and compliance).
+  const lift = [4.2, 0.6, 5, 2.4, 1.8, 0.8, 1.2];
+  const views = [24, 24, 28, 24, 22, 30, 32];
 
   const hz = groundMat.uniforms.uHazards.value as Vector4[];
   TRAIL_ORDER.forEach((id, i) => {
     const a = anchors[id];
-    hz[i].set(a.x, a.z, [7, 8, 8, 8, 9][i], 0);
+    hz[i].set(a.x, a.z, [7, 8, 8, 9, 8][i], 0);
   });
   const hazardTarget = new Array(HAZARD_SLOTS).fill(0);
 

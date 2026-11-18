@@ -25,7 +25,7 @@ import {
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { cable, oilGas, rotorGeometry, solarPlant, substation, tower, windTurbine, type Bucket } from './geometry';
-import { createGroundMaterial } from './materials';
+import { createFireMaterial, createGroundMaterial } from './materials';
 import { scenePalette } from './palette';
 import { onThemeChange } from '../theme';
 import type { SectorId } from './world';
@@ -59,7 +59,7 @@ function ensureRenderer() {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
   whiteMat = new MeshLambertMaterial({ color: new Color(scenePalette().asset) });
-  riskMat = new MeshLambertMaterial({ color: new Color('#FF3700') });
+  riskMat = createFireMaterial();
   return renderer;
 }
 

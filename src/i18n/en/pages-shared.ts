@@ -25,7 +25,7 @@ export type LogoGroup = { label: string; items: readonly LogoItem[] };
 
 /** Clients in operation and recognition, as listed in the base document. */
 export const logoBand: LogoGroup[] = [
-  { label: 'In operation with', items: [logo.iberdrola, logo.naturgy, logo.moeve] },
+  { label: 'Trusted by', items: [logo.iberdrola, logo.naturgy, logo.moeve] },
   { label: 'Recognized by', items: [logo.edso, logo.lightUp, logo.azure] },
 ];
 

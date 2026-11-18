@@ -12,9 +12,10 @@ export default {
     navLabel: 'Main',
     toLight: 'Switch to light theme',
     toDark: 'Switch to dark theme',
-    // Platform · Solutions ▾ · Cases · About, then the orange button. "Solutions"
-    // only opens its panel: it has no page of its own.
+    // Home · Platform · Solutions ▾ · Cases · About, then the orange button.
+    // "Solutions" only opens its panel: it has no page of its own.
     nav: [
+      { label: 'Home', href: routes.home },
       { label: 'Platform', href: routes.platform },
       {
         label: 'Solutions',

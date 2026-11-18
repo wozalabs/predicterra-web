@@ -44,6 +44,14 @@ const { notFound: nf } = getCopy(locale).common;
     line-height: 0.9;
     letter-spacing: -0.05em;
     color: var(--accent);
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    background-size: var(--grad-text-size);
+    animation: var(--fire-text-motion);
   }
 
   .nf__title {
@@ -88,6 +96,14 @@ const { notFound: nf } = getCopy(locale).common;
   @media (hover: hover) and (pointer: fine) {
     .nf__links a:hover {
       color: var(--accent);
+      background: var(--grad-text);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+      background-size: var(--grad-text-size);
+      animation: var(--fire-text-motion);
     }
   }
 </style>

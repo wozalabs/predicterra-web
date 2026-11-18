@@ -190,6 +190,10 @@ const coverOrder = ['bare', 'crops', 'built', 'water', 'rangeland', 'forest'] as
 
   .ap__tag--accent {
     background: var(--accent);
+    background: var(--grad-accent);
+    background-size: var(--grad-accent-size);
+    animation: var(--fire-motion);
+    box-shadow: var(--fire-edge);
     color: var(--on-accent);
   }
 
@@ -329,6 +333,14 @@ const coverOrder = ['bare', 'crops', 'built', 'water', 'rangeland', 'forest'] as
 
   .is-alert .ap__value {
     color: var(--accent);
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    background-size: var(--grad-text-size);
+    animation: var(--fire-text-motion);
   }
 
   /* Score bar: a row of thin ticks; the filled part darkens (orange on the alert row). */

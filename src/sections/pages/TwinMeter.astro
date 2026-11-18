@@ -1,0 +1,211 @@
+---
+/**
+ * Three kinds of twin side by side, measured on one scale of what they can do
+ * (Platform). Each column: the scale, a segmented meter filled to its level,
+ * the twin's name, what it asks and what it does. The first two stop part way
+ * (the tail of their fill fades out); the Cognitive Twin fills the whole meter
+ * in the fire gradient and carries the brand colour. The meters fill segment
+ * by segment as they come into view (static with reduced motion). The closing
+ * line is lit word by word under it.
+ */
+import SectionHead from './SectionHead.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  text?: string | readonly string[];
+  columns: readonly string[];
+  rows: readonly { label: string; cells: readonly string[] }[];
+  /** Fill of each column's meter, 0–100. */
+  levels: readonly number[];
+  /** Labels along the scale, spread from 0 to 100. */
+  scale: readonly string[];
+  closing?: string;
+}
+const { id, title, text, columns, rows, levels, scale, closing } = Astro.props;
+const SEGMENTS = 20;
+const hi = columns.length - 1;
+---
+
+<section class="tm pg-sec" aria-labelledby={id}>
+  <div class="container pg-body">
+    <SectionHead id={id} title={title} text={text} align="center" />
+
+    <ol class="tm__cols" data-tm>
+      {
+        columns.map((c, ci) => {
+          const on = Math.round((levels[ci] / 100) * SEGMENTS);
+          const full = on >= SEGMENTS;
+          return (
+            <li class:list={['tm__col', ci === hi && 'is-hi']}>
+              <div class="tm__scale t-small" aria-hidden="true">
+                {scale.map((s) => (
+                  <span>{s}</span>
+                ))}
+              </div>
+              <div class="tm__meter" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow={levels[ci]} aria-label={c}>
+                {Array.from({ length: SEGMENTS }, (_, k) => {
+                  // The last three lit segments of a partial fill fade out.
+                  const fade = !full && k < on ? Math.max(0, 3 - (on - 1 - k)) : 0;
+                  return (
+                    <span
+                      class:list={['tm__seg', k < on && 'is-lit']}
+                      style={`--k:${k};--fade:${fade}`}
+                    />
+                  );
+                })}
+              </div>
+              <h3 class="tm__name">{c}</h3>
+              <dl class="tm__rows">
+                {rows.map((r) => (
+                  <div class="tm__pair">
+                    <dt class="t-small">{r.label}</dt>
+                    <dd>{r.cells[ci]}</dd>
+                  </div>
+                ))}
+              </dl>
+            </li>
+          );
+        })
+      }
+    </ol>
+
+    {
+      closing && (
+        <p class="pg-statement tm__closing" data-lit>
+          {closing.split(' ').map((w) => (
+            <span class="w">{w} </span>
+          ))}
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .tm__cols {
+    display: grid;
+    gap: clamp(3rem, 2rem + 3vw, 4rem) clamp(1.5rem, 1rem + 2vw, 3rem);
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 56rem) {
+    .tm__cols {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .tm__col {
+    display: grid;
+    align-content: start;
+    gap: 0.875rem;
+  }
+
+  .tm__scale {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* The scale: equal segments with a small gap, square like everything else. */
+  .tm__meter {
+    display: grid;
+    grid-template-columns: repeat(20, minmax(0, 1fr));
+    gap: clamp(3px, 0.35vw, 5px);
+    height: clamp(3.5rem, 3rem + 1.5vw, 4.5rem);
+  }
+
+  .tm__seg {
+    position: relative;
+    background: var(--tick-off);
+  }
+
+  /* A lit segment shows its own slice of one fire gradient running across
+     the whole meter; the tail of a partial fill fades out. */
+  .tm__seg.is-lit::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(in oklab 90deg, #d42300 0%, #ff3700 50%, #ff7424 100%);
+    background-size: 2000% 100%;
+    background-position: calc(var(--k) / 19 * 100%) 50%;
+    opacity: calc(1 - var(--fade) * 0.24);
+  }
+
+  .tm__name {
+    margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+    font-size: clamp(2rem, 1.4rem + 1.8vw, 3.25rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: var(--track-display);
+  }
+
+  .is-hi .tm__name {
+    color: var(--accent);
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: var(--grad-text-size);
+    animation: var(--fire-text-motion);
+  }
+
+  .tm__rows {
+    display: grid;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .tm__pair {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .tm__pair dt {
+    color: var(--muted);
+  }
+
+  .tm__pair dd {
+    max-width: 34ch;
+    color: var(--ink-2);
+  }
+
+  .is-hi .tm__pair dd {
+    color: var(--ink);
+  }
+
+  .tm__closing {
+    max-width: 40ch;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+  }
+
+  /* Filling: the lit segments light up one after another once in view. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js-reveal) .tm__seg.is-lit::after {
+      opacity: 0;
+      transition: opacity 320ms ease;
+      transition-delay: calc(var(--k) * 45ms);
+    }
+    :global(.js-reveal) [data-tm].is-on .tm__seg.is-lit::after {
+      opacity: calc(1 - var(--fade) * 0.24);
+    }
+  }
+</style>
+
+<script>
+  /* Fill the meters once they are in view. */
+  document.querySelectorAll<HTMLElement>('[data-tm]').forEach((el) => {
+    new IntersectionObserver(
+      ([e], io) => {
+        if (!e.isIntersecting) return;
+        el.classList.add('is-on');
+        io.disconnect();
+      },
+      { threshold: 0.35 },
+    ).observe(el);
+  });
+</script>

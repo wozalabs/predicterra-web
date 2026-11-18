@@ -76,7 +76,7 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
     /* Matches palette.ctaGround in scripts/sector-scene/palette.ts (shown until WebGL is ready). */
     background: var(--cta-ground);
     /* Notched top edge: the success-stories card notch, mirrored to the top. */
-    clip-path: polygon(0 18px, calc(42% - 18px) 18px, 42% 0, 100% 0, 100% 100%, 0 100%);
+    clip-path: var(--notch-top);
     color: var(--ink);
   }
 

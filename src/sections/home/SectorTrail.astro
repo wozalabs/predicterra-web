@@ -264,11 +264,14 @@ const stops = steps.length;
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* White, so it stands out on the orange asset it marks. */
   .marker__dot {
     width: 14px;
     height: 14px;
-    background: var(--accent);
-    box-shadow: 0 0 0 3px var(--surface), 0 2px 10px rgb(30 30 30 / 0.18);
+    background: #ffffff;
+    box-shadow:
+      0 0 0 1px rgb(30 30 30 / 0.12),
+      0 2px 10px rgb(30 30 30 / 0.35);
     transition: transform 200ms var(--ease-out);
   }
 
@@ -284,7 +287,7 @@ const stops = steps.length;
     position: absolute;
     width: 14px;
     height: 14px;
-    border: 1.5px solid var(--accent);
+    border: 1.5px solid #ffffff;
     opacity: 0;
   }
 
@@ -325,31 +328,34 @@ const stops = steps.length;
       0 1px 2px rgb(30 30 30 / 0.06),
       0 16px 40px -12px rgb(30 30 30 / 0.22);
     pointer-events: none;
+    /* Placed next to its marker by the script (transform); it enters on its
+       own, calmly: a slow fade while it settles a few pixels into place, no
+       scaling. The placement is never animated, so the card never lags. */
     opacity: 0;
     visibility: hidden;
-    transform-origin: var(--origin, 0 0);
-    transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(0.96);
+    transform: translate3d(var(--x, 0), var(--y, 0), 0);
+    translate: 0 6px;
     transition:
-      opacity 140ms ease,
-      transform 160ms var(--ease-out),
-      visibility 0s linear 160ms;
+      opacity 220ms ease,
+      translate 260ms var(--ease-out),
+      visibility 0s linear 260ms;
   }
 
   .alert[data-open] {
     pointer-events: auto;
     opacity: 1;
     visibility: visible;
-    transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1);
+    translate: 0 0;
     transition:
-      opacity 180ms ease,
-      transform 220ms var(--ease-out),
+      opacity 460ms cubic-bezier(0.22, 1, 0.36, 1),
+      translate 620ms cubic-bezier(0.22, 1, 0.36, 1),
       visibility 0s;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .alert,
     .alert[data-open] {
-      transform: translate3d(var(--x, 0), var(--y, 0), 0);
+      translate: none;
     }
   }
 
@@ -380,11 +386,11 @@ const stops = steps.length;
       width: auto;
       max-height: 74svh;
       overflow: auto;
-      transform-origin: 50% 100%;
-      transform: translateY(8px) scale(0.98);
+      transform: none;
+      translate: 0 10px;
     }
     .alert[data-open] {
-      transform: none;
+      translate: 0 0;
     }
   }
 </style>

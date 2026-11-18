@@ -1,6 +1,8 @@
 ---
 /**
- * Platform capture under the hero, centred. It arrives tilted back and
+ * Platform capture under the hero, centred: a silent loop of the platform in
+ * use, with no controls (it cannot be paused, scrubbed, unmuted or opened full
+ * screen), playing only while on screen. It arrives tilted back and
  * straightens as it reaches the middle of the viewport (scroll-linked, see the
  * script below). Reduced motion: shown flat, no movement.
  *
@@ -10,7 +12,7 @@
  *
  * `peek` (homepage only): with the App hero layout (the default) the capture
  * is pulled up into the bottom of the hero, barely tilted, so it is already in
- * view on load.
+ * view on load, rising out of a soft fire glow.
  */
 import LogoBand from '../pages/LogoBand.astro';
 import { getCopy, withBase, type Locale } from '../../i18n/config';
@@ -24,22 +26,33 @@ interface Props {
 }
 const { locale = 'en', peek = false, logos } = Astro.props;
 const { showcase: s } = getCopy(locale).home;
-const src = (w: number) => withBase(`${s.src}-${w}.webp`);
+const v = s.video;
 ---
 
 <section class="sc" aria-label={s.label} data-showcase data-peek={peek ? '' : undefined}>
-  {peek && <canvas class="sc__dither" aria-hidden="true" data-dither />}
+  {peek && <div class="sc__glow" aria-hidden="true" data-glow />}
   <div class="container sc__stage">
     <figure class="sc__frame" data-showcase-frame>
-      <img
-        src={src(1600)}
-        srcset={`${src(960)} 960w, ${src(1600)} 1600w, ${src(2400)} 2400w`}
-        sizes="(min-width: 80rem) 76rem, (min-width: 48rem) calc(100vw - 4rem), 150vw"
-        alt={s.alt}
-        width={s.w}
-        height={s.h}
-        decoding="async"
-      />
+      <video
+        class="sc__video"
+        width={v.w}
+        height={v.h}
+        poster={withBase(v.poster)}
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        disablepictureinpicture
+        disableRemotePlayback
+        controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+        tabindex="-1"
+        aria-label={v.label}
+        data-showcase-video
+      >
+        <source src={withBase(v.small)} type="video/mp4" media="(max-width: 47.99rem)" />
+        <source src={withBase(v.large)} type="video/mp4" />
+      </video>
     </figure>
   </div>
   {
@@ -70,6 +83,12 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
 
   /* App hero: pulled up into the bottom of the hero, only a slight tilt, and
      it rises into place on load after the title. */
+  /* App hero: no drop shadow around the capture, so nothing blurs the
+     sunrise behind it. */
+  :global(html[data-hero='app']) .sc[data-peek] .sc__frame {
+    box-shadow: none;
+  }
+
   :global(html[data-hero='app']) .sc[data-peek] {
     --peek: var(--hero-peek);
     --tilt: 6deg;
@@ -89,33 +108,62 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
     }
   }
 
-  /* App hero: an ordered-dither gradient behind the capture, densest along an
-     arc (the bottom of the first screen in the middle, higher at the edges)
-     and thinning out above and below it. It breaks up into bits as the page
-     scrolls. Drawn by the script; the hero's copy sits above it. */
-  .sc__dither {
+  /* App hero: a sunrise behind the capture. A vertical fire gradient that
+     starts as nothing just above the capture's top edge, deepens through ember red
+     and the brand orange, and is brightest (warm amber) at the bottom of the
+     first screen, with a soft film grain over it. The capture sits in front,
+     so it shows above and beside it. It rises in on load and is gone once
+     the page has scrolled a little over half a screen (--g, set below). The
+     hero's copy sits above it. */
+  .sc__glow {
+    --a: var(--hero-glow-a);
     display: none;
     position: absolute;
     left: 0;
-    top: calc(-1 * var(--peek));
+    top: calc(-0.5 * var(--peek));
     width: 100%;
-    height: calc(3 * var(--peek));
+    height: calc(1.9 * var(--peek));
     pointer-events: none;
+    opacity: calc(1 - var(--g, 0));
+    background:
+      radial-gradient(in oklab 70% 34% at 50% 79%, rgb(var(--sun-light) / calc(var(--a) * 0.45)) 0%, rgb(var(--sun-light) / 0) 100%),
+      linear-gradient(in oklab to bottom,
+        rgb(var(--sun-ember) / 0) 0%,
+        rgb(var(--sun-ember) / calc(var(--a) * 0.5)) 32%,
+        rgb(var(--sun-core) / calc(var(--a) * 0.8)) 55%,
+        rgb(var(--sun-warm) / calc(var(--a) * 0.92)) 70%,
+        rgb(var(--sun-light) / var(--a)) 79%,
+        rgb(var(--sun-warm) / calc(var(--a) * 0.5)) 90%,
+        rgb(var(--sun-core) / 0) 100%);
   }
 
-  :global(html[data-hero='app']) .sc[data-peek] .sc__dither {
+  /* Film grain, only where the light is. */
+  .sc__glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--grain);
+    background-size: 160px 160px;
+    mix-blend-mode: overlay;
+    opacity: var(--hero-grain);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 20%, #000 70%, #000 84%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 20%, #000 70%, #000 84%, transparent 100%);
+  }
+
+  :global(html[data-hero='app']) .sc[data-peek] .sc__glow {
     display: block;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    :global(html[data-hero='app']) .sc[data-peek] .sc__dither {
-      animation: sc-fade 1400ms ease 300ms both;
+    :global(html[data-hero='app']) .sc[data-peek] .sc__glow {
+      animation: sc-glow 2200ms cubic-bezier(0.19, 1, 0.22, 1) 200ms both;
     }
   }
 
-  @keyframes sc-fade {
+  @keyframes sc-glow {
     from {
       opacity: 0;
+      transform: translateY(10%);
     }
   }
 
@@ -136,9 +184,13 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
     will-change: transform;
   }
 
-  .sc__frame img {
+  /* No controls and no pointer: the loop cannot be paused, scrubbed or opened. */
+  .sc__video {
+    display: block;
     width: 100%;
     height: auto;
+    pointer-events: none;
+    user-select: none;
   }
 
   /* ---------- Logos after the capture: the full content width, spread out ---------- */
@@ -206,115 +258,34 @@ const src = (w: number) => withBase(`${s.src}-${w}.webp`);
 </style>
 
 <script>
-  import { onThemeChange } from '../../scripts/theme';
+  /* ---------- The loop plays only while on screen; reduced motion: the poster ---------- */
+  const video = document.querySelector<HTMLVideoElement>('[data-showcase-video]');
+  if (video) {
+    video.muted = true;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (still) {
+      video.removeAttribute('autoplay');
+      video.pause();
+    } else {
+      new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      }).observe(video);
+    }
+  }
 
-  /* ---------- Dither gradient (App hero) ---------- */
-  const dither = document.querySelector<HTMLCanvasElement>('[data-dither]');
-  if (dither) {
-    // 8×8 Bayer matrix, thresholds 0..1.
-    const B = [0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21].map((v) => (v + 0.5) / 64);
-    const CELL = 4; // CSS px per dither cell
-    const DOT = 2; // CSS px dot inside it
-    const MAX = 0.42; // peak density
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const smooth = (a: number, b: number, x: number) => {
-      const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
-      return t * t * (3 - 2 * t);
-    };
-    // Stable pseudo-random value per cell (0..1), for the dissolve.
-    const hash = (x: number, y: number) => {
-      let h = (x * 374761393 + y * 668265263) | 0;
-      h = Math.imul(h ^ (h >>> 13), 1274126177);
-      return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-    };
 
-    const ctx = dither.getContext('2d');
-    let xs = new Float32Array(0);
-    let ys = new Float32Array(0);
-    let rs = new Float32Array(0);
-    let count = 0;
-    let colour = '#363636';
-    let shown = -1;
-
-    // Which cells are on. The canvas spans 3 peeks: it starts one peek above
-    // the section, whose top sits one peek above the bottom of the first
-    // screen. The band of dots follows an arc: lowest in the middle (behind
-    // the capture), rising towards the edges.
-    const build = () => {
-      if (!ctx || getComputedStyle(dither).display === 'none') return false;
-      const w = dither.clientWidth;
-      const h = dither.clientHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      dither.width = Math.round(w * dpr);
-      dither.height = Math.round(h * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      colour = getComputedStyle(dither).getPropertyValue('--hero-dither').trim() || '#363636';
-      const peek = h / 3;
-      const centre = 2 * peek; // the bottom of the first screen
-      const rise = 0.85 * peek; // how much higher the band sits at the edges
-      const above = 0.75 * peek; // fade-in height above the densest line
-      const below = 1.0 * peek; // fade-out depth below it
-      const cols = Math.ceil(w / CELL);
-      const rows = Math.ceil(h / CELL);
-      const max = cols * rows;
-      if (xs.length < max) {
-        xs = new Float32Array(max);
-        ys = new Float32Array(max);
-        rs = new Float32Array(max);
-      }
-      count = 0;
-      for (let c = 0; c < cols; c++) {
-        const u = (c * CELL + CELL / 2) / w * 2 - 1;
-        const line = centre - rise * u * u;
-        for (let r = 0; r < rows; r++) {
-          const y = r * CELL;
-          const d = y < line ? MAX * smooth(line - above, line, y) : MAX * (1 - smooth(line, line + below, y));
-          if (d > 0.004 && B[(r % 8) * 8 + (c % 8)] < d) {
-            xs[count] = c * CELL + 1;
-            ys[count] = y + 1;
-            rs[count] = hash(c, r);
-            count++;
-          }
-        }
-      }
-      return true;
-    };
-
-    // s: 0 = all dots, 1 = none. Dots drop out in random order (dissolve).
-    const render = (s: number) => {
-      if (!ctx) return;
-      shown = s;
-      ctx.clearRect(0, 0, dither.width, dither.height);
-      ctx.fillStyle = colour;
-      for (let i = 0; i < count; i++) if (rs[i] >= s) ctx.fillRect(xs[i], ys[i], DOT, DOT);
-    };
-
-    const amount = () => (reduce ? 0 : Math.round(Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.5))) * 40) / 40);
-    const redraw = () => {
-      if (build()) render(amount());
-    };
-
+  /* ---------- Glow (App hero): fades out as the page scrolls ---------- */
+  const glow = document.querySelector<HTMLElement>('[data-glow]');
+  if (glow && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     let raf = 0;
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (raf || !count) return;
-        raf = requestAnimationFrame(() => {
-          raf = 0;
-          const s = amount();
-          if (s !== shown) render(s);
-        });
-      },
-      { passive: true },
-    );
-    redraw();
-    let t = 0;
-    window.addEventListener('resize', () => {
-      clearTimeout(t);
-      t = window.setTimeout(redraw, 120);
-    });
-    onThemeChange(redraw);
-    window.addEventListener('hero:change', () => requestAnimationFrame(redraw));
+    const dim = () => {
+      raf = 0;
+      const g = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.6)));
+      glow.style.setProperty('--g', g.toFixed(3));
+    };
+    window.addEventListener('scroll', () => raf || (raf = requestAnimationFrame(dim)), { passive: true });
+    dim();
   }
 
   /* ---------- Scroll: tilt → flat ---------- */

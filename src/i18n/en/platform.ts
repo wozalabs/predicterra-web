@@ -21,6 +21,9 @@ export default {
     title: 'A new era of energy needs a new kind of twin.',
     text: 'The climate is moving beyond the historical record, regulators ask for proof of resilience, and the energy transition is adding more assets, more connected, in more exposed places. A Cognitive Twin is a live model of your assets, the physical world acting on them and how everything connects. It tells every team what will happen, why, and what to do.',
     columns: ['Descriptive twin', 'Physical twin', 'Cognitive Twin'],
+    // What each twin can do, on one scale (the meters on the page).
+    scale: ['Describe', 'Simulate', 'Reason', 'Anticipate'],
+    levels: [25, 50, 100],
     rows: [
       {
         label: 'Asks',

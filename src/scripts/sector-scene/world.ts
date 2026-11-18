@@ -41,7 +41,7 @@ import { createGroundMaterial, createFlowMaterial, HAZARD_SLOTS } from './materi
 import { scenePalette } from './palette';
 
 export type SectorId = 'grid' | 'substation' | 'solar' | 'wind' | 'oilgas';
-export const SECTOR_ORDER: SectorId[] = ['grid', 'substation', 'solar', 'wind', 'oilgas'];
+export const SECTOR_ORDER: SectorId[] = ['grid', 'solar', 'wind', 'oilgas', 'substation'];
 
 interface Stop {
   target: Vector3;
@@ -275,20 +275,21 @@ export function createWorld(
   const stops: Stop[] = [
     { target: plan(8, 0), view: 84 },
     { target: groundOf(anchors.grid).add(new Vector3(0, 4, 0)), view: 26 },
-    { target: groundOf(anchors.substation).add(new Vector3(0, 1.5, 0)), view: 24 },
     { target: groundOf(anchors.solar), view: 30 },
     { target: groundOf(anchors.wind).add(new Vector3(0, 5, 0)), view: 32 },
     { target: groundOf(anchors.oilgas).add(new Vector3(0, 3, 0)), view: 30 },
+    { target: groundOf(anchors.substation).add(new Vector3(0, 1.5, 0)), view: 24 },
   ];
 
   // Hazard zones in world XZ: (x, z, radius)
   const hz = groundMat.uniforms.uHazards.value as { set(x: number, y: number, z: number, w: number): void; w: number }[];
+  // In SECTOR_ORDER: grid, solar, wind, oil & gas, substation.
   const hazardSpots: [number, number, number][] = [
     [plan(-31, 9).x, plan(-31, 9).z, 9],
-    [plan(-3, -4).x, plan(-3, -4).z, 11],
     [plan(16, 14).x, plan(16, 14).z, 12],
     [plan(23, -17).x, plan(23, -17).z, 11],
     [plan(46, 2).x, plan(46, 2).z, 13],
+    [plan(-3, -4).x, plan(-3, -4).z, 11],
   ];
   hazardSpots.forEach(([x, z, r], i) => hz[i].set(x, z, r, 0));
   const hazardTarget = new Array(HAZARD_SLOTS).fill(0);

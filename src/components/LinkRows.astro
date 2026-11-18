@@ -1,0 +1,129 @@
+---
+/**
+ * A list of rows, one item per row: index and title on the left, the text in
+ * the middle (the same column in every row, so the texts line up) and, for
+ * linked rows, a "Discover …" button on the right. The whole row follows the
+ * title's link and hovering it fills the button. Used by every list of this
+ * kind (home Across all sectors, the Solutions pages' use cases and sectors),
+ * so they read and behave the same.
+ */
+import Button from './Button.astro';
+import { getCopy, localizePath, type Locale } from '../i18n/config';
+
+interface Item {
+  title: string;
+  text: string;
+  href?: string;
+}
+interface Props {
+  items: Item[];
+  locale?: Locale;
+  class?: string;
+}
+const { items, locale = 'en', class: className, ...rest } = Astro.props;
+const discover = getCopy(locale).home.across.discover;
+const pad = (n: number) => String(n).padStart(3, '0');
+---
+
+<ol class:list={['lr', className]} data-reveal-group {...rest}>
+  {
+    items.map((it, i) => (
+      <li class="lr__item" data-reveal data-btn-host={it.href ? '' : undefined}>
+        <h3 class="lr__name">
+          <span class="lr__i t-small t-num">{pad(i + 1)}</span>
+          {it.href ? (
+            <a class="lr__link" href={localizePath(it.href, locale)}>
+              {it.title}
+            </a>
+          ) : (
+            <span>{it.title}</span>
+          )}
+        </h3>
+        <p class="lr__text">{it.text}</p>
+        {it.href && <Button label={`${discover} ${it.title}`} variant="secondary" class="lr__go" />}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .lr {
+    display: grid;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lr__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem var(--gutter);
+    padding-block: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 56rem) {
+    .lr__item {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) minmax(12rem, auto);
+      align-items: start;
+    }
+  }
+
+  .lr__name {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    font-size: var(--fs-h3);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: var(--track-title);
+  }
+
+  .lr__i {
+    flex: none;
+    min-width: 2rem;
+    color: var(--accent);
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    background-size: var(--grad-text-size);
+    animation: var(--fire-text-motion);
+  }
+
+  /* The whole item follows its title's link. */
+  .lr__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .lr__link:focus-visible {
+    outline: none;
+  }
+
+  .lr__item:has(.lr__link:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  .lr__text {
+    max-width: 44ch;
+    padding-top: 0.3rem;
+    color: var(--ink-2);
+  }
+
+  /* "Discover …": the row's button, on the right (under the text on phones). */
+  .lr__item :global(.lr__go) {
+    align-self: center;
+    justify-self: start;
+  }
+
+  @media (min-width: 56rem) {
+    .lr__item :global(.lr__go) {
+      justify-self: end;
+    }
+  }
+</style>

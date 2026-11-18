@@ -1,0 +1,56 @@
+---
+/**
+ * The 3D section's asset panel (components/AssetPanel) on its own, as a card
+ * in the page: the same identity, IDs, live 3D view (turning slowly while on
+ * screen), risk scores and land cover as when a 3D marker is hovered.
+ */
+import AssetPanel from './AssetPanel.astro';
+import { getCopy, type Locale } from '../i18n/config';
+import type { SectorId } from '../scripts/sector-scene/world';
+
+interface Props {
+  sector: SectorId;
+  locale?: Locale;
+  class?: string;
+}
+const { sector, locale = 'en', class: className, ...rest } = Astro.props;
+const { scene } = getCopy(locale).home;
+const s = scene.sectors.find((x) => x.id === sector)!;
+---
+
+<div class:list={['acd', className]} data-asset-card={sector} {...rest}>
+  <AssetPanel panel={s.panel} labels={scene.panelLabels} />
+</div>
+
+<style>
+  .acd {
+    width: 100%;
+    max-width: 22.5rem;
+    background: var(--surface);
+    box-shadow:
+      0 1px 2px rgb(30 30 30 / 0.06),
+      0 16px 40px -12px rgb(30 30 30 / 0.22);
+  }
+</style>
+
+<script>
+  import type { SectorId } from '../scripts/sector-scene/world';
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-asset-card]').forEach((el) => {
+    const canvas = el.querySelector<HTMLCanvasElement>('[data-preview]');
+    if (!canvas) return;
+    const id = el.dataset.assetCard as SectorId;
+    let mod: typeof import('../scripts/sector-scene/asset-preview') | null = null;
+    let on = false;
+    new IntersectionObserver(
+      async ([e]) => {
+        on = e.isIntersecting;
+        if (on && !mod) mod = await import('../scripts/sector-scene/asset-preview');
+        if (on) mod?.showPreview(id, canvas, { reducedMotion: reduce });
+        else mod?.hidePreview();
+      },
+      { rootMargin: '200px 0px' },
+    ).observe(el);
+  });
+</script>

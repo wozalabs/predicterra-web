@@ -1,9 +1,9 @@
 ---
 /**
- * Why us (home), right after the platform and its logos: the title on the
- * left, one differentiating sentence on the right, set like the Platform
- * page's closing statements and lit word by word as it scrolls in
- * (scripts/lit.ts).
+ * Why us (home), right after the platform and its logos: an orange panel with
+ * the CTA's notched top edge, the title on the left and one statement on the
+ * right, lit word by word as it scrolls in (scripts/lit.ts). The panel is the
+ * brand's fire gradient (tokens --grad-panel and --grain); same in both themes.
  */
 import { getCopy, type Locale } from '../../i18n/config';
 
@@ -15,11 +15,13 @@ const { why } = getCopy(locale).home;
 ---
 
 <section class="why" aria-labelledby="why-title">
-  <div class="container why__grid">
-    <h2 id="why-title" class="why__title" data-render>{why.title}</h2>
-    <p class="why__text" data-lit>
-      {why.text.split(' ').map((w) => <span class="w">{w} </span>)}
-    </p>
+  <div class="why__panel">
+    <div class="why__grid">
+      <h2 id="why-title" class="why__title" data-render>{why.title}</h2>
+      <p class="why__text" data-lit>
+        {why.text.split(' ').map((w) => <span class="w">{w} </span>)}
+      </p>
+    </div>
   </div>
 </section>
 
@@ -28,7 +30,37 @@ const { why } = getCopy(locale).home;
     position: relative;
     z-index: var(--z-cover);
     background: var(--canvas);
-    padding-block: clamp(6rem, 4rem + 7vw, 12rem) 0;
+    padding: clamp(5rem, 3rem + 6vw, 10rem) var(--gutter) 0;
+  }
+
+  .why__panel {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    max-width: var(--max-w);
+    margin-inline: auto;
+    padding: clamp(4rem, 2.5rem + 5vw, 8rem) var(--gutter) clamp(3.5rem, 2rem + 5vw, 7rem);
+    background: var(--accent);
+    background: var(--grad-panel);
+    background-size: var(--grad-panel-size);
+    animation: var(--fire-panel-motion);
+    box-shadow: var(--fire-edge-panel);
+    color: #ffffff;
+    /* The CTA card's notched top edge. */
+    clip-path: polygon(0 18px, calc(42% - 18px) 18px, 42% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  /* Fine grain over the gradient: no banding, a printed finish. */
+  .why__panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--grain);
+    background-size: 160px 160px;
+    opacity: 0.16;
+    mix-blend-mode: soft-light;
+    pointer-events: none;
   }
 
   .why__grid {
@@ -39,7 +71,7 @@ const { why } = getCopy(locale).home;
 
   @media (min-width: 64rem) {
     .why__grid {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
       align-items: start;
     }
   }
@@ -51,11 +83,16 @@ const { why } = getCopy(locale).home;
   }
 
   .why__text {
-    max-width: 40ch;
-    font-size: var(--fs-h3);
-    line-height: 1.2;
+    max-width: 38ch;
+    font-size: clamp(1.5rem, 1.1rem + 1.1vw, 2.25rem);
+    line-height: 1.18;
     letter-spacing: -0.025em;
     text-wrap: pretty;
+  }
+
+  /* On the orange the unlit words stay a little more present. */
+  .why__text:global(.is-lit) :global(.w) {
+    opacity: calc(0.3 + 0.7 * var(--o, 0));
   }
 </style>
 

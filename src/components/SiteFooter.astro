@@ -48,15 +48,6 @@ const { footer } = getCopy(locale).common;
             </svg>
           </a>
         </address>
-        <ul class="footer__badges" aria-label={footer.certificationsLabel}>
-          {
-            footer.certifications.map((c) => (
-              <li>
-                <img src={withBase(c.src)} alt={c.name} width={c.w} height={c.h} loading="lazy" decoding="async" />
-              </li>
-            ))
-          }
-        </ul>
       </div>
 
       <nav class="footer__cols" aria-label="Footer" data-reveal-group>
@@ -77,6 +68,17 @@ const { footer } = getCopy(locale).common;
           ))
         }
       </nav>
+
+      <!-- Certification marks, on the right under the columns. -->
+      <ul class="footer__badges" aria-label={footer.certificationsLabel}>
+          {
+            footer.certifications.map((c) => (
+              <li>
+                <img src={withBase(c.src)} alt={c.name} width={c.w} height={c.h} loading="lazy" decoding="async" />
+              </li>
+            ))
+          }
+        </ul>
     </div>
 
     <div class="footer__bottom t-caption">
@@ -169,12 +171,18 @@ const { footer } = getCopy(locale).common;
     fill: var(--canvas);
   }
 
-  /* Certification marks, at their own colours. */
+  /* Certification marks, at their own colours, on the right. */
   .footer__badges {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-top: 0.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    .footer__badges {
+      grid-column: 2;
+      justify-self: end;
+    }
   }
 
   .footer__badges img {

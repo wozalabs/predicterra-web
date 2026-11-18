@@ -48,6 +48,43 @@
 
   --accent: #ff3700;
   --on-accent: #ffffff;
+  /* Orange fills as gradients: a fire that runs from a deep ember red through
+     the brand orange (#FF3700, always the main colour) to a warm amber glow.
+     Mixed in OKLab so the colours blend without grey or banded steps. */
+  --grad-accent:
+    radial-gradient(in oklab 140% 180% at 100% 110%, rgb(255 150 50 / 0.85) 0%, rgb(255 150 50 / 0) 62%),
+    linear-gradient(in oklab 105deg, #cf1f00 0%, #ff3700 48%, #ff4a0c 100%);
+  /* The fire drifts: the gradients slide very slowly back and forth inside
+     their fills (a background larger than the box, its position animated), so
+     the orange breathes without drawing attention. Off with reduced motion. */
+  --fire-motion: fire-drift 11s ease-in-out infinite alternate;
+  --fire-text-motion: fire-drift 13s ease-in-out infinite alternate;
+  --fire-panel-motion: fire-drift-2d 24s ease-in-out infinite alternate;
+  /* Orange text: the same fire along the line, clipped to the letters. */
+  /* The primary button's arrow block: the same fire, a step deeper. */
+  --grad-accent-deep: linear-gradient(in oklab 105deg, #a81900 0%, #c42400 55%, #d02a00 100%);
+  --grad-text: linear-gradient(in oklab 100deg, #cf1f00 0%, #ff3700 40%, #ff5a14 72%, #ff8f34 100%);
+  /* Large panels: a soft mesh. Ember in one corner, the orange body, an amber
+     bloom low on the opposite side, and a pale gold glow at its edge. */
+  --grad-panel:
+    radial-gradient(in oklab 75% 95% at 96% 4%, #7a0d00 0%, rgb(122 13 0 / 0.55) 30%, rgb(122 13 0 / 0) 72%),
+    radial-gradient(in oklab 60% 75% at 4% 104%, #ffe2a6 0%, rgb(255 196 92 / 0.85) 26%, rgb(255 154 40 / 0) 70%),
+    radial-gradient(in oklab 70% 90% at 30% 70%, rgb(255 120 24 / 0.9) 0%, rgb(255 120 24 / 0) 70%),
+    radial-gradient(in oklab 90% 110% at 62% 34%, #ff3700 0%, rgb(255 55 0 / 0) 78%),
+    linear-gradient(in oklab 160deg, #e42600 0%, #ff3d06 55%, #ff6a1c 100%);
+  /* Fine grain laid over large gradients: it breaks any banding and gives the
+     fill a printed, premium feel. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* How each gradient is tiled in its box: one fill larger than the box, so
+     the drift can slide it. */
+  --grad-accent-size: 160% 100%;
+  --grad-text-size: 200% 100%;
+  --grad-panel-size: 140% 140%;
+  /* Inner glow of the primary orange on gradient fills: the ember red and the
+     amber settle back to #FF3700 towards the edges. Wide and soft, so it reads
+     as part of the fill, never as a border. */
+  --fire-edge: inset 0 0 12px 0 rgb(255 55 0 / 0.55);
+  --fire-edge-panel: inset 0 0 160px 24px rgb(255 55 0 / 0.5);
 
   /* Type */
   --font-sans: 'Archivo Variable', 'Archivo Fallback', 'Archivo', system-ui, sans-serif;
@@ -87,10 +124,11 @@
   --z-header: 50;
   --z-menu: 60;
 
-  /* Dark endpoints of the scroll-scrubbed sections (light theme). */
-  --dk-canvas: #1e1e1e;
-  --dk-card: #262626;
-  --dk-surface: #262626;
+  /* Dark endpoints of the scroll-scrubbed sections (light theme): the dark
+     theme's own surfaces, so a dark section looks the same in both themes. */
+  --dk-canvas: #0d0d0d;
+  --dk-card: #1a1a1a;
+  --dk-surface: #242424;
   /* 1 turns monochrome logos white (dark surfaces). */
   --logo-inv: 0;
   /* Inset CTA card ground (matches the CTA 3D scene). */
@@ -104,8 +142,26 @@
   --portrait: #e4e4e4;
   --tick-off: #d6d6d6;
   --scene-dot: #cfcfcf;
-  /* Dots of the dithered gradient at the bottom of the App hero. */
-  --hero-dither: #cfcfcf;
+  /* Glow behind the platform capture at the bottom of the App hero, and the
+     tint of page transitions: the fire's red core and its warm edge (rgb
+     triplets) and how strong the glow is on this canvas. */
+  --glow-core: 255 55 0;
+  --glow-warm: 255 138 42;
+  --glow-a: 0.42;
+  /* Sunrise behind the App hero capture: ember, core, warm and light (rgb
+     triplets, the brand fire from deep red to amber), its strength on this
+     canvas and its grain. */
+  /* Light canvas: no dark ember (it reads as grey mud on white), the ramp
+     starts straight from the brand orange. */
+  --sun-ember: 255 84 28;
+  --sun-core: 255 55 0;
+  --sun-warm: 255 106 26;
+  --sun-light: 255 143 52;
+  --hero-glow-a: 0.55;
+  --hero-grain: 0.25;
+  /* Notched top edge of a container that comes in over the one before it
+     (the CTA card's cut, used wherever the content changes container). */
+  --notch-top: polygon(0 18px, calc(42% - 18px) 18px, 42% 0, 100% 0, 100% 100%, 0 100%);
   color-scheme: light;
 }
 
@@ -144,6 +200,10 @@
   --portrait: #cfcfcf;
   --tick-off: #333333;
   --scene-dot: #242424;
-  --hero-dither: #2e2e2e;
+  --glow-a: 0.72;
+  --sun-ember: 140 22 0;
+  --hero-glow-a: 1;
+  --hero-grain: 0.45;
   color-scheme: dark;
 }
+

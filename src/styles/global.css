@@ -13,9 +13,38 @@
   }
 }
 
-::view-transition-old(root),
+/* The page leaves through an orange haze: the old page blurs and fades into
+   a fire glow rising from the bottom of the canvas (the home hero's sunrise),
+   and the new one comes into focus out of it. No white or full-strength
+   colour at any point, so there is no flash. */
+::view-transition {
+  background:
+    linear-gradient(in oklab to top, rgb(var(--glow-core) / calc(var(--glow-a) * 0.7)) 0%, rgb(var(--glow-warm) / calc(var(--glow-a) * 0.3)) 30%, rgb(var(--glow-core) / 0) 70%),
+    var(--canvas);
+}
+
+::view-transition-old(root) {
+  animation: vt-out 340ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
 ::view-transition-new(root) {
-  animation-duration: 200ms;
+  animation: vt-in 640ms cubic-bezier(0.19, 1, 0.22, 1) 240ms both;
+}
+
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    filter: blur(18px);
+    transform: scale(0.985);
+  }
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    filter: blur(18px);
+    transform: scale(1.015);
+  }
 }
 
 ::view-transition-group(site-header),
@@ -220,9 +249,18 @@ ol {
   font-variant-numeric: tabular-nums;
 }
 
-/* Orange text: only at >= 44px on light (contrast ~3.2:1). */
+/* Orange text: only at >= 44px on light (contrast ~3.2:1). Filled with the
+   fire gradient; the colour stays orange for anything drawn in currentColor. */
 .accent {
   color: var(--accent);
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background-size: var(--grad-text-size);
+  animation: var(--fire-text-motion);
 }
 
 .nowrap {
@@ -233,23 +271,33 @@ ol {
 
 /* Primary action. White on #FF3700, square corners. */
 .btn {
-  /* Plain fill, label on the left, an inset square on the right with the arrow. */
+  /* Label on the left, a square block on the right with the arrow, flush with
+     the button's edges (no margin). The block is the button's own colour, a
+     step darker: deep orange on the orange primary, darker grey on the grey
+     secondary. On hover the block grows sideways until it fills the button
+     (the label keeps its place) and the label takes the arrow's colour. */
   --btn-bg: var(--accent);
+  --btn-fill: var(--grad-accent);
   --btn-fg: var(--on-accent);
-  --btn-sq: #ffffff;
-  --btn-arrow: var(--grey-700);
-  --btn-hover: #e83200;
-  /* Sizes on a 4 px grid: md 36 px, lg 40 px; the square is the height minus the inset. */
+  --btn-sq: var(--grad-accent-deep);
+  --btn-arrow: #ffffff;
+  /* Sizes on a 4 px grid: md 36 px, lg 40 px; the block is as tall as the button. */
   --btn-h: 2.25rem;
-  --btn-inset: 0.25rem;
+  --btn-inset: 0px;
+  --btn-sq-size: var(--btn-h);
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.875rem;
   height: var(--btn-h);
-  padding: var(--btn-inset) var(--btn-inset) var(--btn-inset) 0.875rem;
-  background: var(--btn-bg);
+  padding: 0 0 0 0.875rem;
+  background: var(--btn-fill, var(--btn-bg));
+  background-color: var(--btn-bg);
+  background-size: var(--grad-accent-size);
+  animation: var(--fire-motion);
+  box-shadow: var(--fire-edge);
   color: var(--btn-fg);
   font-size: 0.875rem;
+  font-weight: 500;
   line-height: 1;
   letter-spacing: var(--track-body);
   white-space: nowrap;
@@ -258,7 +306,7 @@ ol {
   overflow: hidden;
   transition:
     transform 160ms var(--ease-out),
-    background-color 200ms ease;
+    color 260ms var(--ease-out);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -266,25 +314,45 @@ ol {
   position: relative;
 }
 
-/* Hover: the fill darkens a step (and the arrow nudges right). */
+/* The block, drawn behind the arrow: at rest it sits on the right edge; on
+   hover it grows to the left until it covers the button. */
+.btn::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: var(--btn-inset);
+  right: var(--btn-inset);
+  bottom: var(--btn-inset);
+  width: var(--btn-sq-size);
+  background: var(--btn-sq);
+  transition: width 420ms var(--ease-out);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .btn:hover,
   [data-btn-host]:hover .btn {
-    background: var(--btn-hover);
+    color: var(--btn-arrow);
+  }
+  .btn:hover::before,
+  [data-btn-host]:hover .btn::before {
+    width: calc(100% - 2 * var(--btn-inset));
   }
 }
 
 .btn:focus-visible {
-  background: var(--btn-hover);
+  color: var(--btn-arrow);
+}
+
+.btn:focus-visible::before {
+  width: calc(100% - 2 * var(--btn-inset));
 }
 
 .btn__sq {
   display: grid;
   place-items: center;
   flex: none;
-  width: calc(var(--btn-h) - 2 * var(--btn-inset));
-  height: calc(var(--btn-h) - 2 * var(--btn-inset));
-  background: var(--btn-sq);
+  width: var(--btn-sq-size);
+  height: var(--btn-sq-size);
   color: var(--btn-arrow);
 }
 
@@ -292,21 +360,16 @@ ol {
   width: 0.875rem;
   height: 0.875rem;
   fill: currentColor;
-  transition: transform 200ms var(--ease-out);
 }
 
 .btn:active {
   transform: scale(0.97);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .btn:hover .btn__icon {
-    transform: translateX(2px);
+@media (prefers-reduced-motion: reduce) {
+  .btn::before {
+    transition: none;
   }
-}
-
-.btn:focus-visible .btn__icon {
-  transform: translateX(2px);
 }
 
 .btn--lg {
@@ -320,22 +383,24 @@ ol {
   height: 1rem;
 }
 
-/* Secondary: grey on every surface (light grey on light, dark grey on dark). */
+/* Secondary: grey on every surface (light grey on light, dark grey on dark),
+   no gradient; its block is the same grey a step darker. */
 .btn--secondary {
   --btn-bg: #e4e4e4;
-  --btn-hover: #d9d9d9;
+  --btn-fill: var(--btn-bg);
+  animation: none;
+  box-shadow: none;
   --btn-fg: var(--grey-700);
-  --btn-sq: var(--grey-700);
-  --btn-arrow: #ffffff;
+  --btn-sq: #cecece;
+  --btn-arrow: var(--grey-700);
 }
 
 .theme-dark .btn--secondary,
 :root[data-theme='dark'] .btn--secondary {
   --btn-bg: var(--grey-600);
-  --btn-hover: #474747;
   --btn-fg: #ffffff;
-  --btn-sq: #ffffff;
-  --btn-arrow: var(--grey-700);
+  --btn-sq: #2b2b2b;
+  --btn-arrow: #ffffff;
 }
 
 /* Pill / chip (square in this brand): a 12% grey fill, no outline */
@@ -359,6 +424,10 @@ ol {
   width: var(--ibox, 3rem);
   height: var(--ibox, 3rem);
   background: var(--accent);
+  background: var(--grad-accent);
+  background-size: var(--grad-accent-size);
+  animation: var(--fire-motion);
+  box-shadow: var(--fire-edge);
   color: var(--on-accent);
 }
 
@@ -403,11 +472,19 @@ ol {
   --ink: color-mix(in oklab, #f1f1f1 var(--tpct), #1e1e1e);
   --ink-2: color-mix(in oklab, var(--ink-2-dk) var(--tpct), var(--ink-2-lt));
   --muted: color-mix(in oklab, var(--muted-dk) var(--tpct), var(--muted-lt));
-  --line: color-mix(in oklab, rgb(241 241 241 / 0.16) var(--tpct), rgb(30 30 30 / 0.16));
-  --line-strong: color-mix(in oklab, rgb(241 241 241 / 0.34) var(--tpct), rgb(30 30 30 / 0.32));
+  /* Every endpoint is the dark theme's own value, so a scrubbed section, its
+     items and their hovers look the same as in the dark theme. */
+  --line: color-mix(in oklab, rgb(241 241 241 / 0.14) var(--tpct), rgb(30 30 30 / 0.16));
+  --line-strong: color-mix(in oklab, rgb(241 241 241 / 0.32) var(--tpct), rgb(30 30 30 / 0.32));
+  --muted-large: color-mix(in oklab, #5e5e5e var(--tpct), #818181);
+  --chip-bg: color-mix(in oklab, rgb(129 129 129 / 0.16) var(--pct), rgb(129 129 129 / 0.1));
   --surface: color-mix(in oklab, var(--dk-surface) var(--pct), #ffffff);
   --card: color-mix(in oklab, var(--dk-card) var(--pct), #f0f0f0);
+  --media: color-mix(in oklab, #1e1e1e var(--pct), #e4e4e4);
+  --media-hover: color-mix(in oklab, #262626 var(--pct), #dadada);
+  --tick-off: color-mix(in oklab, #333333 var(--pct), #d6d6d6);
   --canvas-mix: color-mix(in oklab, var(--dk-canvas) var(--pct), #fafafa);
+  --canvas: var(--canvas-mix);
   --logo-inv: var(--dt);
   background: var(--canvas-mix);
   color: var(--ink);
@@ -422,7 +499,7 @@ ol {
 
 /* Dark theme: the sections that are dark in the light theme ([data-dark] on
    inner pages, [data-theme-dark] on the home) turn light instead, so the page
-   keeps its rhythm of contrast. A straight edge, like any other container. */
+   keeps its rhythm of contrast, entering with the notched top edge (below). */
 :root[data-theme='dark'] :is([data-dark], [data-theme-dark]) {
   --d: 0 !important;
   --dt: 0 !important;
@@ -445,10 +522,9 @@ ol {
 
 :root[data-theme='dark'] :is([data-dark], [data-theme-dark]) .btn--secondary {
   --btn-bg: #e4e4e4;
-  --btn-hover: #d9d9d9;
   --btn-fg: var(--grey-700);
-  --btn-sq: var(--grey-700);
-  --btn-arrow: #ffffff;
+  --btn-sq: #cecece;
+  --btn-arrow: var(--grey-700);
 }
 
 /* Switching themes: no transitions for one frame, so nothing cascades. */
@@ -463,9 +539,11 @@ ol {
   --ink: #f1f1f1;
   --ink-2: var(--ink-2-dk);
   --muted: var(--muted-dk);
-  --line: rgb(241 241 241 / 0.16);
-  --line-strong: rgb(241 241 241 / 0.34);
-  --surface: #262626;
+  --line: rgb(241 241 241 / 0.14);
+  --line-strong: rgb(241 241 241 / 0.32);
+  --surface: #242424;
+  --card: #1a1a1a;
+  --chip-bg: rgb(129 129 129 / 0.16);
   --logo-inv: 1;
   color: var(--ink);
 }
@@ -548,6 +626,14 @@ html.js-render-wait [data-render-step] {
 /* Key figures: the unit in orange, the number in ink (components/FigureValue.astro). */
 .fig-unit {
   color: var(--accent);
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background-size: var(--grad-text-size);
+  animation: var(--fire-text-motion);
 }
 
 /* Page titles (components/PageTitle.astro): the home hero's entrance, line by
@@ -578,9 +664,17 @@ html.js-render-wait [data-render-step] {
 }
 
 /* Panel entrance (scripts/panels.ts): the second section of a .pnl pair slides
-   over the first, so it needs a ground of its own. */
+   over the first, so it needs a ground of its own, and comes in with the CTA
+   card's notched top edge. */
 .pnl > :last-child {
   background: var(--canvas-mix, var(--canvas));
+  clip-path: var(--notch-top);
+}
+
+/* Dark theme: the sections that turn light (a container of their own) start
+   with the same notch, wherever the content changes container. */
+:root[data-theme='dark'] :is([data-dark], [data-theme-dark]) {
+  clip-path: var(--notch-top);
 }
 
 /* Partner logos in colour (components/BrandLogo.astro); white parts follow the ink. */
@@ -598,4 +692,32 @@ html.js-render-wait [data-render-step] {
 [data-lit].is-lit .w {
   opacity: var(--o, 0.16);
   transition: opacity 200ms linear;
+}
+
+/* The fire drift (tokens --fire-motion…): the gradient slides inside a fill
+   larger than its box. 1D for buttons and text, 2D for the large panels. */
+@keyframes fire-drift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes fire-drift-2d {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --fire-motion: none;
+    --fire-text-motion: none;
+    --fire-panel-motion: none;
+  }
 }

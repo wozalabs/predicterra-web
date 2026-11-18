@@ -271,6 +271,14 @@ const wozaLogo = wozaLogoRaw
   @media (hover: hover) and (pointer: fine) {
     .ab-woza__fact a:hover {
       color: var(--accent);
+      background: var(--grad-text);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+      background-size: var(--grad-text-size);
+      animation: var(--fire-text-motion);
     }
   }
 </style>

@@ -4,40 +4,21 @@
  * slides over the pinned 3D stage, and the page is scrubbed from light to dark
  * around it (scripts/theme-scrub.ts). In the dark theme it simply stays dark.
  */
-import { getCopy, localizePath, type Locale } from '../../i18n/config';
+import LinkRows from '../../components/LinkRows.astro';
+import { getCopy, type Locale } from '../../i18n/config';
 
 interface Props {
   locale?: Locale;
 }
 const { locale = 'en' } = Astro.props;
 const { across } = getCopy(locale).home;
-const pad = (n: number) => String(n).padStart(3, '0');
 ---
 
 <section class="ac theme-scrub" id="across" aria-labelledby="across-title" data-theme-dark data-header-dark="scrub">
   <div class="container ac__inner">
     <h2 id="across-title" class="t-h2 ac__title" data-render>{across.title}</h2>
 
-    <ul class="ac__list" data-reveal-group>
-      {
-        across.items.map((it, i) => (
-          <li class="ac__item" data-reveal>
-            <h3 class="ac__name">
-              <span class="ac__i t-small t-num">{pad(i + 1)}</span>
-              <a class="ac__link" href={localizePath(it.href, locale)}>
-                {it.title}
-              </a>
-            </h3>
-            <p class="ac__text">{it.text}</p>
-            <span class="ac__go" aria-hidden="true">
-              <svg viewBox="0 -960 960 960">
-                <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
-              </svg>
-            </span>
-          </li>
-        ))
-      }
-    </ul>
+    <LinkRows items={across.items} locale={locale} class="ac__list" />
   </div>
 </section>
 
@@ -46,7 +27,8 @@ const pad = (n: number) => String(n).padStart(3, '0');
     position: relative;
     z-index: var(--z-cover);
     margin-top: -100svh;
-    box-shadow: 0 -24px 48px -24px rgb(30 30 30 / 0.14);
+    /* Comes in over the 3D stage with the CTA card's notched top edge. */
+    clip-path: var(--notch-top);
   }
 
   .ac__inner {
@@ -62,92 +44,9 @@ const pad = (n: number) => String(n).padStart(3, '0');
     padding-top: clamp(1rem, 0.75rem + 1vw, 1.75rem);
   }
 
-  /* One row per item: the title on the left, the text in the middle (the same
-     column in every row, so the texts line up), the arrow on the right. */
-  .ac__list {
-    display: grid;
+  /* The rows (components/LinkRows) sit at the bottom of the screen. */
+  .ac__inner :global(.ac__list) {
     margin-top: auto;
-  }
-
-  .ac__item {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.75rem var(--gutter);
-    padding-block: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
-    border-top: 1px solid var(--line);
-  }
-
-  @media (min-width: 56rem) {
-    .ac__item {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) auto;
-      align-items: start;
-    }
-  }
-
-  .ac__name {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-    font-size: var(--fs-h3);
-    line-height: 1.15;
-    letter-spacing: var(--track-title);
-  }
-
-  .ac__i {
-    flex: none;
-    min-width: 2rem;
-    color: var(--accent);
-  }
-
-  /* The whole item follows its title's link. */
-  .ac__link::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-
-  .ac__link:focus-visible {
-    outline: none;
-  }
-
-  .ac__item:has(.ac__link:focus-visible) {
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
-  }
-
-  .ac__text {
-    max-width: 44ch;
-    padding-top: 0.3rem;
-    color: var(--ink-2);
-  }
-
-  .ac__go {
-    display: grid;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    align-self: center;
-    /* A filled square, no outline: a light grey on light, a dark grey on dark. */
-    background: color-mix(in oklab, var(--ink) 10%, transparent);
-    transition: background-color 200ms ease;
-  }
-
-  .ac__go svg {
-    width: 1rem;
-    height: 1rem;
-    fill: currentColor;
-    transition: transform 200ms var(--ease-out);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .ac__item:hover .ac__go {
-      background: var(--accent);
-      color: var(--on-accent);
-    }
-    .ac__item:hover .ac__go svg {
-      transform: translateX(2px);
-    }
   }
 </style>
 

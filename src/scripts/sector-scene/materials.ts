@@ -1,5 +1,6 @@
 import {
   Color,
+  MeshLambertMaterial,
   ShaderLib,
   ShaderMaterial,
   UniformsLib,
@@ -165,4 +166,79 @@ export function createFlowMaterial() {
       }
     `,
   });
+}
+
+/**
+ * The at-risk assets in the brand's fire gradient (the same one as the site's
+ * orange fills). A white Lambert material whose lighting is mapped onto a
+ * colour ramp instead of shading one flat orange: faces in shadow sink to an
+ * ember red, lit faces carry #FF3700, and the brightest faces warm towards
+ * amber. The tops of tall assets lean a little warmer too (world height), so
+ * a tower or a turbine reads like a flame, darker at the foot.
+ * Ramp stops are mixed in linear light with smoothsteps, so the blend has no
+ * visible bands.
+ */
+/** Colour ramp: shadow → mid → lit → brightest. */
+const FIRE_RAMP = ['#9e1400', '#e02400', '#ff3700', '#ff8a2a'] as const;
+type FireUniforms = Record<'uEmber' | 'uRed' | 'uOrange' | 'uAmber', { value: Color }>;
+const applyRamp = (u: FireUniforms) => {
+  const [a, b, c, d] = FIRE_RAMP;
+  u.uEmber.value.set(a);
+  u.uRed.value.set(b);
+  u.uOrange.value.set(c);
+  u.uAmber.value.set(d);
+};
+
+export function createFireMaterial() {
+  const mat = new MeshLambertMaterial({ color: 0xffffff });
+  const uniforms = {
+    uEmber: { value: new Color() },
+    uRed: { value: new Color() },
+    uOrange: { value: new Color() },
+    uAmber: { value: new Color() },
+    // Lighting range mapped onto the ramp (luminance of the white material).
+    uLo: { value: 0.4 },
+    uHi: { value: 1.5 },
+    // World height over which the warm lift builds up, and its strength.
+    uHeight: { value: 12 },
+    uLift: { value: 0.42 },
+  };
+  applyRamp(uniforms);
+  mat.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, uniforms);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying float vFireY;')
+      .replace(
+        '#include <project_vertex>',
+        '#include <project_vertex>\n  vFireY = (modelMatrix * vec4(transformed, 1.0)).y;',
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying float vFireY;
+        uniform vec3 uEmber;
+        uniform vec3 uRed;
+        uniform vec3 uOrange;
+        uniform vec3 uAmber;
+        uniform float uLo;
+        uniform float uHi;
+        uniform float uHeight;
+        uniform float uLift;`,
+      )
+      .replace(
+        '#include <opaque_fragment>',
+        `float fireLum = dot(outgoingLight, vec3(0.2126, 0.7152, 0.0722));
+        float fireT = clamp((fireLum - uLo) / (uHi - uLo), 0.0, 1.0);
+        fireT = clamp(fireT + uLift * smoothstep(0.0, uHeight, vFireY), 0.0, 1.0);
+        vec3 fire = mix(uEmber, uRed, smoothstep(0.0, 0.3, fireT));
+        fire = mix(fire, uOrange, smoothstep(0.25, 0.62, fireT));
+        fire = mix(fire, uAmber, smoothstep(0.62, 1.0, fireT));
+        outgoingLight = fire;
+        #include <opaque_fragment>`,
+      );
+  };
+  // Distinct program from the plain Lambert materials.
+  mat.customProgramCacheKey = () => 'predicterra-fire';
+  return mat;
 }

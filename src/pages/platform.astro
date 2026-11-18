@@ -1,19 +1,19 @@
 ---
 /**
  * Platform (/platform), from "predicterra-02-platform.md".
- * hero (video) · what it is · how it's built · the ontology in action · every
+ * hero (copy beside the platform capture) · what it is · how it's built · the ontology in action · every
  * team, every horizon · already built · in and out · validation and trust
  * (dark) · CTA. "Read the methodology" stays hidden until the PDF exists.
  */
 import PageLayout from '../layouts/PageLayout.astro';
-import VideoHero from '../sections/pages/VideoHero.astro';
-import Compare from '../sections/pages/Compare.astro';
+import AppHero from '../sections/pages/AppHero.astro';
+import TwinMeter from '../sections/pages/TwinMeter.astro';
 import Rows from '../sections/pages/Rows.astro';
 import SectionHead from '../sections/pages/SectionHead.astro';
 import Stats from '../sections/pages/Stats.astro';
 import CodePanel from '../components/CodePanel.astro';
+import AssetCard from '../components/AssetCard.astro';
 import Cta from '../sections/home/Cta.astro';
-import Showcase from '../sections/home/Showcase.astro';
 import { getCopy } from '../i18n/config';
 import { softwareJsonLd } from '../data/seo';
 
@@ -29,20 +29,19 @@ const pad = (n: number) => String(n).padStart(3, '0');
   locale={locale}
   jsonLd={[softwareJsonLd(site, c.seo.description)]}
 >
-  <VideoHero locale={locale} {...c.hero} />
+  <!-- The title and the platform itself (the home's app capture) side by side, in one screen. -->
+  <AppHero locale={locale} {...c.hero} />
 
-  <!-- The platform itself: the app capture from the home hero, straightening as it scrolls in. -->
-  <Showcase locale={locale} />
-
-  <Compare
+  <!-- Three kinds of twin on one scale: the first two stop part way. -->
+  <TwinMeter
     id="twin-title"
     title={c.twin.title}
     text={c.twin.text}
     columns={c.twin.columns}
     rows={c.twin.rows}
+    levels={c.twin.levels}
+    scale={c.twin.scale}
     closing={c.twin.closing}
-    variant="steps"
-    head="center"
   />
 
   <Rows id="arch-title" title={c.architecture.title} text={c.architecture.text} items={c.architecture.layers} marker="num">
@@ -55,7 +54,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
   <!-- The ontology in action: the story on one side, the object and its relationships on the other. -->
   <section class="pf-ont pg-sec" aria-labelledby="ont-title">
     <div class="container pf-ont__grid">
-      <SectionHead id="ont-title" title={c.ontology.title} text={c.ontology.text} align="stack" />
+      <SectionHead id="ont-title" title={c.ontology.title} text={c.ontology.text} align="stack" class="pf-ont__head" />
       <figure class="pf-obj" data-reveal>
         <figcaption class="pf-obj__bar t-caption">
           <span class="pf-obj__live" aria-hidden="true"></span>
@@ -76,6 +75,8 @@ const pad = (n: number) => String(n).padStart(3, '0');
           </div>
         </dl>
       </figure>
+      <!-- The same asset as every team sees it: the 3D section's asset panel. -->
+      <AssetCard sector="solar" locale={locale} class="pf-ont__card" data-reveal />
     </div>
   </section>
 
@@ -127,35 +128,49 @@ const pad = (n: number) => String(n).padStart(3, '0');
   <section class="pf-io pg-sec" aria-labelledby="io-title">
     <div class="container pg-body">
       <SectionHead id="io-title" title={c.io.title} text={c.io.text} align="side" />
-      <div class="pf-io__grid">
-        <div class="pf-io__lists">
-          {
-            [
-              { label: c.io.inLabel, items: c.io.in, out: false },
-              { label: c.io.outLabel, items: c.io.out, out: true },
-            ].map((list) => (
-              <div class="pf-io__list">
-                <p class:list={['pf-io__label t-small', list.out && 'is-out']}>{list.label}</p>
-                <ul data-reveal-group>
-                  {list.items.map((it, i) => (
-                    <li class="pf-io__item" data-reveal>
-                      <span class="pg-idx">{pad(i + 1)}</span>
-                      <span>{it}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          }
+      <!-- A flow: what goes in runs into the twin, what comes out leaves it.
+           Pulses travel along the connectors (none with reduced motion). -->
+      <div class="pf-flow" data-reveal>
+        <div class="pf-flow__side">
+          <p class="pf-flow__label t-small">{c.io.inLabel}</p>
+          <ul class="pf-flow__list">
+            {c.io.in.map((it, i) => (
+              <li class="pf-flow__item pf-flow__item--in" style={`--i:${i}`}>
+                <span class="pg-idx">{pad(i + 1)}</span>
+                <span>{it}</span>
+              </li>
+            ))}
+          </ul>
         </div>
+
+        <div class="pf-flow__core">
+          <p class="pf-flow__brand">Predicterra</p>
+          <p class="pf-flow__kind t-small">{c.twin.columns[c.twin.columns.length - 1]}</p>
+          <ul class="pf-flow__layers">
+            {c.architecture.layers.map((l) => <li>{l.title}</li>)}
+          </ul>
+        </div>
+
+        <div class="pf-flow__side">
+          <p class="pf-flow__label pf-flow__label--out t-small">{c.io.outLabel}</p>
+          <ul class="pf-flow__list">
+            {c.io.out.map((it, i) => (
+              <li class="pf-flow__item pf-flow__item--out" style={`--i:${i}`}>
+                <span class="pg-idx">{pad(i + 1)}</span>
+                <span>{it}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Every output is a structured object: the note and an example of one. -->
+      <div class="pf-io__grid">
+        <p class="pf-io__note" data-reveal>{c.io.note}</p>
         <div class="pf-io__code" data-reveal>
           <CodePanel label={c.io.code.label} json={c.io.code.json} />
         </div>
       </div>
-      <p class="pf-note" data-reveal>
-        <span class="pg-dot" aria-hidden="true"></span>
-        {c.io.note}
-      </p>
     </div>
   </section>
 
@@ -186,23 +201,42 @@ const pad = (n: number) => String(n).padStart(3, '0');
   }
 
   /* ---------- The ontology in action ---------- */
+  /* The story, then the object and its relationships beside the asset panel
+     (side by side from tablets; all three in a row on wide screens). */
   .pf-ont__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 3rem clamp(3rem, 1rem + 6vw, 8rem);
+    gap: 3rem clamp(1.5rem, 1rem + 2vw, 3rem);
   }
 
-  @media (min-width: 64rem) {
+  @media (min-width: 56rem) {
     .pf-ont__grid {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      align-items: center;
+      grid-template-columns: minmax(0, 1fr) 22.5rem;
+      align-items: start;
     }
+    .pf-ont__grid :global(.pf-ont__head) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .pf-ont__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 4fr) 22.5rem;
+    }
+    .pf-ont__grid :global(.pf-ont__head) {
+      grid-column: auto;
+      padding-right: clamp(1rem, 2vw, 3rem);
+    }
+  }
+
+  .pf-ont__grid :global(.pf-ont__card) {
+    justify-self: center;
   }
 
   /* The object card: the brand's dark panel, one row per relationship, the
      decision in orange at the end. */
   .pf-obj {
-    background: #1e1e1e;
+    background: #1a1a1a;
     color: #f1f1f1;
   }
 
@@ -248,6 +282,10 @@ const pad = (n: number) => String(n).padStart(3, '0');
     padding: 0.875rem 1rem;
     border-bottom: 0;
     background: var(--accent);
+    background: var(--grad-accent);
+    background-size: var(--grad-accent-size);
+    animation: var(--fire-motion);
+    box-shadow: var(--fire-edge);
     color: var(--on-accent);
   }
 
@@ -315,68 +353,195 @@ const pad = (n: number) => String(n).padStart(3, '0');
     color: var(--ink-2);
   }
 
-  /* ---------- In and out ---------- */
-  .pf-io__grid {
+  /* ---------- In and out: a flow through the twin ----------
+     Inputs on the left, the twin in the middle (the fire block), outputs on
+     the right. Each item is joined to the block by a hairline that a small
+     pulse runs along: into the twin on the left, out of it on the right. */
+  .pf-flow {
+    --link: clamp(2rem, 1rem + 3vw, 4.5rem);
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 3rem clamp(3rem, 1rem + 5vw, 7rem);
+    gap: 2.5rem;
   }
 
   @media (min-width: 64rem) {
-    .pf-io__grid {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-      align-items: start;
+    .pf-flow {
+      grid-template-columns: minmax(0, 1fr) minmax(13rem, 16rem) minmax(0, 1fr);
+      gap: 0 var(--link);
+      align-items: stretch;
     }
   }
 
-  .pf-io__lists {
+  .pf-flow__side {
     display: grid;
-    gap: 3rem var(--gutter);
+    align-content: center;
   }
 
-  @media (min-width: 40rem) {
-    .pf-io__lists {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  .pf-io__label {
+  .pf-flow__label {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     color: var(--muted);
   }
 
-  .pf-io__label.is-out {
+  .pf-flow__label--out {
     color: var(--ink);
   }
 
-  .pf-io__label.is-out::before {
+  .pf-flow__label--out::before {
     content: '';
     width: 0.5rem;
     height: 0.5rem;
     background: var(--accent);
   }
 
-  .pf-io__item {
+  .pf-flow__list {
     display: grid;
-    grid-template-columns: 3rem minmax(0, 1fr);
     gap: 0.5rem;
-    padding-block: 1.125rem;
-    border-top: 1px solid var(--line);
-    color: var(--ink-2);
+    padding: 0;
+    list-style: none;
   }
 
-  .pf-io__item .pg-idx {
-    padding-top: 0.2rem;
+  .pf-flow__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: baseline;
+    min-height: 4rem;
+    align-content: center;
+    padding: 0.875rem 1rem;
+    background: var(--card);
+    color: var(--ink-2);
+    font-size: var(--fs-small);
+    line-height: 1.4;
+  }
+
+  .pf-flow__item--out {
+    color: var(--ink);
+  }
+
+  /* The connector, and its pulse (wide screens, where the block sits beside). */
+  @media (min-width: 64rem) {
+    .pf-flow__item::before,
+    .pf-flow__item::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: var(--link);
+      pointer-events: none;
+    }
+    .pf-flow__item::before {
+      height: 1px;
+      background: var(--line-strong);
+    }
+    .pf-flow__item::after {
+      height: 3px;
+      margin-top: -1px;
+      background: linear-gradient(90deg, rgb(255 55 0 / 0), var(--accent) 70%, #ff8a2a);
+      background-size: 40% 100%;
+      background-repeat: no-repeat;
+      background-position: -100% 0;
+    }
+    .pf-flow__item--in::before,
+    .pf-flow__item--in::after {
+      left: 100%;
+    }
+    .pf-flow__item--out::before,
+    .pf-flow__item--out::after {
+      right: 100%;
+    }
+  }
+
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .pf-flow__item::after {
+      animation: pf-pulse 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+      animation-delay: calc(var(--i) * 0.37s);
+    }
+    .pf-flow__item--out::after {
+      animation-delay: calc(1.2s + var(--i) * 0.37s);
+    }
+  }
+
+  @keyframes pf-pulse {
+    0% {
+      background-position: -100% 0;
+    }
+    55%,
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* The twin: the fire block, the brand at the top, the four layers below. */
+  .pf-flow__core {
+    position: relative;
+    display: grid;
+    align-content: space-between;
+    gap: 2rem;
+    min-height: 16rem;
+    padding: 1.5rem;
+    background: var(--accent);
+    background: var(--grad-panel);
+    background-size: var(--grad-panel-size);
+    animation: var(--fire-panel-motion);
+    box-shadow: var(--fire-edge-panel);
+    color: #fff;
+  }
+
+  .pf-flow__core::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--grain);
+    opacity: 0.18;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  .pf-flow__brand {
+    font-size: var(--fs-h3);
+    line-height: 1;
+    letter-spacing: var(--track-heading);
+  }
+
+  .pf-flow__kind {
+    margin-top: -1.5rem;
+    color: rgb(255 255 255 / 0.8);
+  }
+
+  .pf-flow__layers {
+    display: grid;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pf-flow__layers li {
+    padding-block: 0.625rem;
+    border-top: 1px solid rgb(255 255 255 / 0.28);
+    font-size: var(--fs-small);
+  }
+
+  /* The note and one output as it leaves the twin. */
+  .pf-io__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem clamp(3rem, 1rem + 5vw, 7rem);
   }
 
   @media (min-width: 64rem) {
-    .pf-io__code {
-      position: sticky;
-      top: calc(var(--header-h) + 3rem);
+    .pf-io__grid {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+      align-items: center;
     }
+  }
+
+  .pf-io__note {
+    max-width: 46ch;
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    letter-spacing: var(--track-title);
+    color: var(--ink-2);
   }
 
   /* ---------- Trust ---------- */
