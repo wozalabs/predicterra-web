@@ -1,0 +1,149 @@
+---
+/**
+ * Hero, panel layout (test; switch bottom left). A white panel runs the full
+ * width of the viewport from the very top of the page (the header sits on
+ * it, in dark text), with the title on the left and the description on the
+ * right, both ending on the same line; its bottom edge carries the brand's
+ * notch. Under it, on a plain dark ground in both themes, the platform
+ * capture rises from the bottom of the screen (Showcase.astro, which follows
+ * this section and keeps the dark ground behind the capture in this layout).
+ * The title's second line burns (scripts/burn.ts).
+ */
+import { getCopy, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { main } = getCopy(locale).home.hero;
+---
+
+<section class="hpn" aria-labelledby="hpn-title" data-hero-variant="panel">
+  <div class="hpn__panel" data-header-light>
+    <div class="container hpn__inner">
+      <h1 id="hpn-title" class="hpn__title">
+        <span class="hpn__line"><span>{main.titleLine1}</span></span>
+        <span class="hpn__line"><span><span data-burn>{main.titleLine2}</span></span></span>
+      </h1>
+      <p class="hpn__text">{main.text}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* No display here: the hero layout switch (global.css) shows or hides it. */
+  .hpn {
+    position: relative;
+    height: 100svh;
+    min-height: 36rem;
+    background: #0d0d0d;
+    /* The bottom of the screen belongs to the capture (Showcase --peek). */
+    padding-bottom: var(--hero-peek);
+  }
+
+  /* The panel: full width, from the top of the page, white with dark copy
+     in both themes, the notch cut into its bottom edge. */
+  .hpn__panel {
+    --notch: 18px;
+    position: relative;
+    z-index: calc(var(--z-cover) + 1);
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    padding-top: var(--header-h);
+    padding-bottom: calc(clamp(2rem, 1rem + 3vh, 3.5rem) + var(--notch));
+    background: #ffffff;
+    color: #1e1e1e;
+    --ink: #1e1e1e;
+    --ink-2: #4d4d4d;
+    --burn-base: rgb(74 18 6);
+    --burn-tint: rgb(254 60 1);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 58% 100%, calc(58% - var(--notch)) calc(100% - var(--notch)), 0 calc(100% - var(--notch)));
+  }
+
+  .hpn__inner {
+    display: grid;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  /* Side by side from tablets, on the same last line. */
+  @media (min-width: 56rem) {
+    .hpn__inner {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      align-items: last baseline;
+      column-gap: clamp(2rem, 1rem + 4vw, 6rem);
+    }
+  }
+
+  .hpn__title {
+    display: grid;
+    font-size: clamp(2.5rem, 1rem + 4vw, 5.25rem);
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: var(--track-display);
+  }
+
+  .hpn__text {
+    max-width: 38ch;
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.45;
+    color: #4d4d4d;
+  }
+
+  /* Masked lines; the mask opens once a line has risen (script below), so the
+     burnt glow is never cut. */
+  .hpn__line {
+    display: block;
+    overflow: clip;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+
+  .hpn__line.is-open {
+    overflow: visible;
+  }
+
+  .hpn__line > span {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hpn__line > span {
+      animation: hpn-line 1100ms cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
+    .hpn__line:nth-child(1) > span {
+      animation-delay: 200ms;
+    }
+    .hpn__line:nth-child(2) > span {
+      animation-delay: 290ms;
+    }
+    .hpn__text {
+      animation: hpn-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) 460ms both;
+    }
+  }
+
+  @keyframes hpn-line {
+    from {
+      transform: translateY(108%);
+    }
+  }
+
+  @keyframes hpn-focus {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+      filter: blur(6px);
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.hpn__line').forEach((line) => {
+    const open = () => line.classList.add('is-open');
+    const inner = line.firstElementChild as HTMLElement | null;
+    if (!inner || getComputedStyle(inner).animationName === 'none') return open();
+    inner.addEventListener('animationend', open, { once: true });
+    window.setTimeout(open, 2500);
+  });
+</script>

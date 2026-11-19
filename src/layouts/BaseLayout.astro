@@ -1,4 +1,5 @@
 ---
+import TextFxSwitch from '../components/TextFxSwitch.astro';
 import '../styles/global.css';
 import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url';
 import SiteHeader from '../components/SiteHeader.astro';
@@ -67,9 +68,16 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
         if (scene === 'overview') document.documentElement.dataset.scene = 'overview';
         // App is the default hero. New key: earlier saved choices are ignored.
         var hero = localStorage.getItem('predicterra:hero-v3');
-        document.documentElement.dataset.hero = ['centred', 'split', 'cutout', 'pixel', 'clean'].indexOf(hero) > -1 ? hero : 'app';
+        // Panel is shown first while it is compared (switch bottom left).
+        document.documentElement.dataset.hero = ['app', 'centred', 'split', 'cutout', 'pixel', 'clean'].indexOf(hero) > -1 ? hero : 'panel';
       } catch (e) {
         document.documentElement.dataset.hero = 'app';
+      }
+      // Orange text style (test switch, bottom left): burnt unless gradient was chosen.
+      try {
+        document.documentElement.dataset.textFx = localStorage.getItem('predicterra:text-fx') === 'gradient' ? 'gradient' : 'burnt';
+      } catch (e) {
+        document.documentElement.dataset.textFx = 'burnt';
       }
       // The header animates in on the first page of a visit only, not on every navigation.
       try {
@@ -120,9 +128,15 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
       import { mountReveal } from '../scripts/reveal';
       import { mountTitleLines } from '../scripts/title-lines';
       import { mountPanels } from '../scripts/panels';
+      import { mountBurn } from '../scripts/burn';
+      import { mountCount } from '../scripts/count';
       mountTitleLines();
       mountReveal();
       mountPanels();
+      mountBurn();
+      mountCount();
     </script>
+    <!-- Test only: orange text style switch. -->
+    <TextFxSwitch />
   </body>
 </html>

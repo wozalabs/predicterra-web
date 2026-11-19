@@ -411,6 +411,75 @@ ol {
   -webkit-text-fill-color: currentColor;
 }
 
+/* ---------- Burnt text (test: html[data-text-fx='burnt'], scripts/burn.ts) ----------
+   After unifygtm.com's supercharge headline: letters laid over a hidden copy
+   of the word (which keeps the layout); a hot spot slides along, blurring,
+   tinting and making each letter glow by how close it is. Medium weight.
+   --burn-base: the letters at rest; --burn-tint: the hot orange. */
+/* Inline, not inline-block, so a burnt word never changes the height of the
+   line it sits in. */
+html[data-text-fx='burnt'] .burn {
+  position: relative;
+  display: inline;
+  white-space: nowrap;
+  font-weight: 500;
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  animation: none !important;
+  color: var(--burn-base);
+}
+
+.burn__ref {
+  visibility: hidden;
+}
+
+.burn__ch {
+  position: absolute;
+  display: inline-block;
+  white-space: pre;
+  pointer-events: none;
+  will-change: filter;
+}
+
+/* Light surfaces inside the dark theme, and dark ones inside the light theme. */
+:root[data-theme='dark'] :is([data-dark], [data-theme-dark]) {
+  --burn-base: rgb(74 18 6);
+  --burn-tint: rgb(254 60 1);
+}
+
+.theme-dark {
+  --burn-base: rgb(178 36 6);
+  --burn-tint: rgb(255 98 30);
+}
+
+/* ---------- Counting figures (scripts/count.ts) ----------
+   Each digit rolls to its value with a vertical motion blur. The real digit
+   stays in place (transparent) and holds the size, the rolling strip sits
+   over it, so the figure never changes width or height. */
+.odo {
+  position: relative;
+  display: inline-block;
+  clip-path: inset(-0.12em 0);
+}
+
+.odo__d {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.odo__s {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  will-change: transform;
+}
+
+.odo__s > span {
+  display: block;
+}
+
 /* Pill / chip (square in this brand): a 12% grey fill, no outline */
 .chip {
   display: inline-flex;
@@ -575,10 +644,12 @@ html[data-scene='overview'] [data-sectors='trail'] {
 [data-hero-variant='cutout'],
 [data-hero-variant='pixel'],
 [data-hero-variant='clean'],
+[data-hero-variant='panel'],
 [data-hero-variant='app'] {
   display: none;
 }
 html:not([data-hero]) [data-hero-variant='app'],
+html[data-hero='panel'] [data-hero-variant='panel'],
 html[data-hero='clean'] [data-hero-variant='clean'],
 html[data-hero='app'] [data-hero-variant='app'],
 html[data-hero='cutout'] [data-hero-variant='cutout'],

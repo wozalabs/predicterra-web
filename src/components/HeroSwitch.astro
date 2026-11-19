@@ -1,0 +1,77 @@
+---
+/**
+ * Test only: compares the home hero layouts (Panel, App), bottom left above
+ * the text switch. Same setting as the menu's hero switch (html[data-hero],
+ * localStorage predicterra:hero-v3). Remove it once one is chosen.
+ */
+const options = [
+  { id: 'panel', label: 'Panel' },
+  { id: 'app', label: 'App' },
+];
+---
+
+<div class="hsw" role="group" aria-label="Hero layout (test)">
+  <span class="hsw__label">Hero</span>
+  {
+    options.map((o) => (
+      <button type="button" class="hsw__btn" data-hero-switch={o.id} aria-pressed="false">
+        {o.label}
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  .hsw {
+    position: fixed;
+    left: 1rem;
+    bottom: 3.75rem;
+    z-index: var(--z-menu);
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    padding: 0.25rem;
+    background: var(--surface);
+    box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.35);
+    font-size: 0.75rem;
+  }
+
+  .hsw__label {
+    padding: 0 0.5rem;
+    color: var(--muted);
+  }
+
+  .hsw__btn {
+    min-height: 1.75rem;
+    padding: 0 0.625rem;
+    color: var(--ink-2);
+    transition:
+      background-color 150ms ease-out,
+      color 150ms ease-out;
+  }
+
+  .hsw__btn[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--canvas);
+  }
+</style>
+
+<script>
+  const html = document.documentElement;
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-hero-switch]'));
+  const sync = () => buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.heroSwitch === html.dataset.hero)));
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      html.dataset.hero = b.dataset.heroSwitch;
+      try {
+        localStorage.setItem('predicterra:hero-v3', b.dataset.heroSwitch!);
+      } catch {}
+      sync();
+      window.dispatchEvent(new Event('hero:change'));
+      window.dispatchEvent(new Event('header:refresh'));
+      // Rebuild the burnt text for the hero now on screen.
+      window.dispatchEvent(new Event('text-fx:change'));
+    }),
+  );
+  sync();
+</script>

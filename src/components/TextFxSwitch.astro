@@ -1,0 +1,74 @@
+---
+/**
+ * Test only: switches the style of orange text (html[data-text-fx], set
+ * before first paint by BaseLayout): Burnt or Gradient. Fixed bottom left;
+ * remove it and the unused style once one is chosen.
+ */
+const options = [
+  { id: 'burnt', label: 'Burnt' },
+  { id: 'gradient', label: 'Gradient' },
+];
+---
+
+<div class="tfx" role="group" aria-label="Orange text style (test)">
+  <span class="tfx__label">Text</span>
+  {
+    options.map((o) => (
+      <button type="button" class="tfx__btn" data-text-fx-option={o.id} aria-pressed="false">
+        {o.label}
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  .tfx {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: var(--z-menu);
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    padding: 0.25rem;
+    background: var(--surface);
+    box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.35);
+    font-size: 0.75rem;
+  }
+
+  .tfx__label {
+    padding: 0 0.5rem;
+    color: var(--muted);
+  }
+
+  .tfx__btn {
+    min-height: 1.75rem;
+    padding: 0 0.625rem;
+    color: var(--ink-2);
+    transition:
+      background-color 150ms ease-out,
+      color 150ms ease-out;
+  }
+
+  .tfx__btn[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--canvas);
+  }
+</style>
+
+<script>
+  const html = document.documentElement;
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-text-fx-option]'));
+  const sync = () => buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.textFxOption === html.dataset.textFx)));
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      html.dataset.textFx = b.dataset.textFxOption;
+      try {
+        localStorage.setItem('predicterra:text-fx', b.dataset.textFxOption!);
+      } catch {}
+      sync();
+      window.dispatchEvent(new Event('text-fx:change'));
+    }),
+  );
+  sync();
+</script>

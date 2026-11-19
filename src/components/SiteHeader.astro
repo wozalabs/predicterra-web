@@ -811,6 +811,13 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
         const r = el.getBoundingClientRect();
         return r.height > 0 && r.top <= line && r.bottom > line;
       };
+      // A light panel under the header (panel hero): dark text in both themes.
+      const lightPanels = Array.from(document.querySelectorAll<HTMLElement>('[data-header-light]'));
+      if (lightPanels.some(under)) {
+        header.style.setProperty('--hd', '0');
+        ticking = false;
+        return;
+      }
       // Dark theme: light text, except over the sections that turn light there.
       const dark = isDarkTheme()
         ? !lightSections.some(under)

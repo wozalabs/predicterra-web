@@ -9,13 +9,12 @@ export const actions = {
   engineer: { label: 'Talk to an engineer', href: routes.engineer, external: false },
 } as const;
 
-/** Logos for the bands. Files in public/logos; E.DSO and Moeve Light Up have none yet, so they are set as text. */
+/** Logos for the bands (files in public/logos). */
 export const logo = {
   iberdrola: { name: 'Iberdrola', src: '/logos/iberdrola.svg', w: 109, h0: 27, h: 22 },
   naturgy: { name: 'UFD, Grupo Naturgy', src: '/logos/ufd.svg', w: 848, h0: 512, h: 34 },
   moeve: { name: 'Moeve', src: '/logos/moeve.svg', w: 109, h0: 20, h: 16 },
-  edso: { name: 'E.DSO' },
-  lightUp: { name: 'Moeve Light Up' },
+  edso: { name: 'E.DSO', src: '/logos/edso.svg', w: 675, h0: 222, h: 34 },
   azure: { name: 'Microsoft Azure Marketplace', src: '/logos/microsoft-partner.svg', w: 1352, h0: 350, h: 26 },
   bind: { name: 'BIND 4.0', src: '/logos/bind.svg', w: 1305, h0: 256, h: 20 },
 } as const;
@@ -26,7 +25,7 @@ export type LogoGroup = { label: string; items: readonly LogoItem[] };
 /** Clients in operation and recognition, as listed in the base document. */
 export const logoBand: LogoGroup[] = [
   { label: 'Trusted by', items: [logo.iberdrola, logo.naturgy, logo.moeve] },
-  { label: 'Recognized by', items: [logo.edso, logo.lightUp, logo.azure] },
+  { label: 'Recognized by', items: [logo.edso, logo.azure] },
 ];
 
 /** Logo band with its line and the link to the cases (home and solution pages). */
@@ -57,7 +56,7 @@ export const proof = {
   onTheGrids: (assets: string): Proof => ({
     groups: [
       { label: 'In operation on the grids of', items: [logo.iberdrola, logo.naturgy] },
-      { label: 'Recognized by', items: [logo.edso, logo.lightUp, logo.azure] },
+      { label: 'Recognized by', items: [logo.edso, logo.azure] },
     ],
     text: `Proven in operation on 116,000 km of Spanish distribution grid, the kind of network your ${assets}.`,
     link: cases.all,
@@ -66,7 +65,7 @@ export const proof = {
     groups: [
       { label: 'In operation with', items: [logo.moeve] },
       { label: 'In operation on the grids of', items: [logo.iberdrola, logo.naturgy] },
-      { label: 'Recognized by', items: [logo.lightUp, logo.edso, logo.azure] },
+      { label: 'Recognized by', items: [logo.edso, logo.azure] },
     ],
     text: 'Proven in operation on 116,000 km of Spanish distribution grid, the kind of network your sites depend on for power.',
     link: cases.all,

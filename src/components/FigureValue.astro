@@ -15,13 +15,13 @@ const { value, class: className, ...rest } = Astro.props;
 const WORDS = 'km|days|years|hours|ha|trillion|billion|million|MW|GW|TWh';
 const re = new RegExp(`([€$£]?)(~?\\d[\\d,.]*)([%×+]|[kKMB](?![a-z]))?(\\s+)?(${WORDS})?\\b|([%×+])`, 'g');
 
-type Part = { t: string; unit: boolean };
+type Part = { t: string; unit: boolean; num?: boolean };
 const parts: Part[] = [];
-const push = (t: string | undefined, unit: boolean) => {
+const push = (t: string | undefined, unit: boolean, num = false) => {
   if (!t) return;
   const last = parts[parts.length - 1];
-  if (last && last.unit === unit) last.t += t;
-  else parts.push({ t, unit });
+  if (!num && last && last.unit === unit && !last.num) last.t += t;
+  else parts.push({ t, unit, num });
 };
 let at = 0;
 for (const m of value.matchAll(re)) {
@@ -30,7 +30,7 @@ for (const m of value.matchAll(re)) {
   if (lone) push(lone, true);
   else {
     push(cur, true);
-    push(num, false);
+    push(num, false, true);
     push(suffix, true);
     if (word) {
       push(space, false);
@@ -42,4 +42,4 @@ for (const m of value.matchAll(re)) {
 push(value.slice(at), false);
 ---
 
-<span class={className} {...rest}>{parts.map((p) => (p.unit ? <span class="fig-unit">{p.t}</span> : p.t))}</span>
+<span class={className} {...rest}>{parts.map((p) => (p.unit ? <span class="fig-unit">{p.t}</span> : p.num ? <span class="fig-num" data-count>{p.t}</span> : p.t))}</span>
