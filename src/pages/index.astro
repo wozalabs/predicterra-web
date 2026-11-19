@@ -7,7 +7,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../sections/home/Hero.astro';
 import HeroPanel from '../sections/home/HeroPanel.astro';
-import HeroSwitch from '../components/HeroSwitch.astro';
 import HeroApp from '../sections/home/HeroApp.astro';
 import HeroCutout from '../sections/home/HeroCutout.astro';
 import HeroPixel from '../sections/home/HeroPixel.astro';
@@ -37,9 +36,8 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
 >
   <!-- Default hero: title centred, the platform capture peeking up from the bottom. -->
   <HeroApp locale={locale} />
-  <!-- Test only: the panel hero (white panel, title left, text right) and its switch. -->
+  <!-- Default hero: white panel, title left, text right, the capture underneath. -->
   <HeroPanel locale={locale} />
-  <HeroSwitch />
   <!-- Test only: the other hero layouts, shown when selected in the menu. -->
   <Hero locale={locale} />
   <HeroCutout locale={locale} />

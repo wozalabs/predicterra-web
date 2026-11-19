@@ -223,9 +223,8 @@ const v = s.video;
     user-select: none;
   }
 
-  /* ---------- Logos after the capture: the full content width, spread out ---------- */
   /* ---------- Logos after the capture: a title, then every logo in one row,
-     each on a block a step off the canvas (lighter on dark, darker on light). */
+     evenly spaced, straight on the canvas. */
   .sc__after {
     position: relative;
     display: grid;
@@ -236,8 +235,8 @@ const v = s.video;
 
   .sc__logos {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-    gap: 2px;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 0.5rem clamp(1rem, 0.5rem + 2vw, 2.5rem);
     padding: 0;
     list-style: none;
   }
@@ -253,9 +252,8 @@ const v = s.video;
   .sc__logo {
     display: grid;
     place-items: center;
-    height: clamp(6rem, 4.5rem + 4vw, 9rem);
-    padding: 1.25rem;
-    background: var(--card);
+    height: clamp(5rem, 4rem + 3vw, 7rem);
+    padding: 1rem;
   }
 
   .sc__logo :global(.brand-logo svg) {

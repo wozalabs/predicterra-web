@@ -15,8 +15,8 @@ import { onThemeChange } from './theme';
 
 const C = {
   maxDist: 3.2, // em: how far the hot spot reaches
-  maxBlur: 0.035, // em
-  speed: 2.5, // em per second
+  maxBlur: 0.022, // em
+  speed: 1.5, // em per second
   span: 1.6, // em of travel beyond the word before looping
   baseFilter: 'contrast(1.15) saturate(1.1)',
 };

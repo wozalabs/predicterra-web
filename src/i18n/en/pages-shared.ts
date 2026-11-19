@@ -15,6 +15,7 @@ export const logo = {
   naturgy: { name: 'UFD, Grupo Naturgy', src: '/logos/ufd.svg', w: 848, h0: 512, h: 34 },
   moeve: { name: 'Moeve', src: '/logos/moeve.svg', w: 109, h0: 20, h: 16 },
   edso: { name: 'E.DSO', src: '/logos/edso.svg', w: 675, h0: 222, h: 34 },
+  futured: { name: 'FutuRed', src: '/logos/futured.svg', w: 959, h0: 546, h: 38 },
   azure: { name: 'Microsoft Azure Marketplace', src: '/logos/microsoft-partner.svg', w: 1352, h0: 350, h: 26 },
   bind: { name: 'BIND 4.0', src: '/logos/bind.svg', w: 1305, h0: 256, h: 20 },
 } as const;
@@ -25,7 +26,7 @@ export type LogoGroup = { label: string; items: readonly LogoItem[] };
 /** Clients in operation and recognition, as listed in the base document. */
 export const logoBand: LogoGroup[] = [
   { label: 'Trusted by', items: [logo.iberdrola, logo.naturgy, logo.moeve] },
-  { label: 'Recognized by', items: [logo.edso, logo.azure] },
+  { label: 'Recognized by', items: [logo.edso, logo.futured, logo.azure] },
 ];
 
 /** Logo band with its line and the link to the cases (home and solution pages). */

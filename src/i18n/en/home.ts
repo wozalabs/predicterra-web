@@ -37,7 +37,7 @@ export default {
       label: 'The Cognitive Twin for energy',
       titleLine1: 'The Cognitive Twin of',
       titleLine2: 'the Energy System',
-      text: 'Simulated physics, a physical ontology and AI in one live model of your energy assets and operations.',
+      text: 'The digital infrastructure for the new energy system. Every asset, every hazard and every horizon in one live model, so you can answer questions no tool could answer before.',
       primary: actions.demo,
       secondary: actions.platform,
       pillars: [
@@ -75,7 +75,7 @@ export default {
     clean: {
       titleLine1: 'The Cognitive Twin of',
       titleLine2: 'the Energy System',
-      text: 'Simulated physics, a physical ontology and AI in one live model of your energy assets and operations.',
+      text: 'The digital infrastructure for the new energy system. Every asset, every hazard and every horizon in one live model, so you can answer questions no tool could answer before.',
       cta: { label: 'Request a demo', href: routes.demo },
     },
     // Pixel layout (test): the video shows through a pixel mask that drifts

@@ -2,8 +2,9 @@
 /**
  * Why us (home), right after the platform and its logos: an orange panel with
  * the CTA's notched top edge, the title on the left and one statement on the
- * right, lit word by word as it scrolls in (scripts/lit.ts). The panel is the
- * brand's fire gradient (tokens --grad-panel and --grain); same in both themes.
+ * right, lit word by word as it scrolls in (scripts/lit.ts). The panel takes
+ * the opposite of the page: white with dark text in the dark theme, near
+ * black with white text in the light one.
  */
 import { getCopy, type Locale } from '../../i18n/config';
 
@@ -40,27 +41,15 @@ const { why } = getCopy(locale).home;
     max-width: var(--max-w);
     margin-inline: auto;
     padding: clamp(4rem, 2.5rem + 5vw, 8rem) var(--gutter) clamp(3.5rem, 2rem + 5vw, 7rem);
-    background: var(--accent);
-    background: var(--grad-panel);
-    background-size: var(--grad-panel-size);
-    animation: var(--fire-panel-motion);
-    box-shadow: var(--fire-edge-panel);
+    background: #0d0d0d;
     color: #ffffff;
     /* The CTA card's notched top edge. */
     clip-path: polygon(0 18px, calc(42% - 18px) 18px, 42% 0, 100% 0, 100% 100%, 0 100%);
   }
 
-  /* Fine grain over the gradient: no banding, a printed finish. */
-  .why__panel::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: var(--grain);
-    background-size: 160px 160px;
-    opacity: 0.16;
-    mix-blend-mode: soft-light;
-    pointer-events: none;
+  :global(:root[data-theme='dark']) .why__panel {
+    background: #ffffff;
+    color: #1e1e1e;
   }
 
   .why__grid {
@@ -90,7 +79,7 @@ const { why } = getCopy(locale).home;
     text-wrap: pretty;
   }
 
-  /* On the orange the unlit words stay a little more present. */
+  /* The unlit words stay a little present. */
   .why__text:global(.is-lit) :global(.w) {
     opacity: calc(0.3 + 0.7 * var(--o, 0));
   }
