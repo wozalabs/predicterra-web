@@ -11,7 +11,6 @@ export default {
     description: 'How i-DE (Iberdrola), UFD (Naturgy) and Moeve work with Predicterra, the Cognitive Twin for energy.',
   },
   hero: {
-    label: 'Cases',
     title: 'In operation today.',
     text: 'i-DE (Iberdrola), UFD (Naturgy) and Moeve already work with Predicterra.',
   },
@@ -29,7 +28,7 @@ export default {
     {
       id: 'ufd',
       client: 'UFD (Naturgy)',
-      logo: { src: '/logos/ufd.svg', w: 848, h0: 512, h: 36 },
+      logo: { src: '/logos/ufd.svg', w: 848, h0: 512, h: 37 },
       value: '116,000 km',
       label: 'of grid in one model',
       text: 'Asset-level risk up to 14 days ahead, validated against ten years of real incidents.',
@@ -56,5 +55,5 @@ export default {
       { name: 'Microsoft Azure Marketplace' },
     ] as { name: string; text?: string }[],
   },
-  cta: cta('See your system', 'in the', 'Cognitive Twin.'),
+  cta,
 };

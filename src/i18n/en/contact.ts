@@ -10,7 +10,6 @@ export default {
       'See your assets in the Cognitive Twin. Tell us the first problem you want to solve, and an engineer will get back to you.',
   },
   hero: {
-    label: 'Request a demo',
     title: 'See your system in the Cognitive Twin.',
     text: 'Tell us the first problem you want to solve. An engineer will get back to you within [two] business days.',
   },
@@ -25,7 +24,7 @@ export default {
     problem: 'What would you like to solve first?',
     news: 'I’d like to receive news and updates from Predicterra.',
     optional: 'Optional',
-    submit: 'Request a demo',
+    submit: 'Get started',
     legal:
       'Predicterra SL will use your data to answer your request. You can access, rectify or erase it, and exercise your other rights, as explained in our',
     legalLink: { label: 'Privacy Policy', href: routes.privacy },

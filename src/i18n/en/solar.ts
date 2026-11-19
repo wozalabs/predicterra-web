@@ -10,7 +10,6 @@ export default {
       'The Cognitive Twin for solar portfolios: heat, fire, flood, wind and drought risk per plant, and the production at stake.',
   },
   hero: {
-    label: 'Predicterra for Solar',
     title: 'See what’s coming to every plant.',
     text: 'Protect production through every heatwave, site new plants where the future climate allows, and give lenders and insurers numbers they can underwrite.',
     primary: actions.demo,
@@ -46,5 +45,5 @@ export default {
       },
     ],
   },
-  cta: cta('See your portfolio', 'in the', 'Cognitive Twin.'),
+  cta,
 } satisfies SolutionCopy;

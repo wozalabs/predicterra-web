@@ -1,11 +1,12 @@
 ---
 /**
  * Legal notice, Privacy policy and Cookie policy: one quiet reading layout.
- * Title on the left (sticky on desktop), numbered blocks on the right.
+ * The page hero (title, then the date of the last update on the right), then
+ * numbered blocks in the right-hand column.
  * Templates with bracketed fields, so the pages stay out of search for now.
  */
 import PageLayout from '../../layouts/PageLayout.astro';
-import PageTitle from '../../components/PageTitle.astro';
+import PageHero from './PageHero.astro';
 import type { LegalDoc } from '../../i18n/en/legal';
 import type { Locale } from '../../i18n/config';
 
@@ -18,12 +19,10 @@ const pad = (n: number) => String(n).padStart(3, '0');
 ---
 
 <PageLayout title={doc.seo.title} description={doc.seo.description} locale={locale} noindex>
+  <PageHero locale={locale} title={doc.title} text={doc.updated} />
+
   <article class="lg" aria-labelledby="page-title">
     <div class="container container--narrow lg__grid">
-      <header class="lg__head">
-        <PageTitle class="lg__title" text={doc.title} />
-        <p class="lg__updated t-small">{doc.updated}</p>
-      </header>
 
       <div class="lg__body">
         {
@@ -68,40 +67,18 @@ const pad = (n: number) => String(n).padStart(3, '0');
 
 <style>
   .lg {
-    padding-top: calc(var(--header-h) + clamp(3rem, 1.5rem + 8vh, 8rem));
-    padding-bottom: var(--pg-y);
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem) var(--pg-y);
   }
 
-  .lg__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 3rem clamp(3rem, 1rem + 6vw, 8rem);
-  }
-
+  /* The text reads in the right-hand column, under the hero's description. */
   @media (min-width: 64rem) {
     .lg__grid {
+      display: grid;
       grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
-      align-items: start;
     }
-    .lg__head {
-      position: sticky;
-      top: calc(var(--header-h) + 3rem);
+    .lg__body {
+      grid-column: 2;
     }
-  }
-
-  .lg__head {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .lg__title {
-    font-size: var(--pg-hero);
-    line-height: 1.02;
-    letter-spacing: -0.03em;
-  }
-
-  .lg__updated {
-    color: var(--muted);
   }
 
   .lg__body {

@@ -19,7 +19,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
 ---
 
 <PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
-  <PageHero locale={locale} {...c.hero} layout="centred" />
+  <PageHero locale={locale} {...c.hero} />
 
   <section class="cs pg-sec" aria-label="Cases">
     <div class="container">
@@ -27,6 +27,8 @@ const pad = (n: number) => String(n).padStart(3, '0');
         {
           c.cases.map((k, i) => (
             <li class="cs__case" aria-labelledby={`${k.id}-title`} data-reveal-group>
+              <!-- Image placeholder until the case photo exists. -->
+              <figure class="cs__media" aria-hidden="true" data-reveal></figure>
               <div class="cs__brand" data-reveal>
                 <span class="pg-idx">{pad(i + 1)}</span>
                 <BrandLogo src={k.logo.src} name={k.client} height={k.logo.h} w={k.logo.w} h0={k.logo.h0} decorative class="cs__logo" />
@@ -94,11 +96,35 @@ const pad = (n: number) => String(n).padStart(3, '0');
     border-bottom: 1px solid var(--line);
   }
 
+  /* Desktop: the image on the left, the client and the result in the
+     middle, the badge and the link on the right. */
   @media (min-width: 64rem) {
     .cs__case {
-      grid-template-columns: minmax(0, 3fr) minmax(0, 6fr) minmax(0, 3fr);
+      grid-template-columns: minmax(0, 4fr) minmax(0, 5fr) minmax(0, 3fr);
+      grid-template-areas: 'media brand meta' 'media main meta';
+      grid-template-rows: auto 1fr;
       align-items: start;
     }
+    .cs__media {
+      grid-area: media;
+      align-self: stretch;
+    }
+    .cs__brand {
+      grid-area: brand;
+    }
+    .cs__main {
+      grid-area: main;
+    }
+    .cs__meta {
+      grid-area: meta;
+    }
+  }
+
+  /* The image's place, with the case cards' notched bottom edge. */
+  .cs__media {
+    aspect-ratio: 4 / 3;
+    background: var(--media);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 42% 100%, calc(42% - 14px) calc(100% - 14px), 0 calc(100% - 14px));
   }
 
   .cs__brand {

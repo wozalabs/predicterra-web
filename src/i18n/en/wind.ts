@@ -9,7 +9,6 @@ export default {
     description: 'The Cognitive Twin for wind portfolios: gusts, storms, fire, heat and flood risk per turbine and site.',
   },
   hero: {
-    label: 'Predicterra for Wind',
     title: 'See what’s coming to every turbine.',
     text: 'Know which turbines will hit cut-out before the storm, book cranes for the right days, and repower where the future wind allows.',
     primary: actions.demo,
@@ -45,5 +44,5 @@ export default {
       { title: 'Siting, repowering and life extension', text: 'Each option tested against climate scenarios to 2100.' },
     ],
   },
-  cta: cta('See your wind portfolio', 'in the', 'Cognitive Twin.'),
+  cta,
 } satisfies SolutionCopy;

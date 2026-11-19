@@ -26,7 +26,7 @@ import {
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { cable, oilGas, rotorGeometry, solarPlant, substation, tower, windTurbine, type Bucket } from './geometry';
 import { createFireMaterial, createGroundMaterial } from './materials';
-import { scenePalette } from './palette';
+import { scenePalette, darkPalette } from './palette';
 import { onThemeChange } from '../theme';
 import type { SectorId } from './world';
 
@@ -191,23 +191,28 @@ function aim(mini: Mini, w: number, h: number) {
 }
 
 /** Theme colours for one mini scene. */
-function paint(mini: Mini) {
-  const p = scenePalette();
+function paint(mini: Mini, p = scenePalette()) {
   (mini.scene.background as Color).set(p.bg);
   mini.ground.uniforms.uBase.value.set(p.bg);
   mini.ground.uniforms.uGridDot.value.set(p.gridDot);
   mini.ground.uniforms.uShadow.value.set(p.shadow);
 }
 
-let active: { id: SectorId; canvas: HTMLCanvasElement; raf: number; redraw: () => void } | null = null;
+let active: { id: SectorId; canvas: HTMLCanvasElement; raf: number; redraw: () => void; dark: boolean } | null = null;
+
+/** Colours the shared renderer and materials for one view: its theme, or always dark. */
+function recolour(dark: boolean) {
+  if (!renderer) return;
+  const p = dark ? darkPalette : scenePalette();
+  renderer.setClearColor(new Color(p.bg), 1);
+  whiteMat.color.set(p.asset);
+  minis.forEach((m) => paint(m, p));
+}
 
 // Theme switch: recolour every built view and redraw the one on screen.
 onThemeChange(() => {
   if (!renderer) return;
-  const p = scenePalette();
-  renderer.setClearColor(new Color(p.bg), 1);
-  whiteMat.color.set(p.asset);
-  minis.forEach(paint);
+  recolour(active?.dark ?? false);
   active?.redraw();
 });
 
@@ -216,9 +221,11 @@ export function showPreview(
   id: SectorId,
   canvas: HTMLCanvasElement,
   /** turn: the model slowly turns on itself (asset panel); false keeps it still (page heroes). */
-  opts: { reducedMotion: boolean; turn?: boolean },
+  /** dark: always the dark palette (page heroes sit on a ground that is dark in both themes). */
+  opts: { reducedMotion: boolean; turn?: boolean; dark?: boolean },
 ) {
   const turn = opts.turn !== false;
+  const dark = opts.dark === true;
   hidePreview();
   let r: WebGLRenderer;
   try {
@@ -228,6 +235,7 @@ export function showPreview(
   }
   if (!minis.has(id)) minis.set(id, build(id));
   const mini = minis.get(id)!;
+  recolour(dark);
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
@@ -263,7 +271,7 @@ export function showPreview(
   };
 
   size();
-  active = { id, canvas, raf: 0, redraw: draw };
+  active = { id, canvas, raf: 0, redraw: draw, dark };
   active.raf = requestAnimationFrame(frame);
 }
 

@@ -1,12 +1,12 @@
 ---
 /**
  * Platform (/platform), from "predicterra-02-platform.md".
- * hero (copy beside the platform capture) · what it is · how it's built · the ontology in action · every
+ * hero · what it is · how it's built · the ontology in action · every
  * team, every horizon · already built · in and out · validation and trust
  * (dark) · CTA. "Read the methodology" stays hidden until the PDF exists.
  */
 import PageLayout from '../layouts/PageLayout.astro';
-import AppHero from '../sections/pages/AppHero.astro';
+import PageHero from '../sections/pages/PageHero.astro';
 import TwinMeter from '../sections/pages/TwinMeter.astro';
 import Rows from '../sections/pages/Rows.astro';
 import SectionHead from '../sections/pages/SectionHead.astro';
@@ -29,8 +29,8 @@ const pad = (n: number) => String(n).padStart(3, '0');
   locale={locale}
   jsonLd={[softwareJsonLd(site, c.seo.description)]}
 >
-  <!-- The title and the platform itself (the home's app capture) side by side, in one screen. -->
-  <AppHero locale={locale} {...c.hero} />
+  <!-- The title on the left, the description and the action on the right. -->
+  <PageHero locale={locale} {...c.hero} />
 
   <!-- Three kinds of twin on one scale: the first two stop part way. -->
   <TwinMeter

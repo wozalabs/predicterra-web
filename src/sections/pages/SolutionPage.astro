@@ -3,9 +3,9 @@
  * The seven Solutions pages ("predicterra-00-mapa-web.md"):
  * hero (logos under the title) · key figures (with the line and the link to
  * the cases) · the solution · use cases or sectors · CTA.
- *  - sector pages: the sector's asset from the home's 3D scene in the hero,
- *    on alternating sides, standing still
- *  - pages across all sectors: a type-only hero
+ *  - sector pages: the sector's asset from the home's 3D scene under the
+ *    hero's panel, standing still
+ *  - pages across all sectors: the panel and the logos only
  * The solution reads title on the left, content on the right; use cases and
  * sectors are the home's rows (components/LinkRows).
  */
@@ -22,21 +22,19 @@ import type { SolutionCopy } from './types';
 interface Props {
   locale?: Locale;
   copy: SolutionCopy;
-  /** Sector pages: which side the asset sits on, so the four don't open identically. */
-  layout?: 'split' | 'split-reverse';
 }
-const { locale = 'en', copy: c, layout = 'split' } = Astro.props;
+const { locale = 'en', copy: c } = Astro.props;
 const s = c.solution;
 ---
 
 <PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
   {
     c.asset ? (
-      <PageHero locale={locale} {...c.hero} logos={c.proof.groups} layout={layout}>
-        <AssetView slot="visual" asset={c.asset} />
+      <PageHero locale={locale} {...c.hero} logos={c.proof.groups}>
+        <AssetView slot="visual" asset={c.asset} dark />
       </PageHero>
     ) : (
-      <PageHero locale={locale} {...c.hero} logos={c.proof.groups} layout="centred" />
+      <PageHero locale={locale} {...c.hero} logos={c.proof.groups} />
     )
   }
 

@@ -1,6 +1,6 @@
 ---
 /**
- * Case page: the image on top, then the article. Facts (client, sector,
+ * Case page: the page hero (title and summary), the image, then the article. Facts (client, sector,
  * region, year, key figures) sit in the left column and stay in view; the
  * article reads as one narrow column on the right. Below it, the other
  * success stories, then the CTA card.
@@ -9,7 +9,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import NotchRule from '../../components/NotchRule.astro';
 import CaseCard from '../../components/CaseCard.astro';
 import Button from '../../components/Button.astro';
-import PageTitle from '../../components/PageTitle.astro';
+import PageHero from '../../sections/pages/PageHero.astro';
 import FigureValue from '../../components/FigureValue.astro';
 import Icon from '../../components/Icon.astro';
 import Cta from '../../sections/home/Cta.astro';
@@ -71,8 +71,10 @@ const jsonLd = [
 ---
 
 <BaseLayout title={seoTitle} description={seoDescription} locale={locale} jsonLd={jsonLd}>
+  <PageHero locale={locale} id="case-title" title={story.title} text={story.summary} />
+
   <article class="cs" aria-labelledby="case-title">
-    <!-- Image on top -->
+    <!-- Image -->
     <div class="container cs-top">
       <a class="cs-back t-small" href={localizePath(routes.cases, locale)}>
         <Icon name="arrow_back" />
@@ -91,11 +93,6 @@ const jsonLd = [
 
     <!-- Article -->
     <div class="container cs-grid">
-      <header class="cs-head">
-        <p class="cs-eyebrow t-small" data-reveal>{story.client}</p>
-        <PageTitle id="case-title" class="cs-title" text={story.title} />
-        <p class="cs-summary" data-reveal>{story.summary}</p>
-      </header>
 
       <aside class="cs-aside" aria-label={labels.keyFigures} data-reveal>
         <dl class="cs-meta">
@@ -166,7 +163,6 @@ const jsonLd = [
         <div class="container">
           <NotchRule at={70} />
           <div class="cs-more__head">
-            <p class="label">{labels.more}</p>
             <h2 id="more-title" class="t-h2" data-render>
               {labels.moreTitle}
             </h2>
@@ -192,7 +188,7 @@ const jsonLd = [
 <style>
   /* ---------- Image ---------- */
   .cs-top {
-    padding-top: calc(var(--header-h) + clamp(0.5rem, 0.25rem + 1vw, 1.5rem));
+    padding-top: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
   }
 
   .cs-back {
@@ -249,7 +245,7 @@ const jsonLd = [
   /* ---------- Article ---------- */
   .cs-grid {
     display: grid;
-    grid-template-areas: 'head' 'aside' 'body';
+    grid-template-areas: 'aside' 'body';
     gap: 2.5rem var(--gutter);
     padding-block: clamp(2.5rem, 1.5rem + 3vw, 4.5rem) var(--section-y);
   }
@@ -257,45 +253,8 @@ const jsonLd = [
   @media (min-width: 64rem) {
     .cs-grid {
       grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-      grid-template-areas: 'aside head' 'aside body';
-      grid-template-rows: auto 1fr;
-      row-gap: 3.5rem;
+      grid-template-areas: 'aside body';
     }
-  }
-
-  .cs-head {
-    grid-area: head;
-    display: grid;
-    gap: 1.25rem;
-    /* The reading column: about 65 characters a line */
-    max-width: 40rem;
-  }
-
-  .cs-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.625rem;
-    color: var(--muted);
-  }
-
-  .cs-eyebrow::before {
-    content: '';
-    width: 0.5rem;
-    height: 0.5rem;
-    background: var(--accent);
-  }
-
-  .cs-title {
-    font-size: var(--fs-display);
-    line-height: 1.02;
-    letter-spacing: var(--track-display);
-    text-wrap: balance;
-  }
-
-  .cs-summary {
-    font-size: var(--fs-lead);
-    line-height: 1.5;
-    color: var(--ink-2);
   }
 
   /* Facts: in view while reading on wide screens */

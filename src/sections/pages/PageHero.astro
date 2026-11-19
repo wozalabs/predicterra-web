@@ -1,10 +1,12 @@
 ---
 /**
- * Page hero in two calm compositions:
- *  - centred: label, title and copy centred; a visual (slot "visual") as a wide
- *    band under it if there is one, otherwise the hero is type only
- *  - split / split-reverse: copy on one side, a full-height visual running to
- *    the page edge on the other
+ * Page hero, like the home's: a white panel runs the full width of the
+ * viewport from the very top of the page (the header sits on it, in dark
+ * text), with the title on the left and the description (and the page's
+ * actions) on the right, both ending on the same line; its bottom edge carries
+ * the brand's notch. Under it, on a ground that is near black in both themes,
+ * the page's visual (slot "visual", e.g. the sector's 3D asset) and the logos,
+ * when there are any.
  */
 import Button from '../../components/Button.astro';
 import LogoBand from './LogoBand.astro';
@@ -15,185 +17,170 @@ import type { Link } from './types';
 
 interface Props {
   locale?: Locale;
-  label: string;
+  id?: string;
   title: string;
+  /** The title's closing words, in orange. */
+  accent?: string;
   text: string;
   /** A short line under the text (About: where it's built, who runs it). */
   note?: string;
   primary?: Link;
   secondary?: Link;
-  layout?: 'stack' | 'centred' | 'split' | 'split-reverse';
   logos?: LogoGroup[];
 }
-const {
-  locale = 'en',
-  label,
-  title,
-  text,
-  note,
-  primary,
-  secondary,
-  layout: rawLayout = 'centred',
-  logos,
-} = Astro.props;
-const layout = rawLayout === 'stack' ? 'centred' : rawLayout;
-const split = layout !== 'centred';
+const { locale = 'en', id = 'page-title', title, accent, text, note, primary, secondary, logos } = Astro.props;
 const hasVisual = Astro.slots.has('visual');
+const below = hasVisual || !!logos;
 ---
 
-<section class:list={['ph-hero', `ph-hero--${layout}`, !hasVisual && 'ph-hero--type']} aria-labelledby="page-title">
-  <div class="container ph-hero__inner">
-    <div class="ph-hero__copy">
-      <p class="label ph-hero__label" data-reveal>{label}</p>
-      <PageTitle class="ph-hero__title" text={title} />
-      <p class="ph-hero__text" data-reveal>{text}</p>
-      {
-        note && (
-          <p class="ph-hero__note" data-reveal>
-            <span class="pg-dot" aria-hidden="true" />
-            {note}
-          </p>
-        )
-      }
-      {
-        (primary || secondary) && (
-          <div class="ph-hero__actions" data-reveal>
-            {primary && <Button href={localizePath(primary.href, locale)} label={primary.label} size="lg" />}
-            {secondary && (
-              <Button href={localizePath(secondary.href, locale)} label={secondary.label} size="lg" variant="secondary" />
-            )}
-          </div>
-        )
-      }
-      {split && logos && <LogoBand groups={logos} class="ph-hero__logos" />}
+<section class:list={['ph', below && 'ph--below']} aria-labelledby={id}>
+  <div class="ph__panel" data-header-light>
+    <div class="container ph__inner">
+      <PageTitle id={id} class="ph__title" text={title} accent={accent} />
+      <div class="ph__side">
+        <p class="ph__text" data-reveal>{text}</p>
+        {
+          note && (
+            <p class="ph__note" data-reveal>
+              <span class="pg-dot" aria-hidden="true" />
+              {note}
+            </p>
+          )
+        }
+        {
+          (primary || secondary) && (
+            <div class="ph__actions" data-reveal>
+              {primary && <Button href={localizePath(primary.href, locale)} label={primary.label} size="lg" />}
+              {secondary && (
+                <Button href={localizePath(secondary.href, locale)} label={secondary.label} size="lg" variant="secondary" />
+              )}
+            </div>
+          )
+        }
+      </div>
     </div>
-
-    {
-      hasVisual && (
-        <div class="ph-hero__media" data-reveal>
-          <slot name="visual" />
-        </div>
-      )
-    }
-
-    {!split && logos && <LogoBand groups={logos} class="ph-hero__logos" />}
   </div>
+
+  {
+    below && (
+      <div class="container ph__below">
+        {hasVisual && (
+          <div class="ph__media" data-reveal>
+            <slot name="visual" />
+          </div>
+        )}
+        {logos && <LogoBand groups={logos} class="ph__logos" />}
+      </div>
+    )
+  }
 </section>
 
 <style>
-  .ph-hero__inner {
-    display: grid;
-    gap: clamp(3rem, 2rem + 3vw, 5rem);
-    padding-top: calc(var(--header-h) + clamp(3rem, 1.5rem + 8vh, 8rem));
-    padding-bottom: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  /* Near black under the panel in both themes, like the home hero. */
+  .ph {
+    position: relative;
+    background: #0d0d0d;
+    color: #ffffff;
+    --ink: #ffffff;
+    --ink-2: #bdbdbd;
+    --muted: #8c8c8c;
+    --line: rgb(255 255 255 / 0.12);
+    --canvas: #0d0d0d;
+    padding-bottom: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
   }
 
-  .ph-hero__copy {
+  .ph--below {
+    padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+  }
+
+  /* The panel: full width, from the top of the page, white with dark copy in
+     both themes, the notch cut into its bottom edge. */
+  .ph__panel {
+    --notch: 18px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    min-height: clamp(26rem, 62svh, 40rem);
+    padding-top: calc(var(--header-h) + 2rem);
+    padding-bottom: calc(clamp(2rem, 1rem + 3vh, 3.5rem) + var(--notch));
+    background: #ffffff;
+    color: #1e1e1e;
+    --ink: #1e1e1e;
+    --ink-2: #4d4d4d;
+    --muted: #767676;
+    --burn-base: rgb(74 18 6);
+    --burn-tint: rgb(254 60 1);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 58% 100%, calc(58% - var(--notch)) calc(100% - var(--notch)), 0 calc(100% - var(--notch)));
+  }
+
+  .ph--below .ph__panel {
+    min-height: clamp(24rem, 54svh, 36rem);
+  }
+
+  .ph__inner {
     display: grid;
-    align-content: start;
     gap: 1.5rem;
+    width: 100%;
   }
 
-  .ph-hero__title {
-    max-width: 17ch;
-    font-size: var(--pg-hero);
-    line-height: 1.02;
-    letter-spacing: -0.03em;
+  /* Side by side from tablets, on the same last line. */
+  @media (min-width: 56rem) {
+    .ph__inner {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      align-items: end;
+      column-gap: clamp(2rem, 1rem + 4vw, 6rem);
+    }
+  }
+
+  .ph__title {
+    max-width: 18ch;
+    font-size: clamp(2.5rem, 1.25rem + 3.4vw, 4.5rem);
+    font-weight: 400;
+    line-height: 0.98;
+    letter-spacing: var(--track-display);
     text-wrap: balance;
   }
 
-  .ph-hero__text {
-    max-width: 50ch;
-    font-size: var(--fs-lead);
-    line-height: 1.5;
-    letter-spacing: var(--track-title);
+  .ph__side {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .ph__text {
+    max-width: 40ch;
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.45;
     color: var(--ink-2);
   }
 
-  .ph-hero__note {
+  .ph__note {
     display: inline-flex;
     align-items: baseline;
     gap: 0.625rem;
     color: var(--muted);
   }
 
-  .ph-hero__actions {
+  .ph__actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
   }
 
-  .ph-hero__media {
+  /* Under the panel: the visual, then the logos. */
+  .ph__below {
+    display: grid;
+    gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    padding-top: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  }
+
+  .ph__media {
     position: relative;
-    min-height: clamp(18rem, 40svh, 36rem);
+    height: clamp(18rem, 46svh, 34rem);
   }
 
-  .ph-hero__media > :global(*) {
+  .ph__media > :global(*) {
     height: 100%;
-  }
-
-  /* Type only: the hero is one calm screen-and-a-bit of words. */
-  .ph-hero--type .ph-hero__inner {
-    padding-top: calc(var(--header-h) + clamp(5rem, 3rem + 12vh, 11rem));
-    padding-bottom: clamp(3rem, 2rem + 4vw, 6rem);
-  }
-
-  .ph-hero--type .ph-hero__title {
-    max-width: 20ch;
-  }
-
-  /* ----- centred ----- */
-  .ph-hero--centred .ph-hero__copy {
-    justify-items: center;
-    text-align: center;
-  }
-
-  .ph-hero--centred .ph-hero__actions {
-    justify-content: center;
-  }
-
-  .ph-hero--centred .ph-hero__media {
-    min-height: clamp(20rem, 62svh, 44rem);
-  }
-
-  .ph-hero--centred :global(.ph-hero__logos) {
-    justify-content: center;
-  }
-
-  /* ----- split ----- */
-  @media (min-width: 64rem) {
-    .ph-hero--split .ph-hero__inner,
-    .ph-hero--split-reverse .ph-hero__inner {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-      align-items: stretch;
-      min-height: 100svh;
-      column-gap: clamp(3rem, 1rem + 5vw, 7rem);
-      padding-top: calc(var(--header-h) + 1rem);
-      padding-bottom: 0;
-    }
-    .ph-hero--split .ph-hero__copy,
-    .ph-hero--split-reverse .ph-hero__copy {
-      grid-template-rows: auto auto auto auto 1fr;
-      padding-block: clamp(3rem, 1rem + 8vh, 7rem) clamp(1.5rem, 1rem + 1vw, 2.5rem);
-    }
-    .ph-hero--split :global(.ph-hero__logos),
-    .ph-hero--split-reverse :global(.ph-hero__logos) {
-      align-self: end;
-    }
-    .ph-hero--split .ph-hero__media {
-      margin-right: calc(-1 * var(--gutter));
-    }
-    .ph-hero--split-reverse .ph-hero__inner {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    }
-    .ph-hero--split-reverse .ph-hero__media {
-      order: -1;
-      margin-left: calc(-1 * var(--gutter));
-    }
-    .ph-hero--split .ph-hero__media,
-    .ph-hero--split-reverse .ph-hero__media {
-      min-height: 0;
-    }
   }
 </style>

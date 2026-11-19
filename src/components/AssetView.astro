@@ -8,12 +8,14 @@
  */
 interface Props {
   asset: 'grid' | 'substation' | 'solar' | 'wind' | 'oilgas';
+  /** Always the dark palette (on a ground that is dark in both themes). */
+  dark?: boolean;
   class?: string;
 }
-const { asset, class: className } = Astro.props;
+const { asset, dark = false, class: className } = Astro.props;
 ---
 
-<div class:list={['av', className]} data-asset-view={asset}>
+<div class:list={['av', dark && 'av--dark', className]} data-asset-view={asset} data-av-dark={dark ? '' : undefined}>
   <canvas class="av__canvas" aria-hidden="true"></canvas>
 </div>
 
@@ -25,6 +27,10 @@ const { asset, class: className } = Astro.props;
     min-height: 20rem;
     overflow: hidden;
     background: var(--canvas);
+  }
+
+  .av--dark {
+    background: #0d0d0d;
   }
 
   .av__canvas {
@@ -52,7 +58,7 @@ const { asset, class: className } = Astro.props;
     let on = false;
     const start = () => {
       if (!mod) return;
-      mod.showPreview(id, canvas, { reducedMotion: reduce, turn: false });
+      mod.showPreview(id, canvas, { reducedMotion: reduce, turn: false, dark: 'avDark' in el.dataset });
       canvas.dataset.ready = '';
     };
     new IntersectionObserver(

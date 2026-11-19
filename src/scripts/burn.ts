@@ -16,9 +16,11 @@ import { onThemeChange } from './theme';
 const C = {
   maxDist: 3.2, // em: how far the hot spot reaches
   maxBlur: 0.022, // em
-  speed: 1.5, // em per second
+  speed: 1, // em per second
   span: 1.6, // em of travel beyond the word before looping
   baseFilter: 'contrast(1.15) saturate(1.1)',
+  /** How far a letter goes towards the bright orange at the hot spot (0–1). */
+  maxTint: 0.6,
 };
 
 type RGB = [number, number, number];
@@ -86,6 +88,9 @@ function measure(inst: Inst) {
     const span = chars[i];
     span.style.left = `${r.left - box.left}px`;
     span.style.top = `${r.top - box.top}px`;
+    // The glyph box's own height as the line height, so each letter sits on
+    // the reference's baseline whatever the parent's (tight) line height is.
+    span.style.lineHeight = `${r.height}px`;
     inst.cx[i] = r.left - left0 + r.width / 2;
     inst.cy[i] = r.top - box.top + r.height / 2;
     offset += ch.length;
@@ -114,7 +119,7 @@ function paint(inst: Inst) {
     const s = inst.chars[i].style;
     const blur = Math.round(q * size * C.maxBlur * 20) / 20;
     s.filter = `${blur > 0.01 ? `blur(${blur}px) ` : ''}${C.baseFilter}`;
-    const t = Math.min(1, q * 1.15);
+    const t = Math.min(1, q * 1.15) * C.maxTint;
     s.color = mix(inst.base, inst.tint, t);
     if (t <= 0.001) {
       s.textShadow = '';
@@ -122,8 +127,8 @@ function paint(inst: Inst) {
     }
     const glow = inst.tint.join(',');
     const inner = (size * (0.015 + t * 0.035)).toFixed(2);
-    const outer = (size * (0.06 + t * 0.16)).toFixed(2);
-    s.textShadow = `0 0 ${inner}px rgba(${glow},${(0.4 + t * 0.4).toFixed(3)}), 0 0 ${outer}px rgba(${glow},${(0.1 + t * 0.3).toFixed(3)})`;
+    const outer = (size * (0.05 + t * 0.12)).toFixed(2);
+    s.textShadow = `0 0 ${inner}px rgba(${glow},${(0.2 + t * 0.2).toFixed(3)}), 0 0 ${outer}px rgba(${glow},${(0.04 + t * 0.12).toFixed(3)})`;
   }
 }
 

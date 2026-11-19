@@ -9,7 +9,6 @@ export default {
       'The Cognitive Twin for transmission and distribution networks: fire, flood, wind, heat and vegetation risk per span and substation.',
   },
   hero: {
-    label: 'Predicterra for Grid',
     title: 'See what’s coming to every span and substation.',
     text: 'Put crews in place before the storm, invest in hardening where it cuts the most risk, and give the regulator evidence it can follow.',
     primary: actions.demo,
@@ -50,5 +49,5 @@ export default {
       { title: 'Hardening and undergrounding', text: 'Reinforcement and undergrounding ranked by real exposure.' },
     ],
   },
-  cta: cta('See your network', 'in the', 'Cognitive Twin.'),
+  cta,
 } satisfies SolutionCopy;

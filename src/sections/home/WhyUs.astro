@@ -1,11 +1,12 @@
 ---
 /**
- * Why us (home), right after the platform and its logos: an orange panel with
- * the CTA's notched top edge, the title on the left and one statement on the
+ * Why us (home), right after the platform and its logos: a panel with the
+ * CTA's notched top edge, the orange icon square and the title in a row on the left and one statement on the
  * right, lit word by word as it scrolls in (scripts/lit.ts). The panel takes
  * the opposite of the page: white with dark text in the dark theme, near
  * black with white text in the light one.
  */
+import Icon from '../../components/Icon.astro';
 import { getCopy, type Locale } from '../../i18n/config';
 
 interface Props {
@@ -18,7 +19,11 @@ const { why } = getCopy(locale).home;
 <section class="why" aria-labelledby="why-title">
   <div class="why__panel">
     <div class="why__grid">
-      <h2 id="why-title" class="why__title" data-render>{why.title}</h2>
+      <div class="why__head">
+        <Icon name="verified_user" boxed size="3.5rem" />
+        <span class="why__divider" aria-hidden="true"></span>
+        <h2 id="why-title" class="why__title" data-render>{why.title}</h2>
+      </div>
       <p class="why__text" data-lit>
         {why.text.split(' ').map((w) => <span class="w">{w} </span>)}
       </p>
@@ -63,6 +68,21 @@ const { why } = getCopy(locale).home;
       grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
       align-items: start;
     }
+  }
+
+  /* The orange square with its icon, a rule and the title in one row, like
+     the 3D section's sector titles. */
+  .why__head {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .why__divider {
+    width: 1px;
+    align-self: stretch;
+    background: currentColor;
+    opacity: 0.2;
   }
 
   .why__title {

@@ -7,7 +7,7 @@
  */
 import PageLayout from '../layouts/PageLayout.astro';
 import Button from '../components/Button.astro';
-import PageTitle from '../components/PageTitle.astro';
+import PageHero from '../sections/pages/PageHero.astro';
 import { getCopy, localizePath } from '../i18n/config';
 import { icons } from '../data/icons';
 
@@ -17,13 +17,11 @@ const f = c.form;
 ---
 
 <PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
-  <section class="ct" aria-labelledby="page-title">
+  <PageHero locale={locale} title={c.hero.title} text={c.hero.text} />
+
+  <section class="ct" aria-label={c.other.title}>
     <div class="container container--narrow ct__grid">
       <div class="ct__intro">
-        <p class="label" data-reveal>{c.hero.label}</p>
-        <PageTitle class="ct__title" text={c.hero.title} />
-        <p class="ct__text" data-reveal>{c.hero.text}</p>
-
         <div class="ct__other" data-reveal>
           <p class="ct__other-title">{c.other.title}</p>
           <ul class="ct__facts">
@@ -137,8 +135,7 @@ const f = c.form;
 
 <style>
   .ct {
-    padding-top: calc(var(--header-h) + clamp(3rem, 1.5rem + 8vh, 8rem));
-    padding-bottom: var(--pg-y);
+    padding-block: clamp(3rem, 2rem + 4vw, 6rem) var(--pg-y);
   }
 
   .ct__grid {
@@ -164,26 +161,16 @@ const f = c.form;
     gap: 1.5rem;
   }
 
-  .ct__title {
-    max-width: 14ch;
-    font-size: var(--pg-hero);
-    line-height: 1.02;
-    letter-spacing: -0.03em;
-    text-wrap: balance;
-  }
-
   .ct__text {
     max-width: 44ch;
     font-size: var(--fs-lead);
     line-height: 1.5;
-    letter-spacing: var(--track-title);
     color: var(--ink-2);
   }
 
   .ct__other {
     display: grid;
     gap: 1rem;
-    margin-top: clamp(1.5rem, 1rem + 3vw, 4rem);
     padding-top: 1.25rem;
     border-top: 1px solid var(--line);
   }

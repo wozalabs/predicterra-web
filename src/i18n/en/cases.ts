@@ -1,4 +1,5 @@
 import { routes, external } from '../../data/routes';
+import { cta } from './pages-shared';
 
 /**
  * Success stories. One entry per case: it feeds the homepage cards, the index
@@ -136,14 +137,7 @@ export default {
 
   items,
 
-  cta: {
-    label: 'Ready before the next event',
-    titleLine1: 'Run your infrastructure',
-    titleLine2: 'on',
-    titleAccent: 'foresight.',
-    text: 'One live system across every asset, every feed, every team. Act before the event, not after the report.',
-    primary: { label: 'Request a demo', href: routes.demo },
-  },
+  cta,
 };
 
 export const casePath = (slug: string) => `${routes.stories}/${slug}`;

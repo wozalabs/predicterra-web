@@ -166,12 +166,3 @@
   height: round(down, calc(var(--p, 1) * 100%), 5px);
 }
 
-/* ---------- CTA card on the inner pages ----------
-   The claims are longer than the homepage CTA: let them wrap, give them room. */
-.pg .cta .cta__content {
-  max-width: 54rem;
-}
-
-.pg .cta .cta__line {
-  white-space: normal;
-}

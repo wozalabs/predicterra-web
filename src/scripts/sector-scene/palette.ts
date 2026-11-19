@@ -49,3 +49,9 @@ const DARK: ScenePalette = {
 };
 
 export const scenePalette = (): ScenePalette => (isDarkTheme() ? DARK : LIGHT);
+
+/** The CTA card takes the opposite of the page: light in the dark theme, dark in the light one. */
+export const ctaPalette = (): ScenePalette => (isDarkTheme() ? LIGHT : DARK);
+
+/** The dark palette whatever the theme (views on a ground that is dark in both themes). */
+export const darkPalette = DARK;

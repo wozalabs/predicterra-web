@@ -12,7 +12,6 @@ export default {
       'A cognitive digital twin of your assets and the physical world acting on them, ready for every team, system and AI agent, EU-hosted or on-premises.',
   },
   hero: {
-    label: 'Digitalization · Across all sectors',
     title: 'A cognitive digital twin of the physical world, ready to consume.',
     text: 'Predicterra fuses your systems and thousands of external sources into a Cognitive Twin: a live model of your assets, the physical world acting on them and how everything connects, ready for every team, every system and every AI agent.',
     primary: actions.demo,
@@ -59,5 +58,5 @@ export default {
       },
     ],
   },
-  cta: cta('Give your systems', 'a world', 'to run on.'),
+  cta,
 } satisfies SolutionCopy;

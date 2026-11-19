@@ -23,7 +23,7 @@ import {
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { cable, rotorGeometry, solarPlant, substation, tower, windTurbine, type Bucket } from './sector-scene/geometry';
 import { createGroundMaterial } from './sector-scene/materials';
-import { scenePalette } from './sector-scene/palette';
+import { ctaPalette } from './sector-scene/palette';
 
 const DEG = Math.PI / 180;
 const BASE_AZ = 45;
@@ -48,12 +48,12 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   renderer.setPixelRatio(dpr);
   renderer.outputColorSpace = SRGBColorSpace;
-  renderer.setClearColor(new Color(scenePalette().ctaGround), 1);
+  renderer.setClearColor(new Color(ctaPalette().ctaGround), 1);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = PCFShadowMap;
 
   const scene = new Scene();
-  scene.background = new Color(scenePalette().ctaGround);
+  scene.background = new Color(ctaPalette().ctaGround);
   const assetMat = new MeshLambertMaterial({ color: 0xffffff });
   const groundMat = createGroundMaterial({ pixel: Math.max(1, Math.round(1.5 * dpr)) });
 
@@ -161,18 +161,18 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
     basis(BASE_AZ * DEG, BASE_EL * DEG);
     const aspect = width / height;
     if (aspect >= 1.25) {
-      // Wide card: one cluster on each side of the centred copy.
-      // Large and bleeding past the card edges (the card clips them).
+      // Wide card: both clusters on the right, clear of the copy in the
+      // bottom-left corner. Large and bleeding past the card edges (clipped).
       viewH = 30;
       viewW = viewH * aspect;
-      place(left.group, -viewW / 2 + 9, -11, 1.75);
+      place(left.group, viewW * 0.1, 3, 1.5);
       place(right.group, viewW / 2 - 8, -10, 1.75);
     } else {
-      // Tall card: clusters in the top-left and bottom-right corners.
+      // Tall card: both clusters in the upper half, above the copy.
       viewW = 36;
       viewH = viewW / aspect;
-      place(left.group, -viewW * 0.16, viewH * 0.43, 1.1);
-      place(right.group, viewW * 0.22, -viewH * 0.52, 1.1);
+      place(left.group, -viewW * 0.18, viewH * 0.36, 1.1);
+      place(right.group, viewW * 0.22, viewH * 0.1, 1.1);
     }
   }
 
@@ -233,7 +233,7 @@ export function createCtaScene(canvas: HTMLCanvasElement, opts: { reducedMotion:
   }
 
   function setTheme() {
-    const p = scenePalette();
+    const p = ctaPalette();
     renderer.setClearColor(new Color(p.ctaGround), 1);
     (scene.background as Color).set(p.ctaGround);
     groundMat.uniforms.uBase.value.set(p.ctaGround);

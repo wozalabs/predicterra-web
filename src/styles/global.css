@@ -597,7 +597,7 @@ html[data-text-fx='burnt'] .burn {
   color: var(--ink);
 }
 
-:root[data-theme='dark'] :is([data-dark], [data-theme-dark]) .btn--secondary {
+:root[data-theme='dark'] :is([data-dark], [data-theme-dark], [data-header-light]) .btn--secondary {
   --btn-bg: #e4e4e4;
   --btn-fg: var(--grey-700);
   --btn-sq: #cecece;
@@ -723,6 +723,10 @@ html.js-render-wait [data-render-step] {
   padding-block: 0.08em 0.14em;
   margin-block: -0.08em -0.14em;
   vertical-align: top;
+}
+
+.ttl__w.is-open {
+  overflow: visible;
 }
 
 .ttl__w > span {

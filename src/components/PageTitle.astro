@@ -4,23 +4,30 @@
  * (1100ms, the hero's curve), one line after another. The words are masked one
  * by one so the lines can wrap freely; scripts/title-lines.ts gives every word
  * the delay of the line it lands on. Without the script all lines rise
- * together; with reduced motion the title is simply there.
+ * together; with reduced motion the title is simply there. An `accent` (the
+ * title's closing words) rises as one piece, in orange.
  */
 interface Props {
   text: string;
+  /** The closing words of the title, in orange (burnt with the text effect on). */
+  accent?: string;
   id?: string;
   class?: string;
 }
 // `rest` carries the parent's scoped-style attribute.
-const { text, id = 'page-title', class: className, ...rest } = Astro.props;
+const { text, accent, id = 'page-title', class: className, ...rest } = Astro.props;
 // Keep compound words whole ("deep-tech", "i-DE").
-const words = text.replace(/(\w)-(\w)/g, '$1‑$2').split(/\s+/).filter(Boolean);
+const whole = (t: string) => t.replace(/(\w)-(\w)/g, '$1‑$2');
+const lead = accent && text.endsWith(accent) ? text.slice(0, -accent.length) : text;
+const words = whole(lead).split(/\s+/).filter(Boolean);
+const tail = accent && text.endsWith(accent) ? whole(accent) : '';
 ---
 
 <h1 id={id} class:list={['ttl', className]} data-title-lines {...rest}>
   {words.map((w, i) => (
     <>
-      <span class="ttl__w"><span>{w}</span></span>{i < words.length - 1 && ' '}
+      <span class="ttl__w"><span>{w}</span></span>{(i < words.length - 1 || tail) && ' '}
     </>
   ))}
+  {tail && <span class="ttl__w"><span><span class="accent">{tail}</span></span></span>}
 </h1>

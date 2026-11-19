@@ -11,7 +11,6 @@ export default {
       'Quantify physical climate exposure for every energy asset to 2100, and turn it into adaptation plans and resilience investment cases your board and regulator can follow.',
   },
   hero: {
-    label: 'Resilience · Across all sectors',
     title: 'From exposure to an investment case, on one model.',
     text: 'Predicterra quantifies the exposure of every asset, from today to 2100, and turns it into adaptation plans and investment cases your board and your regulator can follow.',
     primary: actions.demo,
@@ -47,5 +46,5 @@ export default {
       { title: 'Oil & Gas', text: 'Protection, adaptation and business interruption, site by site.', href: routes.sectors.oilGas },
     ],
   },
-  cta: cta('See your exposure to 2100', 'in the', 'Cognitive Twin.'),
+  cta,
 } satisfies SolutionCopy;

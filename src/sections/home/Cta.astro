@@ -3,14 +3,9 @@ import Button from '../../components/Button.astro';
 import { getCopy, localizePath, type Locale } from '../../i18n/config';
 
 interface CtaCopy {
-  /** Optional: pages whose brief has no label above the title leave it out. */
-  label?: string;
-  titleLine1: string;
-  titleLine2: string;
-  titleAccent: string;
-  text: string;
+  title: string;
+  accent?: string;
   primary: { label: string; href: string };
-  secondary?: { label: string; href: string; external?: boolean };
 }
 interface Props {
   locale?: Locale;
@@ -22,8 +17,9 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
 ---
 
 <!--
-  Action card, inset from the page edges. The 3D section's white assets sit
-  on both sides (scripts/cta-scene.ts, lazy) and tilt with the pointer.
+  Action card, inset from the page edges: one large title in the bottom-left
+  corner and its button in the same row, on the right. The 3D section's white assets fill the rest of the
+  card (scripts/cta-scene.ts, lazy) and tilt with the pointer.
 -->
 <section class="cta" id="contact" aria-labelledby="cta-title">
   <div class="cta__card" data-cta-card data-reveal>
@@ -31,26 +27,11 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
     <div class="cta__veil" aria-hidden="true"></div>
 
     <div class="cta__content">
-      {cta.label && <p class="label cta__label" data-render>{cta.label}</p>}
-      <h2 id="cta-title" class="t-h2 cta__title" data-render>
-        <span class="cta__line">{cta.titleLine1}</span>
-        <span class="cta__line">{cta.titleLine2} <span class="accent">{cta.titleAccent}</span></span>
+      <h2 id="cta-title" class="cta__title" data-render>
+        {cta.accent ? `${cta.title} ` : cta.title}
+        {cta.accent && <span class="accent">{cta.accent}</span>}
       </h2>
-      <p class="cta__text">{cta.text}</p>
-      <div class="cta__actions">
-        <Button href={localizePath(cta.primary.href, locale)} label={cta.primary.label} size="lg" />
-        {
-          cta.secondary && (
-            <Button
-              href={cta.secondary.external === false ? localizePath(cta.secondary.href, locale) : cta.secondary.href}
-              label={cta.secondary.label}
-              variant="secondary"
-              size="lg"
-              external={cta.secondary.external !== false}
-            />
-          )
-        }
-      </div>
+      <Button href={localizePath(cta.primary.href, locale)} label={cta.primary.label} size="lg" />
     </div>
   </div>
 </section>
@@ -68,16 +49,28 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
     isolation: isolate;
     overflow: clip;
     display: grid;
-    place-items: center;
+    align-items: end;
     min-height: clamp(30rem, 58vh, 38rem);
     max-width: var(--max-w);
     margin-inline: auto;
-    padding: clamp(3rem, 2rem + 4vw, 5.5rem) var(--gutter);
+    padding: 32px;
     /* Matches palette.ctaGround in scripts/sector-scene/palette.ts (shown until WebGL is ready). */
     background: var(--cta-ground);
     /* Notched top edge: the success-stories card notch, mirrored to the top. */
     clip-path: var(--notch-top);
-    color: var(--ink);
+    /* The opposite of the page behind it: dark on the light theme… */
+    color: #ffffff;
+    --ink: #ffffff;
+    --burn-base: rgb(178 36 6);
+    --burn-tint: rgb(255 98 30);
+  }
+
+  /* …light on the dark one. */
+  :global(:root[data-theme='dark']) .cta__card {
+    color: #1e1e1e;
+    --ink: #1e1e1e;
+    --burn-base: rgb(74 18 6);
+    --burn-tint: rgb(254 60 1);
   }
 
   .cta__scene {
@@ -99,51 +92,37 @@ const cta: CtaCopy = copy ?? getCopy(locale).home.cta;
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: radial-gradient(ellipse 34% 52% at 50% 50%, var(--cta-ground) 55%, rgb(var(--cta-ground-rgb) / 0) 100%);
+    /* The bottom row (title and button) on plain ground, across the card. */
+    background:
+      radial-gradient(ellipse 62% 70% at 0% 100%, var(--cta-ground) 50%, rgb(var(--cta-ground-rgb) / 0) 100%),
+      linear-gradient(to top, var(--cta-ground) 22%, rgb(var(--cta-ground-rgb) / 0) 48%);
     pointer-events: none;
   }
 
+  /* Title and button in one row, sharing the last line (stacked on phones). */
   .cta__content {
-    display: grid;
-    justify-items: center;
-    gap: 1rem;
-    max-width: 44rem;
-    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem) 2rem;
   }
 
   .cta__title {
-    display: grid;
-  }
-
-  .cta__line {
-    white-space: nowrap;
-  }
-
-  .cta__text {
-    max-width: 40ch;
-    color: var(--ink-2);
-  }
-
-  .cta__actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-top: 1rem;
+    font-size: clamp(3rem, 1.25rem + 5.5vw, 7rem);
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: var(--track-display);
+    text-wrap: balance;
   }
 
   @media (max-width: 47.99rem) {
-    /* Room above and below the copy for the two clusters */
+    /* Room above the copy for the two clusters. */
     .cta__card {
-      min-height: 44rem;
-      padding-block: 11rem 12rem;
-    }
-    .cta__line {
-      white-space: normal;
+      min-height: 40rem;
     }
     .cta__veil {
-      background: radial-gradient(ellipse 70% 34% at 50% 50%, var(--cta-ground) 60%, rgb(var(--cta-ground-rgb) / 0) 100%);
+      background: linear-gradient(to top, var(--cta-ground) 40%, rgb(var(--cta-ground-rgb) / 0) 70%);
     }
   }
 </style>

@@ -11,7 +11,6 @@ export default {
       'The Cognitive Twin for refineries, terminals, pipelines and gas networks: fire, flood, heat, wind and drought risk per unit and corridor.',
   },
   hero: {
-    label: 'Predicterra for Oil & Gas',
     title: 'See what’s coming to every site and pipeline.',
     text: 'Protect sites and pipelines before the fire or flood arrives, plan turnarounds and maintenance around real risk, and give insurers exposure they can price.',
     primary: actions.demo,
@@ -47,5 +46,5 @@ export default {
       },
     ],
   },
-  cta: cta('See your sites and networks', 'in the', 'Cognitive Twin.'),
+  cta,
 } satisfies SolutionCopy;

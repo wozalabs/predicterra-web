@@ -16,6 +16,14 @@ export function mountTitleLines() {
         top = w.offsetTop;
       }
       w.style.setProperty('--d', `${FIRST + line * STEP}ms`);
+      // Open the mask once the word has risen, so a burnt word's glow is never cut.
+      const inner = w.firstElementChild as HTMLElement | null;
+      const open = () => w.classList.add('is-open');
+      if (!inner || getComputedStyle(inner).animationName === 'none') open();
+      else {
+        inner.addEventListener('animationend', open, { once: true });
+        window.setTimeout(open, 3000);
+      }
     }
   });
 }

@@ -12,7 +12,6 @@ export default {
       'Audit-ready CSRD, EU Taxonomy and CER reporting from the same model your teams operate, with every figure traced to its data.',
   },
   hero: {
-    label: 'Compliance · Across all sectors',
     title: 'Prove it, from the model you operate.',
     text: 'CSRD, EU Taxonomy and CER Directive reports come out of the same model your control center uses, with the evidence behind every number.',
     primary: actions.demo,
@@ -49,5 +48,5 @@ export default {
       { title: 'Oil & Gas', text: 'CSRD, CER and natural-hazard inputs for safety reports.', href: routes.sectors.oilGas },
     ],
   },
-  cta: cta('See your compliance evidence', 'in the', 'Cognitive Twin.'),
+  cta,
 } satisfies SolutionCopy;

@@ -134,8 +134,9 @@
   /* Inset CTA card ground (matches the CTA 3D scene). */
   /* App hero: how much of the platform capture shows at the bottom on load. */
   --hero-peek: clamp(11rem, 36vh, 18rem);
-  --cta-ground: #eaeaea;
-  --cta-ground-rgb: 234 234 234;
+  /* Inverted: the CTA card is dark on the light page (scripts/cta-scene.ts). */
+  --cta-ground: #1a1a1a;
+  --cta-ground-rgb: 26 26 26;
   /* Image frames, idle score ticks, the 3D section's dot pattern. */
   --media: #e4e4e4;
   --media-hover: #dadada;
@@ -196,8 +197,9 @@
   --dk-card: #1a1a1a;
   --dk-surface: #242424;
   --logo-inv: 1;
-  --cta-ground: #1a1a1a;
-  --cta-ground-rgb: 26 26 26;
+  /* Inverted: the CTA card is light on the dark page. */
+  --cta-ground: #eaeaea;
+  --cta-ground-rgb: 234 234 234;
   --media: #1e1e1e;
   --media-hover: #262626;
   /* Portraits are cut out on white: a light tile keeps them true to colour. */

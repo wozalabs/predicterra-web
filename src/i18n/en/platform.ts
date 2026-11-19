@@ -10,16 +10,16 @@ export default {
   },
 
   hero: {
-    label: 'Platform',
-    titleLine1: 'The Cognitive Twin',
-    titleLine2: 'of the energy system.',
-    text: 'Predicterra combines simulated physics, a physical ontology and AI in one live model of your energy assets.',
+    title: 'A new era of energy needs a new kind of twin.',
+    accent: 'new kind of twin.',
+    text: 'The climate is moving beyond the historical record, regulators ask for proof of resilience, and the energy transition is adding more assets, more connected, in more exposed places. A Cognitive Twin is a live model of your assets, the physical world acting on them and how everything connects. It tells every team what will happen, why, and what to do.',
     primary: actions.demo,
   },
 
+  // The hero's former title and line, now over the three twins.
   twin: {
-    title: 'A new era of energy needs a new kind of twin.',
-    text: 'The climate is moving beyond the historical record, regulators ask for proof of resilience, and the energy transition is adding more assets, more connected, in more exposed places. A Cognitive Twin is a live model of your assets, the physical world acting on them and how everything connects. It tells every team what will happen, why, and what to do.',
+    title: 'The Cognitive Twin of the energy system.',
+    text: 'Predicterra combines simulated physics, a physical ontology and AI in one live model of your energy assets.',
     columns: ['Descriptive twin', 'Physical twin', 'Cognitive Twin'],
     // What each twin can do, on one scale (the meters on the page).
     scale: ['Describe', 'Simulate', 'Reason', 'Anticipate'],
@@ -201,5 +201,5 @@ export default {
     seals: ['GDPR', 'EU-hosted', 'ISO 27001 certification in progress', 'Microsoft Azure Marketplace'],
   },
 
-  cta: cta('Run your energy system', 'on the', 'Cognitive Twin.'),
+  cta,
 } as const;

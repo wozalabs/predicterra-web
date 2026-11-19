@@ -14,6 +14,7 @@ export default {
 
   // Platform capture under the hero (App layout), with the three pillars under it.
   showcase: {
+    trustedBy: 'Trusted by',
     label: 'The Predicterra platform',
     alt: 'The Predicterra platform: an asset list, satellite view of a transmission tower in Zamora with a wind-speed forecast, and the tower’s risk panel with flood, economic and wildfire scores.',
     // Still capture, kept for other uses (public/showcase/predicterra-app-{960,1600,2400}.webp).
@@ -37,7 +38,7 @@ export default {
       label: 'The Cognitive Twin for energy',
       titleLine1: 'The Cognitive Twin of',
       titleLine2: 'the Energy System',
-      text: 'The digital infrastructure for the new energy system. Every asset, every hazard and every horizon in one live model, so you can answer questions no tool could answer before.',
+      text: 'The cognitive digital twin of the energy system: simulated physics, a physical ontology and AI in one live model of your energy assets and operations.',
       primary: actions.demo,
       secondary: actions.platform,
       pillars: [
@@ -75,8 +76,8 @@ export default {
     clean: {
       titleLine1: 'The Cognitive Twin of',
       titleLine2: 'the Energy System',
-      text: 'The digital infrastructure for the new energy system. Every asset, every hazard and every horizon in one live model, so you can answer questions no tool could answer before.',
-      cta: { label: 'Request a demo', href: routes.demo },
+      text: 'The cognitive digital twin of the energy system: simulated physics, a physical ontology and AI in one live model of your energy assets and operations.',
+      cta: { label: 'Get started', href: routes.demo },
     },
     // Pixel layout (test): the video shows through a pixel mask that drifts
     // slowly; the orange pixels are example alerts. x/y place each alert on
@@ -107,8 +108,8 @@ export default {
       { name: 'Iberdrola', src: '/logos/iberdrola.svg', w: 109, h0: 27, h: 26 },
       { name: 'UFD, Grupo Naturgy', src: '/logos/ufd.svg', w: 848, h0: 512, h: 40 },
       { name: 'Moeve', src: '/logos/moeve.svg', w: 109, h0: 20, h: 19 },
-      { name: 'Microsoft Partner', src: '/logos/microsoft-partner.svg', w: 1352, h0: 350, h: 30 },
-      { name: 'BIND 4.0', src: '/logos/bind.svg', w: 1305, h0: 256, h: 22 },
+      { name: 'Microsoft Partner', src: '/logos/microsoft-partner.svg', w: 1352, h0: 350, h: 24 },
+      { name: 'BIND 4.0', src: '/logos/bind.svg', w: 1305, h0: 256, h: 24 },
     ],
   },
 
@@ -386,5 +387,5 @@ export default {
     { value: '95%', text: 'less time producing climate and compliance reports' },
   ],
 
-  cta: cta('See your system', 'in the', 'Cognitive Twin.'),
+  cta,
 };

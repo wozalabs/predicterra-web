@@ -8,7 +8,7 @@ export default {
     homeLabel: 'Predicterra home',
     menu: 'Menu',
     closeMenu: 'Close menu',
-    demo: 'Request a demo',
+    demo: 'Get started',
     navLabel: 'Main',
     toLight: 'Switch to light theme',
     toDark: 'Switch to dark theme',
@@ -170,7 +170,7 @@ export default {
     title: 'Page not found.',
     text: 'The page you’re looking for doesn’t exist or has moved.',
     primary: { label: 'Back to home', href: routes.home },
-    secondary: { label: 'Request a demo', href: routes.demo },
+    secondary: { label: 'Get started', href: routes.demo },
     links: [
       { label: 'Platform', href: routes.platform },
       { label: 'Grid', href: routes.sectors.grid },
