@@ -63,7 +63,7 @@ html[data-rhythm='c'] {
 }
 
 /* Hero: the title and the description on the scale. */
-html:is([data-rhythm='b'], [data-rhythm='c']) .hpn__title {
+html:is([data-rhythm='b'], [data-rhythm='c']) .hpn__head {
   font-size: var(--r-hero);
 }
 

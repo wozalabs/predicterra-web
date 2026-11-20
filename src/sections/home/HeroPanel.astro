@@ -21,10 +21,18 @@ const { main } = getCopy(locale).home.hero;
 <section class="hpn" aria-labelledby="hpn-title" data-hero-variant="panel">
   <div class="hpn__panel" data-header-light>
     <div class="container hpn__inner">
-      <h1 id="hpn-title" class="hpn__title">
-        <span class="hpn__line"><span>{main.titleLine1}</span></span>
-        <span class="hpn__line"><span>{main.titleLine2}</span></span>
-      </h1>
+      <!-- The brand's corner in the orange square, a rule, then the title: the
+           same row as Why us and the 3D section's sector titles. -->
+      <div class="hpn__head">
+        <span class="ibox hpn__mark" aria-hidden="true">
+          <svg viewBox="3.89 -0.11 220 220"><path d="M113.472 36.8552V64.4133H67.5418V110.343H39.9844V36.8552H113.472Z" /></svg>
+        </span>
+        <span class="hpn__divider" aria-hidden="true"></span>
+        <h1 id="hpn-title" class="hpn__title">
+          <span class="hpn__line"><span>{main.titleLine1}</span></span>
+          <span class="hpn__line"><span>{main.titleLine2}</span></span>
+        </h1>
+      </div>
       <span class="hpn__rise" aria-hidden="true"></span>
       <p class="hpn__text">{main.text}</p>
     </div>
@@ -125,9 +133,35 @@ const { main } = getCopy(locale).home.hero;
     }
   }
 
+  /* The square as tall as the title's first line, beside it (the title sets
+     its size on the row, so the square follows it in em). */
+  .hpn__head {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(1rem, 0.75rem + 0.8vw, 1.5rem);
+    font-size: clamp(2.5rem, 1rem + 4vw, 5.25rem);
+  }
+
+  .hpn__mark {
+    --ibox: 0.96em;
+  }
+
+  .hpn__mark svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hpn__divider {
+    flex: none;
+    height: 0.96em;
+    width: 1px;
+    background: currentColor;
+    opacity: 0.2;
+  }
+
   .hpn__title {
     display: grid;
-    font-size: clamp(2.5rem, 1rem + 4vw, 5.25rem);
+    font-size: 1em;
     font-weight: 400;
     line-height: 0.96;
     letter-spacing: var(--track-display);
@@ -153,6 +187,14 @@ const { main } = getCopy(locale).home.hero;
     display: block;
   }
 
+  /* Wide screens: each line on one line; the square takes the room it would
+     otherwise wrap in (the last line, the longest, sits clear of the rise). */
+  @media (min-width: 75rem) {
+    .hpn__line {
+      white-space: nowrap;
+    }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .hpn__line > span {
       animation: hpn-line 850ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
@@ -165,6 +207,10 @@ const { main } = getCopy(locale).home.hero;
     }
     .hpn__text {
       animation: hpn-focus 800ms cubic-bezier(0.33, 1, 0.68, 1) 320ms backwards;
+    }
+    .hpn__mark,
+    .hpn__divider {
+      animation: hpn-focus 800ms cubic-bezier(0.33, 1, 0.68, 1) 120ms backwards;
     }
   }
 

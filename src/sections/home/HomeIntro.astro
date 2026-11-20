@@ -188,6 +188,8 @@ import Logo from '../../components/Logo.astro';
   /* The copy and the platform are let go a little before the end (data-intro-text),
      while the rise is still settling, so their entrances follow on without a gap. */
   html[data-intro]:not([data-intro-text]) .hpn .hpn__line > span,
+  html[data-intro]:not([data-intro-text]) .hpn .hpn__mark,
+  html[data-intro]:not([data-intro-text]) .hpn .hpn__divider,
   html[data-intro]:not([data-intro-text]) .hpn .hpn__text,
   html[data-intro]:not([data-intro-text]) .sc .sc__stage {
     opacity: 0 !important;
@@ -227,7 +229,7 @@ import Logo from '../../components/Logo.astro';
 
     // The logo where the title will sit (its last line).
     const lh = 28; // logo height (1.75rem)
-    const title = panel.querySelector<HTMLElement>('.hpn__title');
+    const title = panel.querySelector<HTMLElement>('.hpn__head') ?? panel.querySelector<HTMLElement>('.hpn__title');
     const tr = title?.getBoundingClientRect();
     const lx = tr ? tr.left : pr.left + 24;
     const lw = logo.getBoundingClientRect().width || 174;
