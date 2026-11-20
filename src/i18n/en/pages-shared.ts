@@ -77,8 +77,6 @@ export const proof = {
 
 /** The closing card on every page: one title and one button. */
 export const cta = {
-  title: 'Explore',
-  /** The word in orange (burnt with the text effect on). */
-  accent: 'Predicterra',
+  title: 'Explore Predicterra',
   primary: actions.demo,
 };

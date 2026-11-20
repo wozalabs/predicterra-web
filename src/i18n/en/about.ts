@@ -10,7 +10,6 @@ export default {
   },
   hero: {
     title: 'European deep-tech for the energy system.',
-    accent: 'energy system.',
     text: 'Predicterra builds the Cognitive Twin of the energy system: a live model of energy assets, the physical world acting on them and how everything connects.',
     note: 'Built in Bilbao, trusted by Iberdrola, Naturgy and Moeve.',
     photo: {

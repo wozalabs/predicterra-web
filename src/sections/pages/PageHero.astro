@@ -19,8 +19,6 @@ interface Props {
   locale?: Locale;
   id?: string;
   title: string;
-  /** The title's closing words, in orange. */
-  accent?: string;
   text: string;
   /** A short line under the text (About: where it's built, who runs it). */
   note?: string;
@@ -28,7 +26,7 @@ interface Props {
   secondary?: Link;
   logos?: LogoGroup[];
 }
-const { locale = 'en', id = 'page-title', title, accent, text, note, primary, secondary, logos } = Astro.props;
+const { locale = 'en', id = 'page-title', title, text, note, primary, secondary, logos } = Astro.props;
 const hasVisual = Astro.slots.has('visual');
 const below = hasVisual || !!logos;
 ---
@@ -36,7 +34,7 @@ const below = hasVisual || !!logos;
 <section class:list={['ph', below && 'ph--below']} aria-labelledby={id}>
   <div class="ph__panel" data-header-light>
     <div class="container ph__inner">
-      <PageTitle id={id} class="ph__title" text={title} accent={accent} />
+      <PageTitle id={id} class="ph__title" text={title} />
       <div class="ph__side">
         <p class="ph__text" data-reveal>{text}</p>
         {
@@ -109,8 +107,6 @@ const below = hasVisual || !!logos;
     --ink: #1e1e1e;
     --ink-2: #4d4d4d;
     --muted: #767676;
-    --burn-base: rgb(74 18 6);
-    --burn-tint: rgb(254 60 1);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 58% 100%, calc(58% - var(--notch)) calc(100% - var(--notch)), 0 calc(100% - var(--notch)));
   }
 

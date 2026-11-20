@@ -13,7 +13,7 @@
 // titles simply appear.
 
 const REVEAL_STAGGER_MS = 70;
-const RENDER_MS = 600;
+const RENDER_MS = 800;
 
 type RenderEl = HTMLElement & { __busy?: boolean; __timer?: number };
 

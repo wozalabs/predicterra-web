@@ -149,10 +149,6 @@
   --glow-core: 255 55 0;
   --glow-warm: 255 138 42;
   --glow-a: 0.42;
-  /* Burnt text (scripts/burn.ts): the letters at rest, and the hot orange the
-     moving hot spot tints them with. */
-  --burn-base: rgb(74 18 6);
-  --burn-tint: rgb(254 60 1);
   /* Sunrise behind the App hero capture: ember, core, warm and light (rgb
      triplets, the brand fire from deep red to amber), its strength on this
      canvas and its grain. */
@@ -207,8 +203,6 @@
   --tick-off: #333333;
   --scene-dot: #242424;
   --glow-a: 0.72;
-  --burn-base: rgb(178 36 6);
-  --burn-tint: rgb(255 98 30);
   --sun-ember: 140 22 0;
   --sun-core: 255 55 0;
   --sun-warm: 255 106 26;

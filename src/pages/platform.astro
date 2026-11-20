@@ -7,11 +7,11 @@
  */
 import PageLayout from '../layouts/PageLayout.astro';
 import PageHero from '../sections/pages/PageHero.astro';
-import TwinMeter from '../sections/pages/TwinMeter.astro';
+import TwinNest from '../sections/pages/TwinNest.astro';
 import Rows from '../sections/pages/Rows.astro';
 import SectionHead from '../sections/pages/SectionHead.astro';
 import Stats from '../sections/pages/Stats.astro';
-import CodePanel from '../components/CodePanel.astro';
+import DataFlow from '../sections/pages/DataFlow.astro';
 import AssetCard from '../components/AssetCard.astro';
 import Cta from '../sections/home/Cta.astro';
 import { getCopy } from '../i18n/config';
@@ -33,14 +33,16 @@ const pad = (n: number) => String(n).padStart(3, '0');
   <PageHero locale={locale} {...c.hero} />
 
   <!-- Three kinds of twin on one scale: the first two stop part way. -->
-  <TwinMeter
+  <!-- Three kinds of twin, each nested in the one that can do more. -->
+  <TwinNest
     id="twin-title"
     title={c.twin.title}
     text={c.twin.text}
     columns={c.twin.columns}
     rows={c.twin.rows}
-    levels={c.twin.levels}
-    scale={c.twin.scale}
+    tags={c.twin.tags}
+    axisY={c.twin.axisY}
+    axisX={c.twin.axisX}
     closing={c.twin.closing}
   />
 
@@ -103,57 +105,11 @@ const pad = (n: number) => String(n).padStart(3, '0');
     items={c.built.items.map((it) => ({ value: it.value, text: it.title, note: it.text }))}
   />
 
-  <!-- In and out, then validation and trust entering over it as a panel (scripts/panels.ts). -->
-  <div class="pnl">
-  <section class="pf-io pg-sec" aria-labelledby="io-title">
-    <div class="container pg-body">
-      <SectionHead id="io-title" title={c.io.title} text={c.io.text} align="side" />
-      <!-- A flow: what goes in runs into the twin, what comes out leaves it.
-           Pulses travel along the connectors (none with reduced motion). -->
-      <div class="pf-flow" data-reveal>
-        <div class="pf-flow__side">
-          <p class="pf-flow__label t-small">{c.io.inLabel}</p>
-          <ul class="pf-flow__list">
-            {c.io.in.map((it, i) => (
-              <li class="pf-flow__item pf-flow__item--in" style={`--i:${i}`}>
-                <span class="pg-idx">{pad(i + 1)}</span>
-                <span>{it}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+  <!-- In and out: the home's pinned 3D scroll, Predicterra as the chip in the middle. -->
+  <DataFlow locale={locale} />
 
-        <div class="pf-flow__core">
-          <p class="pf-flow__brand">Predicterra</p>
-          <p class="pf-flow__kind t-small">{c.twin.columns[c.twin.columns.length - 1]}</p>
-          <ul class="pf-flow__layers">
-            {c.architecture.layers.map((l) => <li>{l.title}</li>)}
-          </ul>
-        </div>
-
-        <div class="pf-flow__side">
-          <p class="pf-flow__label pf-flow__label--out t-small">{c.io.outLabel}</p>
-          <ul class="pf-flow__list">
-            {c.io.out.map((it, i) => (
-              <li class="pf-flow__item pf-flow__item--out" style={`--i:${i}`}>
-                <span class="pg-idx">{pad(i + 1)}</span>
-                <span>{it}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <!-- Every output is a structured object: the note and an example of one. -->
-      <div class="pf-io__grid">
-        <p class="pf-io__note" data-reveal>{c.io.note}</p>
-        <div class="pf-io__code" data-reveal>
-          <CodePanel label={c.io.code.label} json={c.io.code.json} />
-        </div>
-      </div>
-    </div>
-  </section>
-
+  <!-- Validation and trust slides over the pinned board, notched top edge first. -->
+  <div class="pf-cover">
   <Rows id="trust-title" title={c.trust.title} items={c.trust.items} dark>
     <div class="pf-trust" data-reveal>
       <p class="pf-trust__text">{c.trust.statement}</p>
@@ -259,195 +215,17 @@ const pad = (n: number) => String(n).padStart(3, '0');
     color: var(--ink-2);
   }
 
-  /* ---------- In and out: a flow through the twin ----------
-     Inputs on the left, the twin in the middle (the fire block), outputs on
-     the right. Each item is joined to the block by a hairline that a small
-     pulse runs along: into the twin on the left, out of it on the right. */
-  .pf-flow {
-    --link: clamp(2rem, 1rem + 3vw, 4.5rem);
-    display: grid;
-    gap: 2.5rem;
-  }
-
-  @media (min-width: 64rem) {
-    .pf-flow {
-      grid-template-columns: minmax(0, 1fr) minmax(13rem, 16rem) minmax(0, 1fr);
-      gap: 0 var(--link);
-      align-items: stretch;
-    }
-  }
-
-  .pf-flow__side {
-    display: grid;
-    align-content: center;
-  }
-
-  .pf-flow__label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-    color: var(--muted);
-  }
-
-  .pf-flow__label--out {
-    color: var(--ink);
-  }
-
-  .pf-flow__label--out::before {
-    content: '';
-    width: 0.5rem;
-    height: 0.5rem;
-    background: var(--accent);
-  }
-
-  .pf-flow__list {
-    display: grid;
-    gap: 0.5rem;
-    padding: 0;
-    list-style: none;
-  }
-
-  .pf-flow__item {
+  /* ---------- Trust: slides over the pinned data flow ---------- */
+  .pf-cover {
     position: relative;
-    display: grid;
-    grid-template-columns: 2.5rem minmax(0, 1fr);
-    gap: 0.5rem;
-    align-items: baseline;
-    min-height: 4rem;
-    align-content: center;
-    padding: 0.875rem 1rem;
-    background: var(--card);
-    color: var(--ink-2);
-    font-size: var(--fs-small);
-    line-height: 1.4;
+    z-index: var(--z-cover);
+    margin-top: -100svh;
+    clip-path: var(--notch-top);
+    background: var(--canvas);
   }
 
-  .pf-flow__item--out {
-    color: var(--ink);
-  }
-
-  /* The connector, and its pulse (wide screens, where the block sits beside). */
-  @media (min-width: 64rem) {
-    .pf-flow__item::before,
-    .pf-flow__item::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: var(--link);
-      pointer-events: none;
-    }
-    .pf-flow__item::before {
-      height: 1px;
-      background: var(--line-strong);
-    }
-    .pf-flow__item::after {
-      height: 3px;
-      margin-top: -1px;
-      background: linear-gradient(90deg, rgb(255 55 0 / 0), var(--accent) 70%, #ff8a2a);
-      background-size: 40% 100%;
-      background-repeat: no-repeat;
-      background-position: -100% 0;
-    }
-    .pf-flow__item--in::before,
-    .pf-flow__item--in::after {
-      left: 100%;
-    }
-    .pf-flow__item--out::before,
-    .pf-flow__item--out::after {
-      right: 100%;
-    }
-  }
-
-  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
-    .pf-flow__item::after {
-      animation: pf-pulse 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-      animation-delay: calc(var(--i) * 0.37s);
-    }
-    .pf-flow__item--out::after {
-      animation-delay: calc(1.2s + var(--i) * 0.37s);
-    }
-  }
-
-  @keyframes pf-pulse {
-    0% {
-      background-position: -100% 0;
-    }
-    55%,
-    100% {
-      background-position: 200% 0;
-    }
-  }
-
-  /* The twin: the fire block, the brand at the top, the four layers below. */
-  .pf-flow__core {
-    position: relative;
-    display: grid;
-    align-content: space-between;
-    gap: 2rem;
-    min-height: 16rem;
-    padding: 1.5rem;
-    background: var(--accent);
-    background: var(--grad-panel);
-    background-size: var(--grad-panel-size);
-    animation: var(--fire-panel-motion);
-    box-shadow: var(--fire-edge-panel);
-    color: #fff;
-  }
-
-  .pf-flow__core::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--grain);
-    opacity: 0.18;
-    mix-blend-mode: overlay;
-    pointer-events: none;
-  }
-
-  .pf-flow__brand {
-    font-size: var(--fs-h3);
-    line-height: 1;
-    letter-spacing: var(--track-heading);
-  }
-
-  .pf-flow__kind {
-    margin-top: -1.5rem;
-    color: rgb(255 255 255 / 0.8);
-  }
-
-  .pf-flow__layers {
-    display: grid;
-    padding: 0;
-    list-style: none;
-  }
-
-  .pf-flow__layers li {
-    padding-block: 0.625rem;
-    border-top: 1px solid rgb(255 255 255 / 0.28);
-    font-size: var(--fs-small);
-  }
-
-  /* The note and one output as it leaves the twin. */
-  .pf-io__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2.5rem clamp(3rem, 1rem + 5vw, 7rem);
-  }
-
-  @media (min-width: 64rem) {
-    .pf-io__grid {
-      grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
-      align-items: center;
-    }
-  }
-
-  .pf-io__note {
-    max-width: 46ch;
-    font-size: var(--fs-lead);
-    line-height: 1.5;
-    letter-spacing: var(--track-title);
-    color: var(--ink-2);
+  .pf-cover > :global(section) {
+    min-height: 100svh;
   }
 
   /* ---------- Trust ---------- */

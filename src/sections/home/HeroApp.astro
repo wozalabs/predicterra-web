@@ -19,7 +19,7 @@ const { main } = getCopy(locale).home.hero;
   <div class="hap__content container">
     <h1 id="hap-title" class="hap__title">
       <span class="hap__line"><span>{main.titleLine1}</span></span>
-      <span class="hap__line"><span><span class="accent" data-burn>{main.titleLine2}</span></span></span>
+      <span class="hap__line"><span>{main.titleLine2}</span></span>
     </h1>
     <p class="hap__text">{main.text}</p>
     <!-- <div class="hap__actions">
@@ -79,16 +79,10 @@ const { main } = getCopy(locale).home.hero;
     margin-top: clamp(1.5rem, 1rem + 1.2vw, 2.25rem);
   }
 
-  /* Once a line has risen, its mask opens, so the burnt glow and blur are
-     never cut at the line's edges (script below). */
-  .hap__line.is-open {
-    overflow: visible;
-  }
 
-  /* Masked lines (padding keeps descenders inside the mask) */
+  /* One block per line, each fading in on its own beat. */
   .hap__line {
     display: block;
-    overflow: clip;
     padding-bottom: 0.12em;
     margin-bottom: -0.12em;
   }
@@ -101,7 +95,7 @@ const { main } = getCopy(locale).home.hero;
      the button focus in (same timing as the video hero). */
   @media (prefers-reduced-motion: no-preference) {
     .hap__line > span {
-      animation: hap-line 1100ms cubic-bezier(0.19, 1, 0.22, 1) both;
+      animation: hap-line 850ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
       animation-delay: var(--d, 0ms);
     }
     .hap__line:nth-child(1) > span {
@@ -112,7 +106,7 @@ const { main } = getCopy(locale).home.hero;
     }
     .hap__text,
     .hap__actions {
-      animation: hap-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) both;
+      animation: hap-focus 800ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
     }
     .hap__text {
       animation-delay: 460ms;
@@ -122,27 +116,23 @@ const { main } = getCopy(locale).home.hero;
     }
   }
 
+  /* In place: each line fades in out of a soft blur, nothing moves; a touch
+     of orange settles to the ink. */
   @keyframes hap-line {
     from {
-      transform: translateY(108%);
+      opacity: 0;
+      filter: blur(12px);
+      color: var(--accent);
+    }
+    35% {
+      color: var(--accent);
     }
   }
 
   @keyframes hap-focus {
     from {
       opacity: 0;
-      transform: translateY(10px);
       filter: blur(6px);
     }
   }
 </style>
-
-<script>
-  document.querySelectorAll<HTMLElement>('.hap__line').forEach((line) => {
-    const open = () => line.classList.add('is-open');
-    const inner = line.firstElementChild as HTMLElement | null;
-    if (!inner || getComputedStyle(inner).animationName === 'none') return open();
-    inner.addEventListener('animationend', open, { once: true });
-    window.setTimeout(open, 2500);
-  });
-</script>

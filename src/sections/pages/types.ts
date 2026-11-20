@@ -22,7 +22,6 @@ export interface Block {
 
 export interface CtaCopy {
   title: string;
-  accent?: string;
   primary: Link;
 }
 
@@ -34,7 +33,7 @@ export interface CtaCopy {
  */
 export interface SolutionCopy {
   seo: { title: string; description: string };
-  hero: { title: string; accent?: string; text: string; primary: Link; secondary?: Link };
+  hero: { title: string; text: string; primary: Link; secondary?: Link };
   asset?: 'grid' | 'solar' | 'wind' | 'oilgas';
   proof: Proof;
   metrics: Stat[];

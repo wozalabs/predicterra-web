@@ -1,0 +1,392 @@
+---
+/**
+ * Platform, "Start with the data you already run", as the home's pinned 3D
+ * scroll (scripts/sector-scene/flow-controller.ts + world-flow.ts): a circuit
+ * board with Predicterra as the chip in the middle, the data going in on the
+ * left and the results coming out on the right.
+ *
+ * The copy works like the home's sector stops: one layer per stop on the left
+ * (the icon square, a rule and the title in a row, one line under it, and the
+ * stop's list numbered 001–005). The same numbers sit on the board next to
+ * each source and result, so the list and the scene read together. The last
+ * stop opens the risk event as a card beside the tower it describes.
+ */
+import Icon from '../../components/Icon.astro';
+import CodePanel from '../../components/CodePanel.astro';
+import { getCopy, type Locale } from '../../i18n/config';
+import type { IconName } from '../../data/icons';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { platform: c } = getCopy(locale);
+const io = c.io;
+const pad = (n: number) => String(n).padStart(3, '0');
+
+type Step = { icon: IconName; title: string; text: string; items?: readonly string[]; note?: string; numbered?: boolean };
+const steps: Step[] = [
+  { icon: 'database', title: io.inLabel, text: io.inText, items: io.in, numbered: true },
+  { icon: 'hub', title: 'Predicterra', text: io.coreText, items: c.architecture.layers.map((l) => l.title) },
+  { icon: 'query_stats', title: io.outLabel, text: io.outText, items: io.out, numbered: true },
+  { icon: 'api', title: io.apiTitle, text: io.apiText, note: io.apiNote },
+];
+---
+
+<section class="df" id="data" aria-labelledby="io-title" data-flow style={`--stops:${steps.length + 1}`}>
+  <!-- theme-scrub: the stage keeps its own theme while the page darkens for the next section. -->
+  <div class="df__stage theme-scrub" data-stage>
+    <div class="df__canvas" data-canvas-host aria-hidden="true"></div>
+
+    <div class="df__copy container">
+      <!-- Stop 0: the whole board. -->
+      <div class="df-step df-step--intro" data-step="0" data-active>
+        <h2 id="io-title" class="df-step__intro-title" data-render>{io.title}</h2>
+        <p class="df-step__text">{io.text}</p>
+      </div>
+
+      {
+        steps.map((s, i) => (
+          <article class="df-step" data-step={i + 1} aria-labelledby={`df-${i + 1}-title`}>
+            <div class="df-step__head">
+              <Icon name={s.icon} boxed size="var(--step-size)" />
+              <span class="df-step__divider" aria-hidden="true" />
+              <h3 id={`df-${i + 1}-title`} class="df-step__title">
+                {s.title}
+              </h3>
+            </div>
+            <p class="df-step__text">{s.text}</p>
+            {s.items && (
+              <ol class:list={['df-step__list', !s.numbered && 'df-step__list--plain']}>
+                {s.items.map((it, k) => (
+                  <li>
+                    {s.numbered && <span class="pg-idx">{pad(k + 1)}</span>}
+                    <span>{it}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+            {s.note && <p class="df-step__note t-small">{s.note}</p>}
+          </article>
+        ))
+      }
+    </div>
+
+    <!-- Labels on the board, following their 3D anchors (decorative: the lists carry the text). -->
+    <div class="df__tags" aria-hidden="true">
+      {io.inShort.map((t, k) => (
+        <span class="df-tag df-tag--in" data-anchor={`in${k}`} data-stops="1">
+          <span class="pg-idx">{pad(k + 1)}</span>
+          <span class="df-tag__name">{t}</span>
+        </span>
+      ))}
+      <span class="df-tag df-tag--core" data-anchor="core" data-stops="0 2">
+        <span class="df-tag__name">Predicterra</span>
+      </span>
+      {io.outShort.map((t, k) => (
+        <span class="df-tag df-tag--out" data-anchor={`out${k}`} data-stops="3">
+          <span class="pg-idx">{pad(k + 1)}</span>
+          <span class="df-tag__name">{t}</span>
+        </span>
+      ))}
+    </div>
+
+    <!-- The last stop: the risk event as it leaves the twin, beside its tower. -->
+    <div class="df__card" data-card>
+      <CodePanel label={io.code.label} json={io.code.json} />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---------- Pinning (as the home's 3D trace) ---------- */
+  .df {
+    position: relative;
+    z-index: var(--z-stage);
+    /* one viewport per stop, half a viewport to hold the last one, plus one
+       for the next section to slide over (LAST_HOLD in flow-controller.ts) */
+    height: calc((var(--stops) + 1.5) * 100svh);
+  }
+
+  .df__stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+    background: var(--canvas);
+    transform-origin: 50% 0;
+  }
+
+  .df__canvas {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    /* Before WebGL: the same dot grid as the 3D ground. */
+    background-image: radial-gradient(circle, var(--scene-dot) 1px, transparent 1.6px);
+    background-size: 22px 22px;
+  }
+
+  .df__canvas :global(canvas) {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+
+  .df__canvas[data-ready] :global(canvas) {
+    opacity: 1;
+  }
+
+  /* Readability veil behind the copy column. */
+  .df__stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgb(var(--canvas-rgb) / 0.94) 0%, rgb(var(--canvas-rgb) / 0.78) 26%, rgb(var(--canvas-rgb) / 0) 46%);
+  }
+
+  /* ---------- Copy layers ---------- */
+  .df__copy {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .df-step {
+    --step-size: clamp(2.25rem, 1.5rem + 2.2vw, 3.5rem);
+    position: absolute;
+    left: var(--gutter);
+    top: 50%;
+    width: min(30rem, 38vw);
+    display: grid;
+    gap: 1.25rem;
+    opacity: 0;
+    transform: translateY(calc(-50% + 12px));
+    transition:
+      opacity 360ms var(--ease-out),
+      transform 480ms var(--ease-out);
+  }
+
+  .df-step[data-active] {
+    opacity: 1;
+    transform: translateY(-50%);
+    transition:
+      opacity 420ms var(--ease-out) 80ms,
+      transform 560ms var(--ease-out) 80ms;
+  }
+
+  .df-step__intro-title {
+    max-width: 14ch;
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: var(--track-heading);
+  }
+
+  .df-step__head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .df-step__divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--line-strong);
+  }
+
+  .df-step__title {
+    font-size: var(--step-size);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: var(--track-heading);
+  }
+
+  .df-step__text {
+    max-width: 34ch;
+    color: var(--ink-2);
+  }
+
+  .df-step__list {
+    display: grid;
+    gap: 0.625rem;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-small);
+  }
+
+  .df-step__list li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.75rem;
+    color: var(--ink);
+  }
+
+  .df-step__list .pg-idx {
+    transform: translateY(-0.1em);
+  }
+
+  /* The four layers: a plain list under a hairline each. */
+  .df-step__list--plain li {
+    display: block;
+    padding-top: 0.625rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .df-step__note {
+    max-width: 40ch;
+    color: var(--muted);
+  }
+
+  /* ---------- Labels on the board ---------- */
+  .df__tags {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .df-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.625rem 0.25rem 0.25rem;
+    background: var(--surface);
+    box-shadow:
+      0 1px 2px rgb(30 30 30 / 0.06),
+      0 8px 24px -10px rgb(30 30 30 / 0.25);
+    font-size: var(--fs-small);
+    white-space: nowrap;
+    /* Centred above its anchor. */
+    translate: -50% calc(-100% - 10px);
+    opacity: 0;
+    scale: 0.96;
+    transition:
+      opacity 240ms ease,
+      scale 320ms var(--ease-out);
+    will-change: transform;
+  }
+
+  .df-tag[data-on] {
+    opacity: 1;
+    scale: 1;
+    transition:
+      opacity 420ms ease 120ms,
+      scale 520ms var(--ease-out) 120ms;
+  }
+
+  /* Sources: label to the left of the plinth; results: to the right. */
+  .df-tag--in {
+    translate: calc(-100% - 6px) -50%;
+  }
+
+  .df-tag--out {
+    translate: 6px -50%;
+  }
+
+  .df-tag--core {
+    padding: 0.375rem 0.75rem;
+  }
+
+  /* Labels need the 3D scene; without it the lists carry everything. */
+  .df:not([data-ready]) .df-tag {
+    display: none;
+  }
+
+  /* ---------- Risk event card ---------- */
+  .df__card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: min(26rem, 34vw);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate3d(var(--x, 0), var(--y, 0), 0);
+    translate: 0 8px;
+    transition:
+      opacity 220ms ease,
+      translate 260ms var(--ease-out),
+      visibility 0s linear 260ms;
+  }
+
+  .df__card[data-open] {
+    pointer-events: auto;
+    opacity: 1;
+    visibility: visible;
+    translate: 0 0;
+    transition:
+      opacity 460ms cubic-bezier(0.22, 1, 0.36, 1) 160ms,
+      translate 620ms cubic-bezier(0.22, 1, 0.36, 1) 160ms,
+      visibility 0s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .df__card,
+    .df__card[data-open],
+    .df-tag,
+    .df-tag[data-on] {
+      translate: none;
+      scale: none;
+    }
+    .df-tag--core {
+      translate: -50% calc(-100% - 10px);
+    }
+  }
+
+  /* ---------- Small screens: the copy on top, the board under it ---------- */
+  @media (max-width: 47.99rem) {
+    .df__stage::before {
+      background: linear-gradient(180deg, rgb(var(--canvas-rgb) / 0.95) 0%, rgb(var(--canvas-rgb) / 0.85) 40%, rgb(var(--canvas-rgb) / 0) 56%);
+    }
+    .df-step {
+      top: calc(var(--header-h) + 1.5rem);
+      right: var(--gutter);
+      width: auto;
+      gap: 0.75rem;
+      transform: translateY(12px);
+    }
+    .df-step[data-active] {
+      transform: none;
+    }
+    .df-step__text {
+      font-size: var(--fs-small);
+    }
+    .df-step__list {
+      gap: 0.375rem;
+      font-size: var(--fs-caption, 0.8125rem);
+    }
+    .df-tag {
+      font-size: 0.75rem;
+    }
+    .df-tag__name {
+      display: none;
+    }
+    .df-tag--core .df-tag__name {
+      display: inline;
+    }
+    .df__card {
+      left: var(--gutter);
+      right: var(--gutter);
+      top: auto;
+      bottom: var(--gutter);
+      width: auto;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  import { mountFlowScene } from '../../scripts/sector-scene/flow-controller';
+
+  const root = document.querySelector<HTMLElement>('[data-flow]');
+  if (root) mountFlowScene(root);
+</script>

@@ -1,5 +1,4 @@
 ---
-import TextFxSwitch from '../components/TextFxSwitch.astro';
 import '../styles/global.css';
 import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2?url';
 import SiteHeader from '../components/SiteHeader.astro';
@@ -73,12 +72,6 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
       } catch (e) {
         document.documentElement.dataset.hero = 'app';
       }
-      // Orange text style (test switch, bottom left): burnt unless gradient was chosen.
-      try {
-        document.documentElement.dataset.textFx = localStorage.getItem('predicterra:text-fx') === 'gradient' ? 'gradient' : 'burnt';
-      } catch (e) {
-        document.documentElement.dataset.textFx = 'burnt';
-      }
       // The header animates in on the first page of a visit only, not on every navigation.
       try {
         if (sessionStorage.getItem('predicterra:seen')) document.documentElement.classList.add('is-return');
@@ -128,15 +121,11 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
       import { mountReveal } from '../scripts/reveal';
       import { mountTitleLines } from '../scripts/title-lines';
       import { mountPanels } from '../scripts/panels';
-      import { mountBurn } from '../scripts/burn';
       import { mountCount } from '../scripts/count';
       mountTitleLines();
       mountReveal();
       mountPanels();
-      mountBurn();
       mountCount();
     </script>
-    <!-- Test only: orange text style switch. -->
-    <TextFxSwitch />
   </body>
 </html>

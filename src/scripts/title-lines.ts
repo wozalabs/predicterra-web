@@ -1,6 +1,6 @@
 /**
  * Page titles (components/PageTitle.astro): every word takes the entrance delay
- * of the line it sits on, so the title rises line by line like the home hero.
+ * of the line it sits on, so the title comes in line by line like the home hero.
  */
 const FIRST = 200; // ms, the hero's first line
 const STEP = 90; // ms between lines
@@ -16,14 +16,6 @@ export function mountTitleLines() {
         top = w.offsetTop;
       }
       w.style.setProperty('--d', `${FIRST + line * STEP}ms`);
-      // Open the mask once the word has risen, so a burnt word's glow is never cut.
-      const inner = w.firstElementChild as HTMLElement | null;
-      const open = () => w.classList.add('is-open');
-      if (!inner || getComputedStyle(inner).animationName === 'none') open();
-      else {
-        inner.addEventListener('animationend', open, { once: true });
-        window.setTimeout(open, 3000);
-      }
     }
   });
 }

@@ -1,0 +1,685 @@
+---
+/**
+ * Three kinds of twin as nested panels (Platform): each one sits inside the
+ * one that can do more, so the Cognitive Twin is the whole frame and the
+ * other two are parts of it. Two axes run along the outer panel (what it
+ * understands, how far it sees ahead). The Cognitive Twin is white in both
+ * themes, the panels inside it light greys; its chip carries the orange. Each panel: its chip, its name, what it asks, what it does.
+ * The panels come in from the outside in as they enter the screen: the frame,
+ * then each part inside it.
+ *
+ * Test: three compositions behind a switch (data-tn-v, kept in localStorage
+ * 'predicterra:twin-v'): stairs (the default above), rings (concentric frames,
+ * the copy centred in each band) and layers (isometric slabs stacked on the
+ * Cognitive Twin, the copy beside them). Remove the switch and the unused
+ * styles once one is chosen.
+ */
+import SectionHead from './SectionHead.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  text?: string | readonly string[];
+  columns: readonly string[];
+  rows: readonly { label: string; cells: readonly string[] }[];
+  tags: readonly string[];
+  axisY: string;
+  axisX: string;
+  closing?: string;
+}
+const { id, title, text, columns, rows, tags, axisY, axisX, closing } = Astro.props;
+const twins = columns.map((name, i) => ({ name, tag: tags[i], rows: rows.map((r) => ({ label: r.label, text: r.cells[i] })) }));
+const [d, p, c] = twins;
+const variants = [
+  { id: 'stairs', label: 'Staircase' },
+  { id: 'rings', label: 'Rings' },
+  { id: 'layers', label: 'Layers' },
+];
+---
+
+<section class="tn pg-sec" aria-labelledby={id} data-tn-v="stairs">
+  <div class="container pg-body">
+    <SectionHead id={id} title={title} text={text} align="center" />
+
+    <div class="tn__switch" role="group" aria-label="Twin layout (test)">
+      {variants.map((v) => (
+        <button type="button" class="tn__switch-btn" data-tn-option={v.id} aria-pressed="false">
+          {v.label}
+        </button>
+      ))}
+    </div>
+
+    <div class="tn__chart" data-tn>
+      <p class="tn__axis tn__axis--y t-small" aria-hidden="true"><span>{axisY}</span></p>
+
+      <!-- The Cognitive Twin: the whole frame, white in both themes. -->
+      <div class="tn__frame">
+      <div class="tn__box tn__box--3">
+        <div class="tn__copy tn__copy--hi">
+          <span class="tn__tag tn__tag--hi">{c.tag}</span>
+          <h3 class="tn__name">{c.name}</h3>
+          <dl class="tn__rows">
+            {c.rows.map((r) => (
+              <div>
+                <dt class="t-small">{r.label}</dt>
+                <dd>{r.text}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <!-- The physical twin, inside it. -->
+        <div class="tn__box tn__box--2">
+          <div class="tn__copy">
+            <span class="tn__tag">{p.tag}</span>
+            <h3 class="tn__name">{p.name}</h3>
+            <dl class="tn__rows">
+              {p.rows.map((r) => (
+                <div>
+                  <dt class="t-small">{r.label}</dt>
+                  <dd>{r.text}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <!-- The descriptive twin, the innermost. -->
+          <div class="tn__box tn__box--1">
+            <div class="tn__copy">
+              <span class="tn__tag">{d.tag}</span>
+              <h3 class="tn__name">{d.name}</h3>
+              <dl class="tn__rows">
+                {d.rows.map((r) => (
+                  <div>
+                    <dt class="t-small">{r.label}</dt>
+                    <dd>{r.text}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <p class="tn__axis tn__axis--x t-small" aria-hidden="true"><span>{axisX}</span></p>
+    </div>
+
+    <!-- Layers: isometric slabs, each twin standing on the one that can do more. -->
+    <div class="tn__iso" data-tn-iso>
+      <div class="tn__stack" aria-hidden="true">
+        <div class="tn__plane">
+          <span class="tn__slab tn__slab--3"></span>
+          <span class="tn__slab tn__slab--2"></span>
+          <span class="tn__slab tn__slab--1"></span>
+        </div>
+      </div>
+      <ol class="tn__legend">
+        {[d, p, c].map((t, i) => (
+          <li class:list={['tn__item', i === 2 && 'tn__item--hi']}>
+            <span class:list={['tn__tag', i === 2 && 'tn__tag--hi']}>{t.tag}</span>
+            <h3 class="tn__name">{t.name}</h3>
+            <dl class="tn__rows">
+              {t.rows.map((r) => (
+                <div>
+                  <dt class="t-small">{r.label}</dt>
+                  <dd>{r.text}</dd>
+                </div>
+              ))}
+            </dl>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    {
+      closing && (
+        <p class="pg-statement tn__closing" data-lit>
+          {closing.split(' ').map((w) => (
+            <span class="w">{w} </span>
+          ))}
+        </p>
+      )
+    }
+  </div>
+</section>
+
+<script is:inline>
+  // Test switch: restore the chosen layout before first paint.
+  (function () {
+    try {
+      var v = localStorage.getItem('predicterra:twin-v');
+      var el = document.querySelector('[data-tn-v]');
+      if (el && (v === 'rings' || v === 'layers')) el.setAttribute('data-tn-v', v);
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+  /* Layout: the vertical axis, the frame, the horizontal axis under it. */
+  .tn__chart {
+    --tn-pad: clamp(1.25rem, 0.75rem + 1.5vw, 2rem);
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    gap: 0.75rem;
+  }
+
+  .tn__box {
+    position: relative;
+    display: grid;
+    align-items: start;
+  }
+
+  /* The frame carries a soft shadow (the notch clips the panel's own), so the
+     white panel holds on the light page too. */
+  .tn__frame {
+    grid-column: 2;
+    grid-row: 1;
+    filter: drop-shadow(0 1px 2px rgb(30 30 30 / 0.06)) drop-shadow(0 18px 40px rgb(30 30 30 / 0.08));
+  }
+
+  /* The Cognitive Twin: white with dark copy in both themes; the panels
+     inside it take light greys, the innermost the lightest. */
+  .tn__box--3 {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    background: #ffffff;
+    color: #1e1e1e;
+    --ink: #1e1e1e;
+    --ink-2: #4d4d4d;
+    --muted: #767676;
+    --chip-bg: rgb(30 30 30 / 0.07);
+    --tn-2: #ececec;
+    --tn-1: #f6f6f6;
+    /* The brand's notch on the parent's top edge. */
+    clip-path: polygon(0 18px, calc(42% - 18px) 18px, 42% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .tn__box--2 {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    background: var(--tn-2);
+  }
+
+  .tn__box--1 {
+    background: var(--tn-1);
+  }
+
+  /* Each child sits flush in its parent's bottom-left corner, a step lower than the
+     parent's own copy, so the panels read as a staircase. */
+  .tn__box--3 > .tn__box--2,
+  .tn__box--2 > .tn__box--1 {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    margin-top: clamp(4.5rem, 3rem + 4vw, 7rem);
+  }
+
+  .tn__box--3 > .tn__copy {
+    grid-column: 2;
+    grid-row: 1;
+    padding-top: calc(var(--tn-pad) + 18px);
+  }
+
+  .tn__box--2 > .tn__copy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .tn__copy {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0.75rem;
+    padding: var(--tn-pad);
+  }
+
+  .tn__tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+    padding: 0 0.5rem;
+    background: var(--chip-bg);
+    color: var(--ink-2);
+    font-size: var(--fs-caption);
+    white-space: nowrap;
+  }
+
+  .tn__tag--hi {
+    background: var(--grad-accent);
+    background-size: var(--grad-accent-size);
+    color: #ffffff;
+  }
+
+  .tn__name {
+    font-size: clamp(1.375rem, 1.1rem + 0.8vw, 1.875rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: var(--track-heading);
+  }
+
+  .tn__copy--hi .tn__name {
+    font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
+    font-weight: 500;
+  }
+
+  .tn__rows {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .tn__rows div {
+    display: grid;
+    align-content: start;
+    gap: 0.125rem;
+  }
+
+  .tn__rows dt {
+    color: var(--muted);
+  }
+
+  .tn__rows dd {
+    max-width: 30ch;
+    color: var(--ink-2);
+  }
+
+  .tn__copy--hi .tn__rows dd {
+    color: var(--ink);
+  }
+
+  /* Axes: a hairline with an arrow, the label sitting on it. */
+  .tn__axis {
+    position: relative;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+  }
+
+  .tn__axis span {
+    position: relative;
+    z-index: 1;
+    padding: 0.25rem 0.5rem;
+    background: var(--canvas);
+  }
+
+  .tn__axis::before,
+  .tn__axis::after {
+    content: '';
+    position: absolute;
+    background: var(--line-strong);
+  }
+
+  .tn__axis--y {
+    grid-column: 1;
+    grid-row: 1;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
+  /* Rotated 180°, so the line's "bottom" end is the arrow at the top. */
+  .tn__axis--y::before {
+    inset: 0 auto 0 50%;
+    width: 1px;
+  }
+
+  .tn__axis--y::after {
+    bottom: 0;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    background: none;
+    border-left: 1px solid var(--line-strong);
+    border-bottom: 1px solid var(--line-strong);
+    transform: translate(-50%, 0) rotate(-45deg);
+  }
+
+  .tn__axis--x {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .tn__axis--x::before {
+    inset: 50% 0 auto 0;
+    height: 1px;
+  }
+
+  .tn__axis--x::after {
+    right: 0;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    background: none;
+    border-right: 1px solid var(--line-strong);
+    border-top: 1px solid var(--line-strong);
+    transform: translate(0, -50%) rotate(45deg);
+  }
+
+  /* ================= Test switch ================= */
+  .tn__switch {
+    display: flex;
+    justify-self: center;
+    gap: 0.125rem;
+    padding: 0.25rem;
+    background: var(--chip-bg);
+    font-size: 0.75rem;
+  }
+
+  .tn__switch-btn {
+    min-height: 1.75rem;
+    padding: 0 0.75rem;
+    color: var(--ink-2);
+    transition:
+      background-color 150ms ease-out,
+      color 150ms ease-out;
+  }
+
+  .tn__switch-btn[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--canvas);
+  }
+
+  .tn__iso {
+    display: none;
+  }
+
+  /* ================= Rings: concentric frames =================
+     Each twin a frame around the one before it, the copy centred in the band
+     at its top, what it asks and what it does side by side. */
+  .tn[data-tn-v='rings'] .tn__axis {
+    display: none;
+  }
+
+  .tn[data-tn-v='rings'] .tn__chart {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tn[data-tn-v='rings'] .tn__frame {
+    grid-column: 1;
+  }
+
+  .tn[data-tn-v='rings'] .tn__box--3,
+  .tn[data-tn-v='rings'] .tn__box--2,
+  .tn[data-tn-v='rings'] .tn__box--1 {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0 var(--tn-ring) var(--tn-ring);
+  }
+
+  .tn[data-tn-v='rings'] .tn__box--1 {
+    padding-bottom: 0;
+  }
+
+  .tn[data-tn-v='rings'] .tn__chart {
+    --tn-ring: clamp(1.25rem, 0.5rem + 3vw, 3.5rem);
+  }
+
+  .tn[data-tn-v='rings'] .tn__box > .tn__copy {
+    grid-column: 1;
+    grid-row: 1;
+    justify-items: center;
+    text-align: center;
+    padding-inline: 0;
+  }
+
+  .tn[data-tn-v='rings'] .tn__box--3 > .tn__copy {
+    padding-top: calc(var(--tn-pad) + 24px);
+  }
+
+  .tn[data-tn-v='rings'] .tn__box--3 > .tn__box--2,
+  .tn[data-tn-v='rings'] .tn__box--2 > .tn__box--1 {
+    grid-row: 2;
+    margin: 0;
+    align-self: auto;
+  }
+
+  .tn[data-tn-v='rings'] .tn__rows {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 1rem + 2vw, 3rem);
+    width: min(100%, 44rem);
+    text-align: left;
+  }
+
+  .tn[data-tn-v='rings'] .tn__rows dd {
+    max-width: none;
+  }
+
+  /* The notch sits centred on the outer frame. */
+  .tn[data-tn-v='rings'] .tn__box--3 {
+    clip-path: polygon(0 18px, calc(50% - 18px) 18px, 50% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  /* ================= Layers: isometric slabs =================
+     The Cognitive Twin is the base slab (white, orange sides); the physical
+     and the descriptive twins stand on it, each smaller and higher. The copy
+     runs beside them, top to bottom in the same order as the slabs. */
+  .tn[data-tn-v='layers'] .tn__chart {
+    display: none;
+  }
+
+  .tn[data-tn-v='layers'] .tn__iso {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(2rem, 1rem + 3vw, 4rem);
+  }
+
+  @media (min-width: 56rem) {
+    .tn[data-tn-v='layers'] .tn__iso {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    }
+  }
+
+  /* The shadow sits on the stage: a filter on the 3D plane would flatten it. */
+  .tn__stack {
+    position: relative;
+    height: clamp(22rem, 16rem + 18vw, 34rem);
+    filter: drop-shadow(0 30px 40px rgb(30 30 30 / 0.12));
+  }
+
+  .tn__plane {
+    --s: clamp(13rem, 8rem + 14vw, 22rem);
+    --t: clamp(14px, 0.5rem + 1vw, 22px);
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    width: 0;
+    height: 0;
+    transform-style: preserve-3d;
+    transform: rotateX(58deg) rotateZ(-45deg);
+  }
+
+  .tn__slab {
+    --w: var(--s);
+    position: absolute;
+    left: calc(var(--w) / -2);
+    top: calc(var(--w) / -2);
+    width: var(--w);
+    height: var(--w);
+    background: var(--top);
+    transform-style: preserve-3d;
+    transform: translateZ(var(--z));
+  }
+
+  /* Two visible sides: hung from the front edges. */
+  .tn__slab::before,
+  .tn__slab::after {
+    content: '';
+    position: absolute;
+  }
+
+  .tn__slab::before {
+    left: 0;
+    top: 100%;
+    width: 100%;
+    height: var(--t);
+    background: var(--side-a);
+    transform-origin: top;
+    transform: rotateX(-90deg);
+  }
+
+  .tn__slab::after {
+    left: 0;
+    top: 0;
+    width: var(--t);
+    height: 100%;
+    background: var(--side-b);
+    transform-origin: left;
+    transform: rotateY(90deg);
+  }
+
+  .tn__slab--3 {
+    --z: 0px;
+    --top: #ffffff;
+    --side-a: #ff3700;
+    --side-b: #d42300;
+  }
+
+  .tn__slab--2 {
+    --w: calc(var(--s) * 0.66);
+    --z: calc(var(--t) * 3.2);
+    --top: #ececec;
+    --side-a: #d6d6d6;
+    --side-b: #c4c4c4;
+    translate: calc(var(--s) * -0.1) calc(var(--s) * 0.1);
+  }
+
+  .tn__slab--1 {
+    --w: calc(var(--s) * 0.36);
+    --z: calc(var(--t) * 6.4);
+    --top: #f6f6f6;
+    --side-a: #dedede;
+    --side-b: #cdcdcd;
+    translate: calc(var(--s) * -0.18) calc(var(--s) * 0.18);
+  }
+
+  .tn__legend {
+    display: grid;
+    gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+    padding: 0;
+    list-style: none;
+  }
+
+  .tn__item {
+    display: grid;
+    justify-items: start;
+    gap: 0.625rem;
+  }
+
+  /* The Cognitive Twin's copy on a white card, like its slab. */
+  .tn__item--hi {
+    padding: var(--tn-pad, 1.5rem);
+    background: #ffffff;
+    color: #1e1e1e;
+    --ink: #1e1e1e;
+    --ink-2: #4d4d4d;
+    --muted: #767676;
+    box-shadow:
+      0 1px 2px rgb(30 30 30 / 0.06),
+      0 18px 40px -12px rgb(30 30 30 / 0.14);
+  }
+
+  .tn__item--hi .tn__name {
+    font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
+    font-weight: 500;
+  }
+
+  .tn__item--hi .tn__rows dd {
+    color: var(--ink);
+  }
+
+  .tn__iso .tn__rows {
+    justify-self: stretch;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.5rem;
+  }
+
+  .tn__iso .tn__rows dd {
+    max-width: none;
+  }
+
+  .tn__closing {
+    max-width: 40ch;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+  }
+
+  /* Entrance: the frame first, then each panel inside it (nested opacity means
+     a child can never show before its parent). */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js-reveal) .tn__box {
+      opacity: 0;
+      translate: 0 16px;
+      transition:
+        opacity 700ms var(--ease-out),
+        translate 900ms var(--ease-out);
+    }
+    :global(.js-reveal) .tn__box--2 {
+      transition-delay: 180ms;
+    }
+    :global(.js-reveal) .tn__box--1 {
+      transition-delay: 360ms;
+    }
+    :global(.js-reveal) [data-tn].is-on .tn__box {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /* Phones: the panels stack, still nested; the axes go. */
+  @media (max-width: 47.99rem) {
+    .tn__chart {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .tn__axis {
+      display: none;
+    }
+    .tn__frame {
+      grid-column: 1;
+    }
+    .tn__box--3,
+    .tn__box--2 {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .tn__box--3 > .tn__copy,
+    .tn__box--2 > .tn__copy {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .tn__box--3 > .tn__box--2,
+    .tn__box--2 > .tn__box--1 {
+      grid-row: 2;
+      margin-top: 0;
+      margin-left: var(--tn-pad);
+    }
+  }
+</style>
+
+<script>
+  /* Test switch: Staircase, Rings or Layers. */
+  const root = document.querySelector<HTMLElement>('[data-tn-v]');
+  const opts = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-tn-option]'));
+  const syncSwitch = () => opts.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tnOption === root?.dataset.tnV)));
+  opts.forEach((b) =>
+    b.addEventListener('click', () => {
+      if (!root) return;
+      root.dataset.tnV = b.dataset.tnOption;
+      try {
+        localStorage.setItem('predicterra:twin-v', b.dataset.tnOption!);
+      } catch {}
+      syncSwitch();
+    }),
+  );
+  syncSwitch();
+
+  /* Bring the panels in once the chart is in view. */
+  document.querySelectorAll<HTMLElement>('[data-tn]').forEach((el) => {
+    new IntersectionObserver(
+      ([e], io) => {
+        if (!e.isIntersecting) return;
+        el.classList.add('is-on');
+        io.disconnect();
+      },
+      { threshold: 0.25 },
+    ).observe(el);
+  });
+</script>

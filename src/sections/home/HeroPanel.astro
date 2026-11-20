@@ -7,7 +7,6 @@
  * notch. Under it, on a plain dark ground in both themes, the platform
  * capture rises from the bottom of the screen (Showcase.astro, which follows
  * this section and keeps the dark ground behind the capture in this layout).
- * The title's second line burns (scripts/burn.ts).
  */
 import { getCopy, type Locale } from '../../i18n/config';
 
@@ -23,7 +22,7 @@ const { main } = getCopy(locale).home.hero;
     <div class="container hpn__inner">
       <h1 id="hpn-title" class="hpn__title">
         <span class="hpn__line"><span>{main.titleLine1}</span></span>
-        <span class="hpn__line"><span><span class="accent" data-burn>{main.titleLine2}</span></span></span>
+        <span class="hpn__line"><span>{main.titleLine2}</span></span>
       </h1>
       <p class="hpn__text">{main.text}</p>
     </div>
@@ -56,8 +55,6 @@ const { main } = getCopy(locale).home.hero;
     color: #1e1e1e;
     --ink: #1e1e1e;
     --ink-2: #4d4d4d;
-    --burn-base: rgb(74 18 6);
-    --burn-tint: rgb(254 60 1);
     clip-path: polygon(0 0, 100% 0, 100% 100%, 58% 100%, calc(58% - var(--notch)) calc(100% - var(--notch)), 0 calc(100% - var(--notch)));
   }
 
@@ -91,18 +88,13 @@ const { main } = getCopy(locale).home.hero;
     color: #4d4d4d;
   }
 
-  /* Masked lines; the mask opens once a line has risen (script below), so the
-     burnt glow is never cut. */
+  /* One block per line, each fading in on its own beat. */
   .hpn__line {
     display: block;
-    overflow: clip;
     padding-bottom: 0.12em;
     margin-bottom: -0.12em;
   }
 
-  .hpn__line.is-open {
-    overflow: visible;
-  }
 
   .hpn__line > span {
     display: block;
@@ -110,7 +102,7 @@ const { main } = getCopy(locale).home.hero;
 
   @media (prefers-reduced-motion: no-preference) {
     .hpn__line > span {
-      animation: hpn-line 1100ms cubic-bezier(0.19, 1, 0.22, 1) both;
+      animation: hpn-line 850ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
     }
     .hpn__line:nth-child(1) > span {
       animation-delay: 200ms;
@@ -119,31 +111,27 @@ const { main } = getCopy(locale).home.hero;
       animation-delay: 290ms;
     }
     .hpn__text {
-      animation: hpn-focus 900ms cubic-bezier(0.19, 1, 0.22, 1) 460ms both;
+      animation: hpn-focus 800ms cubic-bezier(0.33, 1, 0.68, 1) 320ms backwards;
     }
   }
 
+  /* In place: each line fades in out of a soft blur, nothing moves; a touch
+     of orange settles to the ink. */
   @keyframes hpn-line {
     from {
-      transform: translateY(108%);
+      opacity: 0;
+      filter: blur(12px);
+      color: var(--accent);
+    }
+    35% {
+      color: var(--accent);
     }
   }
 
   @keyframes hpn-focus {
     from {
       opacity: 0;
-      transform: translateY(10px);
-      filter: blur(6px);
+      filter: blur(8px);
     }
   }
 </style>
-
-<script>
-  document.querySelectorAll<HTMLElement>('.hpn__line').forEach((line) => {
-    const open = () => line.classList.add('is-open');
-    const inner = line.firstElementChild as HTMLElement | null;
-    if (!inner || getComputedStyle(inner).animationName === 'none') return open();
-    inner.addEventListener('animationend', open, { once: true });
-    window.setTimeout(open, 2500);
-  });
-</script>

@@ -411,47 +411,6 @@ ol {
   -webkit-text-fill-color: currentColor;
 }
 
-/* ---------- Burnt text (test: html[data-text-fx='burnt'], scripts/burn.ts) ----------
-   After unifygtm.com's supercharge headline: letters laid over a hidden copy
-   of the word (which keeps the layout); a hot spot slides along, blurring,
-   tinting and making each letter glow by how close it is. Medium weight.
-   --burn-base: the letters at rest; --burn-tint: the hot orange. */
-/* Inline, not inline-block, so a burnt word never changes the height of the
-   line it sits in. */
-html[data-text-fx='burnt'] .burn {
-  position: relative;
-  display: inline;
-  white-space: nowrap;
-  font-weight: 500;
-  background: none !important;
-  -webkit-text-fill-color: currentColor !important;
-  animation: none !important;
-  color: var(--burn-base);
-}
-
-.burn__ref {
-  visibility: hidden;
-}
-
-.burn__ch {
-  position: absolute;
-  display: inline-block;
-  white-space: pre;
-  pointer-events: none;
-  will-change: filter;
-}
-
-/* Light surfaces inside the dark theme, and dark ones inside the light theme. */
-:root[data-theme='dark'] :is([data-dark], [data-theme-dark]) {
-  --burn-base: rgb(74 18 6);
-  --burn-tint: rgb(254 60 1);
-}
-
-.theme-dark {
-  --burn-base: rgb(178 36 6);
-  --burn-tint: rgb(255 98 30);
-}
-
 /* ---------- Counting figures (scripts/count.ts) ----------
    Each digit rolls to its value with a vertical motion blur. The real digit
    stays in place (transparent) and holds the size, the rolling strip sits
@@ -661,17 +620,38 @@ html:not([data-hero='centred']):not([data-hero='split']) [data-hero-variant='def
 }
 
 /* ---------- Entrances (scripts/reveal.ts) ---------- */
-/* Subtle: a short rise and fade, staggered inside groups. */
+/* Subtle: a short rise and fade, staggered inside groups. Text also comes
+   into focus from a light blur. Cheap on purpose: text only (never images,
+   cards or the 3D stages), a small radius, played once, and the filter is
+   gone once the entrance ends (reveal.ts drops the hooks), so nothing stays
+   on its own layer. */
 html.js-reveal [data-reveal] {
   transition:
     opacity 700ms var(--ease-out),
-    transform 900ms var(--ease-out);
+    transform 900ms var(--ease-out),
+    filter 800ms var(--ease-out);
   transition-delay: calc(var(--ri, 0) * 70ms);
 }
 
 html.js-reveal [data-reveal]:not(.is-in) {
   opacity: 0;
   transform: translate3d(0, 14px, 0);
+}
+
+/* Text doesn't move: it fades in out of a soft blur, slower and calmer. */
+html.js-reveal :is(p, h1, h2, h3, h4, dd, blockquote, li:not(:has(img, picture, video, canvas)))[data-reveal] {
+  transition:
+    opacity 750ms cubic-bezier(0.33, 1, 0.68, 1),
+    filter 750ms cubic-bezier(0.33, 1, 0.68, 1),
+    color 650ms ease 200ms;
+  transition-delay: calc(var(--ri, 0) * 60ms), calc(var(--ri, 0) * 60ms), calc(var(--ri, 0) * 60ms + 200ms);
+}
+
+html.js-reveal :is(p, h1, h2, h3, h4, dd, blockquote, li:not(:has(img, picture, video, canvas)))[data-reveal]:not(.is-in) {
+  transform: none;
+  filter: blur(8px);
+  /* A touch of orange while it comes into focus, settling to the ink. */
+  color: var(--accent);
 }
 
 /* Until reveal.ts has split the titles (and the font is in), keep them hidden
@@ -682,14 +662,25 @@ html.js-render-wait [data-render-step] {
   visibility: hidden;
 }
 
-/* Titles fade in (scripts/reveal.ts). Opacity only. */
+/* Titles fade in and come into focus (scripts/reveal.ts); the classes, and
+   with them the filter, are removed once it has played. */
 .render {
   opacity: 0;
+  filter: blur(10px);
+}
+
+/* A touch of orange while it comes into focus, settling to the ink. */
+.render:not(.render--go) {
+  color: var(--accent);
 }
 
 .render--go {
   opacity: 1;
-  transition: opacity 600ms var(--ease-out);
+  filter: blur(0);
+  transition:
+    opacity 800ms cubic-bezier(0.33, 1, 0.68, 1),
+    filter 800ms cubic-bezier(0.33, 1, 0.68, 1),
+    color 700ms ease 200ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -699,6 +690,7 @@ html.js-render-wait [data-render-step] {
   }
   html.js-reveal [data-reveal]:not(.is-in) {
     transform: none;
+    filter: none;
   }
 }
 
@@ -716,17 +708,12 @@ html.js-render-wait [data-render-step] {
 }
 
 /* Page titles (components/PageTitle.astro): the home hero's entrance, line by
-   line, each word rising out of its own mask. */
+   line, each word fading in place out of a soft blur. */
 .ttl__w {
   display: inline-block;
-  overflow: clip;
   padding-block: 0.08em 0.14em;
   margin-block: -0.08em -0.14em;
   vertical-align: top;
-}
-
-.ttl__w.is-open {
-  overflow: visible;
 }
 
 .ttl__w > span {
@@ -735,14 +722,22 @@ html.js-render-wait [data-render-step] {
 
 @media (prefers-reduced-motion: no-preference) {
   .ttl__w > span {
-    animation: ttl-line 1100ms cubic-bezier(0.19, 1, 0.22, 1) both;
+    /* backwards: nothing (no filter) stays on the words once they are in */
+    animation: ttl-line 850ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
     animation-delay: var(--d, 200ms);
   }
 }
 
+/* In place: each word fades in out of a soft blur, line after line, with a
+   touch of orange that settles to the ink. */
 @keyframes ttl-line {
   from {
-    transform: translateY(112%);
+    opacity: 0;
+    filter: blur(12px);
+    color: var(--accent);
+  }
+  35% {
+    color: var(--accent);
   }
 }
 

@@ -11,7 +11,6 @@ export default {
 
   hero: {
     title: 'A new era of energy needs a new kind of twin.',
-    accent: 'new kind of twin.',
     text: 'The climate is moving beyond the historical record, regulators ask for proof of resilience, and the energy transition is adding more assets, more connected, in more exposed places. A Cognitive Twin is a live model of your assets, the physical world acting on them and how everything connects. It tells every team what will happen, why, and what to do.',
     primary: actions.demo,
   },
@@ -24,6 +23,11 @@ export default {
     // What each twin can do, on one scale (the meters on the page).
     scale: ['Describe', 'Simulate', 'Reason', 'Anticipate'],
     levels: [25, 50, 100],
+    // Nested panels (sections/pages/TwinNest.astro): each twin sits inside the
+    // one that can do more; the chip names what it adds.
+    tags: ['Describes', 'Simulates', 'Reasons and anticipates'],
+    axisY: 'Understanding',
+    axisX: 'Foresight',
     rows: [
       {
         label: 'Asks',
@@ -141,6 +145,16 @@ export default {
     text: 'Predicterra can start with incomplete data and sharpens as more connects, because each input improves the ontology, the physics, the thresholds and the actions your teams receive.',
     inLabel: 'What goes in',
     outLabel: 'What comes out',
+    // The pinned 3D scroll (sections/pages/DataFlow.astro): one stop each.
+    inText: 'The registers, maps and records your teams already keep, connected as they are.',
+    coreText: 'Each input sharpens the four layers of one live model.',
+    outText: 'Structured results your teams and your systems can act on.',
+    apiTitle: 'One open API',
+    apiText: 'Each prediction becomes a structured object that moves into SCADA, GIS, asset management and planning through an open API.',
+    apiNote: 'Six asset types and eight use cases, built one by one, mean 48 integrations; on one ontology they mean 14, and every new use case goes live in weeks.',
+    // Short names on the board, next to each source and result.
+    inShort: ['Asset registry', 'Locations', 'Thresholds', 'Incident history', 'Enterprise systems'],
+    outShort: ['Asset-level risk', 'Impact forecasts', 'Dependency maps', 'Operational actions', 'Audit evidence'],
     in: [
       'Asset registry: IDs, types, criticality and maintenance status',
       'Exact locations of lines, substations, plants, pipelines and facilities',
