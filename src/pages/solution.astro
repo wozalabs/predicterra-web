@@ -5,7 +5,8 @@
  * in the site's own compositions:
  * hero (the platform capture under it) · the challenge · the Cognitive Twin,
  * from data to action (dark, entering as a panel over the challenge) · what makes it different · where it works (the
- * four sectors with their 3D assets) · in operation · start and scale · CTA.
+ * four sectors with their 3D assets; dark, entering as a panel over the
+ * comparison) · in operation · start and scale · CTA.
  * Section ids are the anchors the rest of the site links to (data/routes.ts).
  */
 import PageLayout from '../layouts/PageLayout.astro';
@@ -100,6 +101,8 @@ const pad = (n: number) => String(n).padStart(3, '0');
   </section>
   </div>
 
+  <!-- Where it works enters as a panel over the comparison (scripts/panels.ts). -->
+  <div class="pnl">
   <!-- What makes it different: the comparison, Predicterra's column highlighted. -->
   <div id="difference">
     <Compare
@@ -113,14 +116,14 @@ const pad = (n: number) => String(n).padStart(3, '0');
   </div>
 
   <!-- Where it works: the four sectors with their asset from the home's 3D scene. -->
-  <section id="covers" class="pg-sec" aria-labelledby="covers-title">
+  <section id="covers" class="pg-sec" aria-labelledby="covers-title" data-dark>
     <div class="container pg-body">
       <SectionHead id="covers-title" title={c.covers.title} text={c.covers.text} align="side" />
       <ul class="sl-sectors" data-reveal-group>
         {
           c.covers.sectors.map((s) => (
             <li id={s.id} class="sl-sector" data-reveal>
-              <AssetView asset={s.asset} class="sl-sector__asset" />
+              <AssetView asset={s.asset} invert class="sl-sector__asset" />
               <div class="sl-sector__copy">
                 <h3 class="sl-sector__title">
                   <span class="pg-dot" aria-hidden="true" />
@@ -144,6 +147,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
       </dl>
     </div>
   </section>
+  </div>
 
   <!-- In operation: the field, then what the operators get. -->
   <section id="proof" class="pg-sec" aria-labelledby="proof-title">
@@ -172,7 +176,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
 
   <!-- Start with one use case: the three steps. -->
   <div id="start">
-    <Rows id="start-title" title={c.start.title} text={c.start.text} items={c.start.steps} marker="num" />
+    <Rows id="start-title" title={c.start.title} text={c.start.text} items={c.start.steps} marker="num" sticky={false} />
   </div>
 
   <Cta locale={locale} copy={c.cta} />

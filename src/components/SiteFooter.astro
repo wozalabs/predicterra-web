@@ -67,18 +67,20 @@ const { footer } = getCopy(locale).common;
             </div>
           ))
         }
+        <!-- Certification marks: one more column, stacked, flush with the right edge. -->
+        <div class="footer__certs" data-reveal>
+          <p class="footer__title t-caption t-muted">{footer.certificationsLabel}</p>
+          <ul class="footer__badges">
+            {
+              footer.certifications.map((c) => (
+                <li>
+                  <img src={withBase(c.src)} alt={c.name} width={c.w} height={c.h} loading="lazy" decoding="async" />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
       </nav>
-
-      <!-- Certification marks, on the right under the columns. -->
-      <ul class="footer__badges" aria-label={footer.certificationsLabel}>
-          {
-            footer.certifications.map((c) => (
-              <li>
-                <img src={withBase(c.src)} alt={c.name} width={c.w} height={c.h} loading="lazy" decoding="async" />
-              </li>
-            ))
-          }
-        </ul>
     </div>
 
     <div class="footer__bottom t-caption">
@@ -171,21 +173,28 @@ const { footer } = getCopy(locale).common;
     fill: var(--canvas);
   }
 
-  /* Certification marks, at their own colours, on the right. */
-  .footer__badges {
-    display: flex;
-    align-items: center;
+  /* Certification marks, at their own colours, one above the other. */
+  .footer__cols .footer__badges {
     gap: 1rem;
+    justify-items: center;
+    width: max-content;
   }
 
-  @media (min-width: 64rem) {
-    .footer__badges {
-      grid-column: 2;
+  @media (min-width: 48rem) {
+    .footer__certs {
       justify-self: end;
+      text-align: right;
+    }
+    /* The marks on one vertical axis, the widest one flush with the edge. */
+    .footer__cols .footer__badges {
+      width: max-content;
+      margin-left: auto;
+      justify-items: center;
     }
   }
 
   .footer__badges img {
+    display: block;
     width: auto;
     height: 3.5rem;
   }

@@ -185,9 +185,11 @@ import Logo from '../../components/Logo.astro';
     transition: opacity 500ms ease-out 450ms !important;
   }
 
-  html[data-intro] .hpn .hpn__line > span,
-  html[data-intro] .hpn .hpn__text,
-  html[data-intro] .sc .sc__stage {
+  /* The copy and the platform are let go a little before the end (data-intro-text),
+     while the rise is still settling, so their entrances follow on without a gap. */
+  html[data-intro]:not([data-intro-text]) .hpn .hpn__line > span,
+  html[data-intro]:not([data-intro-text]) .hpn .hpn__text,
+  html[data-intro]:not([data-intro-text]) .sc .sc__stage {
     opacity: 0 !important;
     animation: none !important;
   }
@@ -291,10 +293,13 @@ import Logo from '../../components/Logo.astro';
       timers.forEach(clearTimeout);
       cancelAnimationFrame(raf);
       delete html.dataset.intro;
+      delete html.dataset.introText;
       ['wheel', 'touchstart', 'keydown', 'resize'].forEach((ev) => window.removeEventListener(ev, finish));
     };
 
     steps.forEach(([state, at]) => timers.push(window.setTimeout(() => (html.dataset.intro = state), at)));
+    // The title and description start while the rise is still sliding in.
+    timers.push(window.setTimeout(() => (html.dataset.introText = ''), 2300));
     timers.push(window.setTimeout(finish, END));
     ['wheel', 'touchstart', 'keydown', 'resize'].forEach((ev) => window.addEventListener(ev, finish, { passive: true }));
   } else if (html.dataset.intro) {

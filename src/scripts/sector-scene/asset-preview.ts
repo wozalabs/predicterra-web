@@ -26,7 +26,7 @@ import {
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { cable, oilGas, rotorGeometry, solarPlant, substation, tower, windTurbine, type Bucket } from './geometry';
 import { createFireMaterial, createGroundMaterial } from './materials';
-import { scenePalette, darkPalette } from './palette';
+import { scenePalette, darkPalette, ctaPalette } from './palette';
 import { onThemeChange } from '../theme';
 import type { SectorId } from './world';
 
@@ -198,12 +198,14 @@ function paint(mini: Mini, p = scenePalette()) {
   mini.ground.uniforms.uShadow.value.set(p.shadow);
 }
 
-let active: { id: SectorId; canvas: HTMLCanvasElement; raf: number; redraw: () => void; dark: boolean } | null = null;
+type Tone = 'theme' | 'dark' | 'invert';
+let active: { id: SectorId; canvas: HTMLCanvasElement; raf: number; redraw: () => void; tone: Tone } | null = null;
 
-/** Colours the shared renderer and materials for one view: its theme, or always dark. */
-function recolour(dark: boolean) {
+/** Colours the shared renderer and materials for one view: its theme, always
+ *  dark, or the opposite of the theme (on a section that inverts the page). */
+function recolour(tone: Tone) {
   if (!renderer) return;
-  const p = dark ? darkPalette : scenePalette();
+  const p = tone === 'dark' ? darkPalette : tone === 'invert' ? ctaPalette() : scenePalette();
   renderer.setClearColor(new Color(p.bg), 1);
   whiteMat.color.set(p.asset);
   minis.forEach((m) => paint(m, p));
@@ -212,7 +214,7 @@ function recolour(dark: boolean) {
 // Theme switch: recolour every built view and redraw the one on screen.
 onThemeChange(() => {
   if (!renderer) return;
-  recolour(active?.dark ?? false);
+  recolour(active?.tone ?? 'theme');
   active?.redraw();
 });
 
@@ -222,10 +224,11 @@ export function showPreview(
   canvas: HTMLCanvasElement,
   /** turn: the model slowly turns on itself (asset panel); false keeps it still (page heroes). */
   /** dark: always the dark palette (page heroes sit on a ground that is dark in both themes). */
-  opts: { reducedMotion: boolean; turn?: boolean; dark?: boolean },
+  /** invert: the opposite of the theme (sections that turn light in the dark theme). */
+  opts: { reducedMotion: boolean; turn?: boolean; dark?: boolean; invert?: boolean },
 ) {
   const turn = opts.turn !== false;
-  const dark = opts.dark === true;
+  const tone: Tone = opts.dark === true ? 'dark' : opts.invert === true ? 'invert' : 'theme';
   hidePreview();
   let r: WebGLRenderer;
   try {
@@ -235,7 +238,7 @@ export function showPreview(
   }
   if (!minis.has(id)) minis.set(id, build(id));
   const mini = minis.get(id)!;
-  recolour(dark);
+  recolour(tone);
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
@@ -274,7 +277,7 @@ export function showPreview(
   // One frame now, so the view keeps its picture even when another view takes
   // the shared renderer before the next animation frame (several on one page).
   draw();
-  active = { id, canvas, raf: 0, redraw: draw, dark };
+  active = { id, canvas, raf: 0, redraw: draw, tone };
   active.raf = requestAnimationFrame(frame);
 }
 

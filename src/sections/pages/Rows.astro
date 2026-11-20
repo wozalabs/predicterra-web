@@ -16,12 +16,14 @@ interface Props {
   items: readonly { icon?: IconName | string; title: string; text: string }[];
   marker?: 'icon' | 'num';
   dark?: boolean;
+  /** The title holds still while the rows scroll past (wide screens). */
+  sticky?: boolean;
 }
-const { id, title, text, items, marker = 'icon', dark = false } = Astro.props;
+const { id, title, text, items, marker = 'icon', dark = false, sticky = true } = Astro.props;
 const pad = (n: number) => String(n).padStart(3, '0');
 ---
 
-<section class="rw pg-sec" aria-labelledby={id} data-dark={dark ? '' : undefined}>
+<section class:list={['rw pg-sec', !sticky && 'rw--static']} aria-labelledby={id} data-dark={dark ? '' : undefined}>
   <div class="container rw__grid">
     <div class="rw__head">
       <SectionHead id={id} title={title} text={text} align="stack" />
@@ -61,7 +63,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
       grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
       align-items: start;
     }
-    .rw__head {
+    .rw:not(.rw--static) .rw__head {
       position: sticky;
       top: calc(var(--header-h) + 2.5rem);
     }

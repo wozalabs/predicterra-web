@@ -31,6 +31,10 @@ import '../styles/rhythm.css';
 const locale = 'en';
 const { home } = getCopy(locale);
 const site = Astro.site ?? new URL('https://www.predicterra.com');
+// Test switches, bottom left (intro, proportions). Hidden for production: the
+// page then runs on the defaults (Compact, intro on) whatever was stored.
+// Set to true to bring the switches back.
+const showTests = false;
 ---
 
 <BaseLayout
@@ -40,9 +44,9 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   jsonLd={[softwareJsonLd(site, home.seo.description)]}
 >
   <!-- Test: proportions A (current), B (proposal) or C (compact), styles/rhythm.css; set before paint. -->
-  <script is:inline>
+  <script is:inline define:vars={{ showTests }}>
     try {
-      var r = localStorage.getItem('predicterra:rhythm-v2');
+      var r = showTests ? localStorage.getItem('predicterra:rhythm-v2') : null;
       document.documentElement.dataset.rhythm = r === 'a' || r === 'b' ? r : 'c';
     } catch (e) {
       document.documentElement.dataset.rhythm = 'c';
@@ -52,7 +56,7 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
     // arriving from another page of the site (a link or the back button).
     try {
       var h = document.documentElement;
-      var intro = localStorage.getItem('predicterra:intro') === 'off' ? 'off' : 'on';
+      var intro = showTests && localStorage.getItem('predicterra:intro') === 'off' ? 'off' : 'on';
       var nav = performance.getEntriesByType('navigation')[0];
       var type = nav ? nav.type : 'navigate';
       var internal = false;
@@ -94,7 +98,8 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   {/* <Metrics locale={locale} /> */}
   <Cta locale={locale} copy={home.cta} />
 
-  <!-- Test switch, bottom left: proportions. -->
+  <!-- Test switches, bottom left: intro and proportions (hidden for production, showTests). -->
+  {showTests && (
   <div class="rhy">
     <div class="rhy__row" role="group" aria-label="Intro (test)">
       <span class="rhy__label">Intro</span>
@@ -109,6 +114,7 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
       <button type="button" class="rhy__btn" data-rhythm-option="c" aria-pressed="false">Compact</button>
     </div>
   </div>
+  )}
 </BaseLayout>
 
 <script>
