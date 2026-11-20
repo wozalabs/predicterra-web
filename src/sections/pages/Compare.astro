@@ -1,7 +1,7 @@
 ---
 /**
- * Comparison with Predicterra's column highlighted as a dark block with the
- * brand's orange corners.
+ * Comparison with Predicterra's column highlighted as a white block (in both
+ * themes), its name led by the orange icon square.
  *  - table: rows of criteria across 2–3 columns (stacked per column on phones)
  *  - steps: the columns as cards that grow left to right, joined by arrows
  *    (descriptive → physical → cognitive twin)
@@ -37,11 +37,12 @@ const hi = columns.length - 1;
           <>
             {/* Wide screens: one grid; the highlight block sits behind the last column. */}
             <div class="cp__grid" role="table" aria-label={title} style={`--cols:${columns.length}`} data-reveal>
-              <span class="cp__hi o-corners" aria-hidden="true" style={`grid-column:${hi + 2};grid-row:1 / ${rows.length + 2}`} />
+              <span class="cp__hi" aria-hidden="true" style={`grid-column:${hi + 2};grid-row:1 / ${rows.length + 2}`} />
               <div role="row" class="cp__row cp__row--head">
                 <span role="columnheader" class="cp__corner" style="grid-area:1 / 1" />
                 {columns.map((c, ci) => (
                   <span role="columnheader" class:list={['cp__head', ci === hi && 'is-hi']} style={`grid-area:1 / ${ci + 2}`}>
+                    {ci === hi && <Icon name="hub" boxed size="1.75rem" />}
                     {c}
                   </span>
                 ))}
@@ -63,8 +64,11 @@ const hi = columns.length - 1;
             {/* Phones: one block per column. */}
             <div class="cp__stack">
               {columns.map((c, ci) => (
-                <div class:list={['cp__card', ci === hi && 'is-hi o-corners']}>
-                  <h3 class="cp__head">{c}</h3>
+                <div class:list={['cp__card', ci === hi && 'is-hi']}>
+                  <h3 class="cp__head">
+                    {ci === hi && <Icon name="hub" boxed size="1.75rem" />}
+                    {c}
+                  </h3>
                   <dl>
                     {rows.map((r) => (
                       <div class="cp__pair">
@@ -80,7 +84,7 @@ const hi = columns.length - 1;
         ) : (
           <ol class="cp__steps" data-reveal-group>
             {columns.map((c, ci) => (
-              <li class:list={['cp__card', 'cp__gen', ci === hi && 'is-hi o-corners']} style={`--i:${ci}`} data-reveal>
+              <li class:list={['cp__card', 'cp__gen', ci === hi && 'is-hi']} style={`--i:${ci}`} data-reveal>
                 <h3 class="cp__head">{c}</h3>
                 <dl>
                   {rows.map((r) => (
@@ -149,9 +153,20 @@ const hi = columns.length - 1;
     display: contents;
   }
 
+  /* Predicterra's column: white with dark copy in both themes. */
   .cp__hi {
     z-index: -1;
     margin-inline: -0.25rem;
+    background: #ffffff;
+    box-shadow:
+      0 1px 2px rgb(30 30 30 / 0.06),
+      0 18px 40px -12px rgb(30 30 30 / 0.14);
+  }
+
+  .cp__head.is-hi {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
 
   .cp__head,
@@ -183,12 +198,12 @@ const hi = columns.length - 1;
   }
 
   .cp__grid .is-hi {
-    color: #f1f1f1;
-    border-top-color: rgb(241 241 241 / 0.14);
+    color: #1e1e1e;
+    border-top-color: rgb(30 30 30 / 0.1);
   }
 
   .cp__grid .cp__cell.is-hi {
-    color: #e8e8e8;
+    color: #1e1e1e;
   }
 
   .cp__grid .cp__row:last-child > * {
@@ -215,7 +230,7 @@ const hi = columns.length - 1;
     padding: 1.5rem;
   }
 
-  /* A filled card, no outline (the highlighted one is the dark o-corners block). */
+  /* A filled card, no outline (the highlighted one is white). */
   .cp__card:not(.is-hi) {
     background: var(--card);
   }
@@ -232,8 +247,19 @@ const hi = columns.length - 1;
     border-top: 1px solid var(--line);
   }
 
+  .cp__card.is-hi {
+    background: #ffffff;
+    color: #1e1e1e;
+  }
+
+  .cp__card.is-hi .cp__head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
   .cp__card.is-hi .cp__pair {
-    border-top-color: rgb(241 241 241 / 0.14);
+    border-top-color: rgb(30 30 30 / 0.1);
   }
 
   .cp__pair dt {
@@ -241,7 +267,7 @@ const hi = columns.length - 1;
   }
 
   .cp__card.is-hi dt {
-    color: #a7a7a7;
+    color: #767676;
   }
 
   /* ---------- steps (generations) ---------- */

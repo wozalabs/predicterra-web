@@ -271,6 +271,9 @@ export function showPreview(
   };
 
   size();
+  // One frame now, so the view keeps its picture even when another view takes
+  // the shared renderer before the next animation frame (several on one page).
+  draw();
   active = { id, canvas, raf: 0, redraw: draw, dark };
   active.raf = requestAnimationFrame(frame);
 }

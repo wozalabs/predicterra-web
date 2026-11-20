@@ -26,7 +26,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
       <ol class="cs__list">
         {
           c.cases.map((k, i) => (
-            <li class="cs__case" aria-labelledby={`${k.id}-title`} data-reveal-group>
+            <li id={k.id} class="cs__case" aria-labelledby={`${k.id}-title`} data-reveal-group>
               <!-- Image placeholder until the case photo exists. -->
               <figure class="cs__media" aria-hidden="true" data-reveal></figure>
               <div class="cs__brand" data-reveal>
@@ -155,7 +155,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
 
   /* The number in ink, its unit in orange (FigureValue). */
   .cs__value {
-    font-size: clamp(2.75rem, 2rem + 2.4vw, 4rem);
+    font-size: var(--fs-figure);
     line-height: 0.9;
     letter-spacing: -0.05em;
     white-space: nowrap;

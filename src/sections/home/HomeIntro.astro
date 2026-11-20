@@ -1,13 +1,13 @@
 ---
 /**
  * Home intro (test, html[data-intro], switch bottom left). Panel hero only.
- * On the dark ground, construction lines run out from where the hero's shape
- * will be, its outline is traced, then it fills white with the logo on it, as
- * a small version of the hero panel built round its rise, which is already in
- * its final place and size. Then it grows into the hero panel itself (the same
- * six corners, the panel's own clip-path), first across, then up, the header comes in, the title and description
+ * On the dark ground, construction lines run out from the hero panel's rise,
+ * set just past where the logo will be, and the panel's bottom edge is traced; then
+ * the panel fills white at its full size with the logo on it, holds, and the
+ * rise slides across to its own place (only the rise moves: the panel's own
+ * clip-path, nothing scales). The header comes in, the title and description
  * render, and the platform rises.
- *  pre → lines → trace → fill → widen → morph → (removed)
+ *  pre → lines → trace → fill → morph → (removed)
  * The state is set before paint (pages/index.astro), on a visit from outside
  * the site and on a reload, not when arriving from another page of the site;
  * any scroll, key or resize skips to the end. Remove this file, its use and the switch row once decided.
@@ -50,7 +50,7 @@ import Logo from '../../components/Logo.astro';
     overflow: visible;
   }
 
-  /* Construction lines: out from the shape's edges to the screen's. */
+  /* Construction lines: out from the rise's two corners to the screen's edges. */
   .intro__ext {
     fill: none;
     stroke: rgb(255 255 255 / 0.16);
@@ -68,11 +68,11 @@ import Logo from '../../components/Logo.astro';
   .intro__ext:nth-of-type(5) { transition-delay: 150ms, 0ms; }
   .intro__ext:nth-of-type(6) { transition-delay: 30ms, 0ms; }
 
-  html:is([data-intro='lines'], [data-intro='trace'], [data-intro='fill'], [data-intro='widen'], [data-intro='morph']) .intro__ext {
+  html:is([data-intro='lines'], [data-intro='trace'], [data-intro='fill'], [data-intro='morph']) .intro__ext {
     stroke-dashoffset: 0;
   }
 
-  /* The shape's outline, traced once round. */
+  /* The panel's bottom edge, traced left to right, rise included. */
   .intro__outline {
     fill: none;
     stroke: rgb(255 255 255 / 0.85);
@@ -84,11 +84,11 @@ import Logo from '../../components/Logo.astro';
       opacity 250ms ease-out;
   }
 
-  html:is([data-intro='trace'], [data-intro='fill'], [data-intro='widen'], [data-intro='morph']) .intro__outline {
+  html:is([data-intro='trace'], [data-intro='fill'], [data-intro='morph']) .intro__outline {
     stroke-dashoffset: 0;
   }
 
-  html:is([data-intro='widen'], [data-intro='morph']) :is(.intro__ext, .intro__outline, .intro__logo, .intro__count) {
+  html[data-intro='morph'] :is(.intro__ext, .intro__outline, .intro__logo, .intro__count) {
     opacity: 0;
     transition-delay: 0ms;
   }
@@ -118,7 +118,7 @@ import Logo from '../../components/Logo.astro';
     transition-delay: 100ms;
   }
 
-  html:is([data-intro='widen'], [data-intro='morph']) .intro__logo {
+  html[data-intro='morph'] .intro__logo {
     filter: blur(6px);
     transition-duration: 220ms;
   }
@@ -140,29 +140,24 @@ import Logo from '../../components/Logo.astro';
     opacity: 1;
   }
 
-  /* The hero panel itself: the small shape first, then its own, across
-     first (the full width), then up (to the top of the page). */
+  /* The hero panel itself, at its full size throughout: the rise first in
+     the middle of the screen, then slid across to its own place. Every corner
+     in plain pixels (measured), so only the rise's two corners move. */
   html[data-intro] .hpn__panel::before {
     transition:
       opacity 300ms ease-out,
-      clip-path 650ms cubic-bezier(0.76, 0, 0.24, 1);
-  }
-
-  /* Every corner in plain pixels (measured). The rise and the bottom edge
-     never move: across, then up to the top of the page. */
-  html[data-intro='widen'] .hpn__panel::before {
+      clip-path 950ms cubic-bezier(0.76, 0, 0.24, 1);
     clip-path: polygon(
-      0px var(--i-t),
-      var(--f-w) var(--i-t),
+      0px 0px,
+      var(--f-w) 0px,
       var(--f-w) var(--f-m),
-      var(--f-n) var(--f-m),
-      var(--f-s) var(--f-b),
+      var(--i-n) var(--f-m),
+      var(--i-s) var(--f-b),
       0px var(--f-b)
     );
   }
 
   html[data-intro='morph'] .hpn__panel::before {
-    transition: clip-path 800ms cubic-bezier(0.76, 0, 0.24, 1);
     clip-path: polygon(
       0px 0px,
       var(--f-w) 0px,
@@ -177,17 +172,6 @@ import Logo from '../../components/Logo.astro';
     opacity: 0;
   }
 
-  html:is([data-intro='pre'], [data-intro='lines'], [data-intro='trace'], [data-intro='fill']) .hpn__panel::before {
-    clip-path: polygon(
-      var(--i-l) var(--i-t),
-      var(--i-r) var(--i-t),
-      var(--i-r) var(--i-m),
-      var(--i-n) var(--i-m),
-      var(--i-s) var(--i-b),
-      var(--i-l) var(--i-b)
-    );
-  }
-
   /* Held back until the panel is in place: the header, the copy, the platform.
      Their own entrances run when the state is removed. */
   html[data-intro] .site-header,
@@ -198,7 +182,7 @@ import Logo from '../../components/Logo.astro';
   html[data-intro='morph'] .site-header,
   html[data-intro='morph'] .header-veil {
     opacity: 1 !important;
-    transition: opacity 500ms ease-out 350ms !important;
+    transition: opacity 500ms ease-out 450ms !important;
   }
 
   html[data-intro] .hpn .hpn__line > span,
@@ -239,61 +223,59 @@ import Logo from '../../components/Logo.astro';
       fr = Math.round(parseFloat(getComputedStyle(panel).getPropertyValue('--rise')) * 16) || 40;
     }
 
-    // The small shape is built round the rise, which is already where and
-    // as big as it ends up: room for the logo to its left, a little to its
-    // right and above it. Only the other edges move afterwards.
+    // The logo where the title will sit (its last line).
+    const lh = 28; // logo height (1.75rem)
+    const title = panel.querySelector<HTMLElement>('.hpn__title');
+    const tr = title?.getBoundingClientRect();
+    const lx = tr ? tr.left : pr.left + 24;
+    const lw = logo.getBoundingClientRect().width || 174;
+
+    // The rise starts just past the logo, at its own size and height (kept
+    // inside the screen), and only slides across afterwards.
     const b = Math.round(pr.top + pr.height);
     const m = b - fr;
-    const n = Math.round(pr.left + fn);
-    const s = n - fr;
-    const l = Math.max(Math.round(pr.left) + 8, s - 260);
-    const r = Math.min(Math.round(pr.right) - 8, n + 220);
-    const t = Math.max(Math.round(pr.top) + 8, m - 110);
+    const s = Math.round(Math.min(lx + lw + 48, vw - fr - 24));
+    const n = s + fr;
 
     // The panel's clip-path, in the panel's own coordinates.
     const px = (v: number) => `${v}px`;
-    panel.style.setProperty('--i-l', px(l - pr.left));
-    panel.style.setProperty('--i-r', px(r - pr.left));
-    panel.style.setProperty('--i-n', px(fn));
-    panel.style.setProperty('--i-s', px(fn - fr));
-    panel.style.setProperty('--i-t', px(t - pr.top));
-    panel.style.setProperty('--i-m', px(m - pr.top));
-    panel.style.setProperty('--i-b', px(b - pr.top));
+    panel.style.setProperty('--i-n', px(n - pr.left));
+    panel.style.setProperty('--i-s', px(s - pr.left));
     panel.style.setProperty('--f-w', px(pr.width));
     panel.style.setProperty('--f-n', px(fn));
     panel.style.setProperty('--f-s', px(fn - fr));
     panel.style.setProperty('--f-m', px(pr.height - fr));
     panel.style.setProperty('--f-b', px(pr.height));
 
-    // Lines and outline, on half pixels so they stay crisp.
+    // Lines and the bottom edge, on half pixels so they stay crisp.
     const h = (v: number) => v + 0.5;
     svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
     const ext = [
-      `M${l} ${h(t)}H0`,
-      `M${r} ${h(t)}H${vw}`,
-      `M${h(l)} ${t}V0`,
-      `M${h(r)} ${t}V0`,
-      `M${h(l)} ${b}V${vh}`,
-      `M${r} ${h(m)}H${vw}`,
+      `M${s} ${h(b)}H0`,
+      `M${n} ${h(m)}H${vw}`,
+      `M${h(n)} ${m}V0`,
+      `M${h(s)} ${b}V${vh}`,
+      `M${s} ${h(b)}H${vw}`,
+      `M${n} ${h(m)}H0`,
     ];
     exts.forEach((p, i) => p.setAttribute('d', ext[i]));
-    outline.setAttribute('d', `M${h(l)} ${h(t)}H${h(r)}V${h(m)}H${h(n)}L${h(s)} ${h(b)}H${h(l)}Z`);
+    outline.setAttribute('d', `M0 ${h(b)}H${h(s)}L${h(n)} ${h(m)}H${vw}`);
 
-    const lh = 28; // logo height (1.75rem)
-    logo.style.setProperty('--lx', px(l + 24));
-    logo.style.setProperty('--ly', px(b - 24 - lh));
-    count.style.setProperty('--cx', px(n + 16));
-    count.style.setProperty('--cy', px(m + 48));
+    // The count where the description will sit (under the raised edge, right
+    // of the rise).
+    logo.style.setProperty('--lx', px(lx));
+    logo.style.setProperty('--ly', px(tr ? tr.bottom - lh - 8 : b - 24 - lh));
+    count.style.setProperty('--cx', px(n + 24));
+    count.style.setProperty('--cy', px(Math.min(m + 48, b + 16)));
 
     // The timeline.
     const steps: [string, number][] = [
       ['lines', 60],
       ['trace', 380],
       ['fill', 1050],
-      ['widen', 1850],
-      ['morph', 2500],
+      ['morph', 1950],
     ];
-    const END = 3300;
+    const END = 3000;
     const timers: number[] = [];
     let raf = 0;
     const t0 = performance.now();

@@ -3,14 +3,8 @@ import home from './home';
 import about from './about';
 import cases from './cases';
 import casesPage from './cases-page';
-import grid from './grid';
-import solar from './solar';
-import wind from './wind';
-import oilGas from './oil-gas';
-import resilience from './resilience';
-import compliance from './compliance';
-import digitalization from './digitalization';
 import platform from './platform';
+import solution from './solution';
 import contact from './contact';
 import legal from './legal';
 
@@ -20,14 +14,8 @@ export default {
   about,
   cases,
   casesPage,
-  grid,
-  solar,
-  wind,
-  oilGas,
-  resilience,
-  compliance,
-  digitalization,
   platform,
+  solution,
   contact,
   legal,
 };

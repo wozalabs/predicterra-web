@@ -14,14 +14,17 @@ export const routes = {
   engineer: '/contact?topic=engineer',
   privacy: '/privacy',
   legal: '/legal',
+  /** The single Solution page (the solution, sectors and use across them). */
+  solution: '/solution',
+  /** Its sections, where the earlier sector and solution pages pointed. */
   sectors: {
-    grid: '/grid',
-    solar: '/solar',
-    wind: '/wind',
-    oilGas: '/oil-gas',
-    resilience: '/resilience',
-    compliance: '/compliance',
-    digitalization: '/digitalization',
+    grid: '/solution#grid',
+    solar: '/solution#solar',
+    wind: '/solution#wind',
+    oilGas: '/solution#oil-gas',
+    resilience: '/solution#covers',
+    compliance: '/solution#capabilities',
+    digitalization: '/solution#capabilities',
   },
 } as const;
 

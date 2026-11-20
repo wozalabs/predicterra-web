@@ -32,8 +32,7 @@ const pad = (n: number) => String(n).padStart(3, '0');
   <!-- The title on the left, the description and the action on the right. -->
   <PageHero locale={locale} {...c.hero} />
 
-  <!-- Three kinds of twin on one scale: the first two stop part way. -->
-  <!-- Three kinds of twin, each nested in the one that can do more. -->
+  <!-- Three kinds of twin as layers, each standing on the one that can do more. -->
   <TwinNest
     id="twin-title"
     title={c.twin.title}
@@ -41,8 +40,6 @@ const pad = (n: number) => String(n).padStart(3, '0');
     columns={c.twin.columns}
     rows={c.twin.rows}
     tags={c.twin.tags}
-    axisY={c.twin.axisY}
-    axisX={c.twin.axisX}
     closing={c.twin.closing}
   />
 

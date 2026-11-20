@@ -26,8 +26,6 @@ export default {
     // Nested panels (sections/pages/TwinNest.astro): each twin sits inside the
     // one that can do more; the chip names what it adds.
     tags: ['Describes', 'Simulates', 'Reasons and anticipates'],
-    axisY: 'Understanding',
-    axisX: 'Foresight',
     rows: [
       {
         label: 'Asks',

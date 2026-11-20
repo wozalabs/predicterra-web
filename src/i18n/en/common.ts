@@ -12,33 +12,11 @@ export default {
     navLabel: 'Main',
     toLight: 'Switch to light theme',
     toDark: 'Switch to dark theme',
-    // Home · Platform · Solutions ▾ · Cases · About, then the orange button.
-    // "Solutions" only opens its panel: it has no page of its own.
+    // Home · Platform · Solution · Cases · About, then the orange button.
     nav: [
       { label: 'Home', href: routes.home },
       { label: 'Platform', href: routes.platform },
-      {
-        label: 'Solutions',
-        groups: [
-          {
-            title: 'Sectors',
-            links: [
-              { label: 'Grid', href: routes.sectors.grid },
-              { label: 'Solar', href: routes.sectors.solar },
-              { label: 'Wind', href: routes.sectors.wind },
-              { label: 'Oil & Gas', href: routes.sectors.oilGas },
-            ],
-          },
-          {
-            title: 'Across all sectors',
-            links: [
-              { label: 'Resilience', href: routes.sectors.resilience },
-              { label: 'Digitalization', href: routes.sectors.digitalization },
-              { label: 'Compliance', href: routes.sectors.compliance },
-            ],
-          },
-        ],
-      },
+      { label: 'Solution', href: routes.solution },
       { label: 'Cases', href: routes.cases },
       { label: 'About', href: routes.about },
     ],
@@ -48,8 +26,11 @@ export default {
     title: 'Site menu',
     groups: [
       {
-        title: 'Platform',
-        links: [{ label: 'Platform', href: routes.platform }],
+        title: 'Product',
+        links: [
+          { label: 'Platform', href: routes.platform },
+          { label: 'Solution', href: routes.solution },
+        ],
       },
       {
         title: 'Sectors',
@@ -58,14 +39,6 @@ export default {
           { label: 'Solar', href: routes.sectors.solar },
           { label: 'Wind', href: routes.sectors.wind },
           { label: 'Oil & Gas', href: routes.sectors.oilGas },
-        ],
-      },
-      {
-        title: 'Across all sectors',
-        links: [
-          { label: 'Resilience', href: routes.sectors.resilience },
-          { label: 'Digitalization', href: routes.sectors.digitalization },
-          { label: 'Compliance', href: routes.sectors.compliance },
         ],
       },
       {
@@ -112,8 +85,11 @@ export default {
     tagline: 'The Cognitive Twin for energy',
     columns: [
       {
-        title: 'Platform',
-        links: [{ label: 'Platform', href: routes.platform }],
+        title: 'Product',
+        links: [
+          { label: 'Platform', href: routes.platform },
+          { label: 'Solution', href: routes.solution },
+        ],
       },
       {
         title: 'Sectors',
@@ -122,14 +98,6 @@ export default {
           { label: 'Solar', href: routes.sectors.solar },
           { label: 'Wind', href: routes.sectors.wind },
           { label: 'Oil & Gas', href: routes.sectors.oilGas },
-        ],
-      },
-      {
-        title: 'Across all sectors',
-        links: [
-          { label: 'Resilience', href: routes.sectors.resilience },
-          { label: 'Digitalization', href: routes.sectors.digitalization },
-          { label: 'Compliance', href: routes.sectors.compliance },
         ],
       },
       {
@@ -177,10 +145,8 @@ export default {
     secondary: { label: 'Get started', href: routes.demo },
     links: [
       { label: 'Platform', href: routes.platform },
-      { label: 'Grid', href: routes.sectors.grid },
-      { label: 'Solar', href: routes.sectors.solar },
-      { label: 'Wind', href: routes.sectors.wind },
-      { label: 'Oil & Gas', href: routes.sectors.oilGas },
+      { label: 'Solution', href: routes.solution },
+      { label: 'Cases', href: routes.cases },
     ],
   },
 };

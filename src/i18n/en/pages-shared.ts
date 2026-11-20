@@ -31,7 +31,7 @@ export const logoBand: LogoGroup[] = [
   { label: 'Recognized by', items: [logo.edso, logo.futured, logo.azure] },
 ];
 
-/** Logo band with its line and the link to the cases (home and solution pages). */
+/** Logo band with its line and the link to the cases (home). */
 export interface Proof {
   groups: LogoGroup[];
   text: string;
@@ -45,34 +45,8 @@ export const cases = {
 const twoNetworks = 'Two of Spain’s largest distribution networks already use Predicterra.';
 
 export const proof = {
-  /** Home, Resilience, Digitalization, Compliance. */
+  /** Home. */
   standard: { groups: logoBand, text: twoNetworks, link: cases.all } satisfies Proof,
-  grid: {
-    groups: [
-      { label: 'In operation with', items: [logo.iberdrola, logo.naturgy] },
-      { label: 'Recognized by', items: [logo.edso, logo.azure] },
-    ],
-    text: twoNetworks,
-    link: cases.all,
-  } satisfies Proof,
-  /** Solar and Wind: proven on the grids their plants export through. */
-  onTheGrids: (assets: string): Proof => ({
-    groups: [
-      { label: 'In operation on the grids of', items: [logo.iberdrola, logo.naturgy] },
-      { label: 'Recognized by', items: [logo.edso, logo.azure] },
-    ],
-    text: `Proven in operation on 116,000 km of Spanish distribution grid, the kind of network your ${assets}.`,
-    link: cases.all,
-  }),
-  oilGas: {
-    groups: [
-      { label: 'In operation with', items: [logo.moeve] },
-      { label: 'In operation on the grids of', items: [logo.iberdrola, logo.naturgy] },
-      { label: 'Recognized by', items: [logo.edso, logo.azure] },
-    ],
-    text: 'Proven in operation on 116,000 km of Spanish distribution grid, the kind of network your sites depend on for power.',
-    link: cases.all,
-  } satisfies Proof,
 };
 
 /** The closing card on every page: one title and one button. */

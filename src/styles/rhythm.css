@@ -7,12 +7,30 @@
  *               one space between sections (--r-y) and one between a title
  *               and what follows it (--r-gap)
  *  c  Compact   (the default) the same rhythm, with the content held to 1200px (full-bleed
- *               grounds still run edge to edge) and every size a step smaller
+ *               grounds still run edge to edge) and every size a step smaller;
+ *               its width and type scale are now the site's (tokens.css), so a
+ *               and b put the earlier ones back on the home
  * The rules are shared by b and c; only the values below differ.
  * Remove this file, its import and the switch once a version is chosen.
  */
+/* Current (a): the earlier, larger scale and 1440px content, on the home only. */
+html[data-rhythm='a'] {
+  --max-w: calc(90rem + 2 * var(--gutter));
+  --fs-cta: clamp(3rem, 1.25rem + 5.5vw, 7rem);
+  --fs-display: clamp(2.5rem, 1.75rem + 2.3vw, 4.25rem);
+  --fs-h2: clamp(2rem, 1.55rem + 1.5vw, 3.25rem);
+  --fs-statement: clamp(1.5rem, 1.2rem + 1vw, 2.375rem);
+  --fs-h3: clamp(1.375rem, 1.2rem + 0.6vw, 1.875rem);
+  --fs-lead: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);
+}
+
 html[data-rhythm='b'] {
+  --max-w: calc(90rem + 2 * var(--gutter));
+  --fs-display: clamp(2.5rem, 1.75rem + 2.3vw, 4.25rem);
   --fs-h2: clamp(2.25rem, 1.5rem + 2.2vw, 3.5rem);
+  --fs-statement: clamp(1.5rem, 1.2rem + 1vw, 2.375rem);
+  --fs-h3: clamp(1.375rem, 1.2rem + 0.6vw, 1.875rem);
+  --fs-lead: clamp(1.0625rem, 1rem + 0.25vw, 1.25rem);
   --r-y: clamp(4.5rem, 3rem + 4.5vw, 8rem);
   --r-gap: clamp(1.75rem, 1.25rem + 1.5vw, 3rem);
   --r-hero: clamp(2.5rem, 1rem + 4vw, 5.25rem);
@@ -27,25 +45,20 @@ html[data-rhythm='b'] {
   --r-logo: 1.15;
 }
 
+/* Compact (c): the site's own scale and width now (tokens.css); only the
+   home's spacing on top. */
 html[data-rhythm='c'] {
-  /* Content held to 1200px; the header, panels and cards follow. */
-  --max-w: calc(75rem + 2 * var(--gutter));
-  --fs-display: clamp(2.25rem, 1.6rem + 1.8vw, 3.25rem);
-  --fs-h2: clamp(1.75rem, 1.3rem + 1.3vw, 2.5rem);
-  --fs-h3: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem);
-  --fs-lead: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
-  --fs-statement: clamp(1.25rem, 1.05rem + 0.6vw, 1.75rem);
   --r-y: clamp(4rem, 2.5rem + 4vw, 7rem);
   --r-gap: clamp(1.5rem, 1rem + 1.2vw, 2.25rem);
-  --r-hero: clamp(2.25rem, 1.2rem + 2.6vw, 3.5rem);
-  --r-hero-text: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
-  --r-lead: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --r-hero: var(--fs-hero);
+  --r-hero-text: var(--fs-hero-text);
+  --r-lead: var(--fs-lead);
   --r-statement: clamp(1.25rem, 1rem + 0.7vw, 1.625rem);
   --r-step: clamp(1.75rem, 1.3rem + 1.2vw, 2.5rem);
   --r-step-text: 1rem;
   --r-row: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem);
   --r-row-text: 1rem;
-  --r-cta: clamp(2.25rem, 1.4rem + 2.2vw, 3.5rem);
+  --r-cta: var(--fs-cta);
   --r-logo: 1;
 }
 

@@ -28,8 +28,16 @@ export default defineConfig({
   ],
   // URLs from the earlier site map that moved with the November 2026 briefs.
   redirects: {
-    '/climate-resilience': '/resilience',
-    '/solutions': '/',
+    '/climate-resilience': '/solution#covers',
+    '/solutions': '/solution',
+    // The seven Solutions pages, now sections of the one Solution page.
+    '/grid': '/solution#grid',
+    '/solar': '/solution#solar',
+    '/wind': '/solution#wind',
+    '/oil-gas': '/solution#oil-gas',
+    '/resilience': '/solution#covers',
+    '/digitalization': '/solution#capabilities',
+    '/compliance': '/solution#capabilities',
     '/success-stories': '/cases',
     '/about-new': '/about',
     '/home-new': '/',

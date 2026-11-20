@@ -1,0 +1,442 @@
+---
+/**
+ * Solution (/solution), from "predicterra-the-solution.html": the one page
+ * that replaces the seven earlier Solutions pages. Content from the file, set
+ * in the site's own compositions:
+ * hero (the platform capture under it) · the challenge · the Cognitive Twin,
+ * from data to action (dark, entering as a panel over the challenge) · what makes it different · where it works (the
+ * four sectors with their 3D assets) · in operation · start and scale · CTA.
+ * Section ids are the anchors the rest of the site links to (data/routes.ts).
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import PageHero from '../sections/pages/PageHero.astro';
+import SectionHead from '../sections/pages/SectionHead.astro';
+import Compare from '../sections/pages/Compare.astro';
+import Rows from '../sections/pages/Rows.astro';
+import AssetView from '../components/AssetView.astro';
+import Cta from '../sections/home/Cta.astro';
+import { getCopy, localizePath, withBase } from '../i18n/config';
+
+const locale = 'en';
+const { solution: c, home } = getCopy(locale);
+const v = home.showcase.video;
+const pad = (n: number) => String(n).padStart(3, '0');
+---
+
+<PageLayout title={c.seo.title} description={c.seo.description} locale={locale}>
+  <PageHero locale={locale} {...c.hero} fit>
+    <!-- The platform in use, whole and at its own proportions. -->
+    <figure slot="visual" class="sl-video">
+      <video
+        width={v.w}
+        height={v.h}
+        poster={withBase(v.poster)}
+        muted
+        loop
+        playsinline
+        preload="none"
+        disablepictureinpicture
+        disableRemotePlayback
+        controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+        tabindex="-1"
+        aria-label={v.label}
+        data-hero-video
+      >
+        <source src={withBase(v.small)} type="video/mp4" media="(max-width: 47.99rem)" />
+        <source src={withBase(v.large)} type="video/mp4" />
+      </video>
+    </figure>
+  </PageHero>
+
+  <!-- The Cognitive Twin enters as a panel over the challenge (scripts/panels.ts). -->
+  <div class="pnl">
+  <!-- The challenge: three problems side by side. -->
+  <section id="challenge" class="pg-sec" aria-labelledby="challenge-title">
+    <div class="container pg-body">
+      <SectionHead id="challenge-title" title={c.challenge.title} text={c.challenge.text} align="side" />
+      <ol class="sl-cols sl-cols--3" data-reveal-group>
+        {
+          c.challenge.items.map((it, i) => (
+            <li class="sl-col" data-reveal>
+              <span class="pg-idx">{pad(i + 1)}</span>
+              <h3 class="sl-col__title">{it.title}</h3>
+              <p class="sl-col__text">{it.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- The Cognitive Twin, from data to action: four steps, then the teams. -->
+  <section id="capabilities" class="pg-sec" aria-labelledby="capabilities-title" data-dark>
+    <div class="container pg-body">
+      <SectionHead id="capabilities-title" title={c.capabilities.title} text={c.capabilities.text} align="side" />
+      <ol class="sl-cols sl-cols--4" data-reveal-group>
+        {
+          c.capabilities.steps.map((it, i) => (
+            <li class="sl-col sl-col--step" data-reveal>
+              <span class="pg-idx">{pad(i + 1)}</span>
+              <h3 class="sl-step">{it.title}</h3>
+              <p class="sl-col__text">{it.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="sl-teams">
+        <h3 class="sl-teams__title t-small">{c.capabilities.teamsTitle}</h3>
+        <ul class="sl-cols sl-cols--5" data-reveal-group>
+          {
+            c.capabilities.teams.map((t) => (
+              <li class="sl-team" data-reveal>
+                <span class="sl-team__name">{t.title}</span>
+                <span class="sl-team__text">{t.text}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- What makes it different: the comparison, Predicterra's column highlighted. -->
+  <div id="difference">
+    <Compare
+      id="difference-title"
+      title={c.difference.title}
+      text={c.difference.text}
+      columns={c.difference.columns}
+      rows={c.difference.rows}
+      support={c.difference.note}
+    />
+  </div>
+
+  <!-- Where it works: the four sectors with their asset from the home's 3D scene. -->
+  <section id="covers" class="pg-sec" aria-labelledby="covers-title">
+    <div class="container pg-body">
+      <SectionHead id="covers-title" title={c.covers.title} text={c.covers.text} align="side" />
+      <ul class="sl-sectors" data-reveal-group>
+        {
+          c.covers.sectors.map((s) => (
+            <li id={s.id} class="sl-sector" data-reveal>
+              <AssetView asset={s.asset} class="sl-sector__asset" />
+              <div class="sl-sector__copy">
+                <h3 class="sl-sector__title">
+                  <span class="pg-dot" aria-hidden="true" />
+                  {s.title}
+                </h3>
+                <p class="sl-col__text">{s.text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+      <dl class="sl-table" data-reveal-group>
+        {
+          c.covers.rows.map((r) => (
+            <div class="sl-table__row" data-reveal>
+              <dt class="sl-table__key">{r.label}</dt>
+              <dd class="sl-table__val">{r.text}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <!-- In operation: the field, then what the operators get. -->
+  <section id="proof" class="pg-sec" aria-labelledby="proof-title">
+    <div class="container pg-body">
+      <SectionHead id="proof-title" title={c.proof.title} align="stack" />
+      <div class="sl-proof" data-reveal-group>
+        <!-- Image placeholder until the photo exists. -->
+        <figure class="sl-proof__media" role="img" aria-label={c.proof.imageLabel} data-reveal></figure>
+        <div class="sl-proof__card" data-reveal>
+          <div class="sl-proof__top">
+            <span class="sl-proof__client">{c.proof.client}</span>
+            <span class="chip">{c.proof.badge}</span>
+          </div>
+          <p class="sl-proof__text">{c.proof.text}</p>
+          <p class="sl-proof__links">
+            {c.proof.links.map((l) => (
+              <a class="sl-proof__link" href={localizePath(l.href, locale)}>
+                {l.label}
+              </a>
+            ))}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Start with one use case: the three steps. -->
+  <div id="start">
+    <Rows id="start-title" title={c.start.title} text={c.start.text} items={c.start.steps} marker="num" />
+  </div>
+
+  <Cta locale={locale} copy={c.cta} />
+</PageLayout>
+
+<script>
+  import { mountHeroVideos } from '../scripts/hero-video';
+  mountHeroVideos();
+</script>
+
+<style>
+  /* ---------- Hero: the capture, whole, with the notch on its top edge ---------- */
+  .sl-video {
+    --notch: 16px;
+    margin: 0;
+    padding-top: var(--notch);
+    background: #1c1c1c;
+    clip-path: polygon(0 var(--notch), calc(58% - var(--notch)) var(--notch), 58% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .sl-video video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1920 / 1076;
+  }
+
+  /* ---------- Columns: index, title, text, on a hairline ---------- */
+  .sl-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem var(--gutter);
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .sl-cols--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .sl-cols--4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .sl-cols--5 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .sl-cols--4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .sl-cols--5 {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .sl-col {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .sl-col__title {
+    font-size: var(--fs-h4);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: var(--track-title);
+  }
+
+  .sl-col__text {
+    max-width: 36ch;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  /* The four verbs, larger. */
+  .sl-step {
+    font-size: var(--fs-h3);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: var(--track-heading);
+  }
+
+  /* ---------- Every team ---------- */
+  .sl-teams {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .sl-teams__title {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .sl-team {
+    display: grid;
+    align-content: start;
+    gap: 0.375rem;
+  }
+
+  .sl-team__name {
+    letter-spacing: var(--track-title);
+  }
+
+  .sl-team__text {
+    font-size: var(--fs-small);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Where it works ---------- */
+  .sl-sectors {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 40rem) {
+    .sl-sectors {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .sl-sectors {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .sl-sector {
+    display: grid;
+    align-content: start;
+    border: 1px solid var(--line);
+  }
+
+  .sl-sector :global(.sl-sector__asset) {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1;
+  }
+
+  .sl-sector__copy {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.25rem 1.5rem 1.5rem;
+  }
+
+  .sl-sector__title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.625rem;
+    font-size: var(--fs-h3);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: var(--track-heading);
+  }
+
+  .sl-sector__title .pg-dot {
+    translate: 0 -0.15em;
+  }
+
+  .sl-table {
+    display: grid;
+  }
+
+  .sl-table__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem var(--gutter);
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .sl-table__row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (min-width: 48rem) {
+    .sl-table__row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+      align-items: baseline;
+    }
+  }
+
+  .sl-table__key {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .sl-table__val {
+    max-width: 48ch;
+    font-size: var(--fs-lead);
+    line-height: 1.4;
+    letter-spacing: var(--track-title);
+  }
+
+  /* ---------- In operation ---------- */
+  .sl-proof {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  @media (min-width: 56rem) {
+    .sl-proof {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .sl-proof__media {
+    min-height: clamp(18rem, 14rem + 10vw, 26rem);
+    margin: 0;
+    background-color: var(--surface-2, var(--chip-bg));
+    background-image: radial-gradient(var(--line) 1px, transparent 1px);
+    background-size: 14px 14px;
+  }
+
+  .sl-proof__card {
+    display: grid;
+    align-content: space-between;
+    gap: 2.5rem;
+    padding: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  .sl-proof__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .sl-proof__text {
+    max-width: 40ch;
+    font-size: var(--fs-statement);
+    line-height: 1.25;
+    letter-spacing: var(--track-heading);
+    text-wrap: pretty;
+  }
+
+  .sl-proof__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .sl-proof__link {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 0.2em;
+    transition: text-decoration-color 150ms ease-out;
+  }
+
+  .sl-proof__link:hover {
+    text-decoration-color: currentColor;
+  }
+</style>
