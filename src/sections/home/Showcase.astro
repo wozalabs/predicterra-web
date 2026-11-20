@@ -121,6 +121,16 @@ const v = s.video;
     padding-bottom: clamp(2rem, 1rem + 3vw, 4rem);
   }
 
+  /* Layouts whose hero already shows the platform: no second capture, the
+     logos follow the hero directly. */
+  :global(html:is([data-hero='immersive'], [data-hero='window'], [data-hero='annotated'])) .sc__stage {
+    display: none;
+  }
+
+  :global(html:is([data-hero='immersive'], [data-hero='window'], [data-hero='annotated'])) .sc {
+    padding-top: 0;
+  }
+
   @keyframes sc-rise {
     from {
       opacity: 0;

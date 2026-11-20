@@ -66,9 +66,9 @@ const structured = [organizationJsonLd(site), websiteJsonLd(site, locale), ...js
         var scene = localStorage.getItem('predicterra:scene');
         if (scene === 'overview') document.documentElement.dataset.scene = 'overview';
         // App is the default hero. New key: earlier saved choices are ignored.
-        var hero = localStorage.getItem('predicterra:hero-v3');
+        var hero = localStorage.getItem('predicterra:hero-v4');
         // Panel is the default hero; the others are test layouts (menu).
-        document.documentElement.dataset.hero = ['app', 'centred', 'split', 'cutout', 'pixel', 'clean'].indexOf(hero) > -1 ? hero : 'panel';
+        document.documentElement.dataset.hero = ['app', 'centred', 'split', 'cutout', 'pixel', 'clean', 'immersive', 'window', 'annotated'].indexOf(hero) > -1 ? hero : 'panel';
       } catch (e) {
         document.documentElement.dataset.hero = 'app';
       }

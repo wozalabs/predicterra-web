@@ -604,6 +604,9 @@ html[data-scene='overview'] [data-sectors='trail'] {
 [data-hero-variant='pixel'],
 [data-hero-variant='clean'],
 [data-hero-variant='panel'],
+[data-hero-variant='immersive'],
+[data-hero-variant='window'],
+[data-hero-variant='annotated'],
 [data-hero-variant='app'] {
   display: none;
 }
@@ -612,7 +615,10 @@ html[data-hero='panel'] [data-hero-variant='panel'],
 html[data-hero='clean'] [data-hero-variant='clean'],
 html[data-hero='app'] [data-hero-variant='app'],
 html[data-hero='cutout'] [data-hero-variant='cutout'],
-html[data-hero='pixel'] [data-hero-variant='pixel'] {
+html[data-hero='pixel'] [data-hero-variant='pixel'],
+html[data-hero='immersive'] [data-hero-variant='immersive'],
+html[data-hero='window'] [data-hero-variant='window'],
+html[data-hero='annotated'] [data-hero-variant='annotated'] {
   display: block;
 }
 html:not([data-hero='centred']):not([data-hero='split']) [data-hero-variant='default'] {

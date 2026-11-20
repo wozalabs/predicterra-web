@@ -2,9 +2,10 @@
 /**
  * Hero, panel layout (the default). A white panel runs the full
  * width of the viewport from the very top of the page (the header sits on
- * it, in dark text), with the title on the left and the description on the
- * right, both ending on the same line; its bottom edge carries the brand's
- * notch. Under it, on a plain dark ground in both themes, the platform
+ * it, in dark text). Its bottom edge is the brand's notch, made larger: low
+ * on the left, where it holds the title, then a long 45° rise right after the
+ * title and flat to the right edge. The description sits under that raised
+ * edge, on the dark ground, in light text. Under it, in both themes, the platform
  * capture rises from the bottom of the screen (Showcase.astro, which follows
  * this section and keeps the dark ground behind the capture in this layout).
  */
@@ -24,6 +25,7 @@ const { main } = getCopy(locale).home.hero;
         <span class="hpn__line"><span>{main.titleLine1}</span></span>
         <span class="hpn__line"><span>{main.titleLine2}</span></span>
       </h1>
+      <span class="hpn__rise" aria-hidden="true"></span>
       <p class="hpn__text">{main.text}</p>
     </div>
   </div>
@@ -40,22 +42,43 @@ const { main } = getCopy(locale).home.hero;
     padding-bottom: var(--hero-peek);
   }
 
-  /* The panel: full width, from the top of the page, white with dark copy
-     in both themes, the notch cut into its bottom edge. */
+  /* The panel: full width, from the top of the page. The white is drawn by
+     ::before so the description can sit on the dark ground outside it.
+     The rise's top corner lines up with the grid: content right edge, minus
+     the description column and the gap before it. */
   .hpn__panel {
-    --notch: 18px;
+    --rise: clamp(9rem, 6rem + 6vh, 12rem);
+    --pb: clamp(2rem, 1rem + 3vh, 3.5rem);
+    --text-w: 26rem;
+    --text-gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+    --rise-top: calc(100% - (100% - min(100%, var(--max-w))) / 2 - var(--gutter) - var(--text-w) - var(--text-gap));
     position: relative;
     z-index: calc(var(--z-cover) + 1);
+    isolation: isolate;
     display: flex;
     align-items: flex-end;
     height: 100%;
     padding-top: var(--header-h);
-    padding-bottom: calc(clamp(2rem, 1rem + 3vh, 3.5rem) + var(--notch));
-    background: #ffffff;
+    padding-bottom: var(--pb);
     color: #1e1e1e;
     --ink: #1e1e1e;
     --ink-2: #4d4d4d;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 58% 100%, calc(58% - var(--notch)) calc(100% - var(--notch)), 0 calc(100% - var(--notch)));
+  }
+
+  .hpn__panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: #ffffff;
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% calc(100% - var(--rise)),
+      var(--rise-top) calc(100% - var(--rise)),
+      calc(var(--rise-top) - var(--rise)) 100%,
+      0 100%
+    );
   }
 
   .hpn__inner {
@@ -64,12 +87,41 @@ const { main } = getCopy(locale).home.hero;
     width: 100%;
   }
 
-  /* Side by side from tablets, on the same last line. */
+  .hpn__rise {
+    display: none;
+  }
+
+  /* Title | the rise | a gap | the description, under the raised edge. */
   @media (min-width: 56rem) {
     .hpn__inner {
-      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-      align-items: last baseline;
-      column-gap: clamp(2rem, 1rem + 4vw, 6rem);
+      grid-template-columns: minmax(0, 1fr) var(--rise) var(--text-gap) var(--text-w);
+      align-items: end;
+      gap: 0;
+    }
+    .hpn__rise {
+      display: block;
+      grid-column: 2;
+      align-self: stretch;
+    }
+    /* From just under the raised edge down; a longer text runs into the
+       panel's bottom padding, still on the dark. */
+    .hpn__inner .hpn__text {
+      grid-column: 4;
+      align-self: end;
+      box-sizing: border-box;
+      height: calc(var(--rise) - var(--pb));
+      max-width: none;
+      padding-top: 3rem;
+      color: rgb(255 255 255 / 0.72);
+    }
+  }
+
+  /* Phones: title and description both on the white, a short rise at the right. */
+  @media (max-width: 55.99rem) {
+    .hpn__panel {
+      --rise: 2.5rem;
+      --rise-top: calc(100% - var(--gutter));
+      padding-bottom: calc(var(--pb) + var(--rise));
     }
   }
 
@@ -83,6 +135,7 @@ const { main } = getCopy(locale).home.hero;
 
   .hpn__text {
     max-width: 38ch;
+    text-wrap: pretty;
     font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
     line-height: 1.45;
     color: #4d4d4d;

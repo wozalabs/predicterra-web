@@ -11,6 +11,9 @@ import HeroApp from '../sections/home/HeroApp.astro';
 import HeroCutout from '../sections/home/HeroCutout.astro';
 import HeroPixel from '../sections/home/HeroPixel.astro';
 import HeroClean from '../sections/home/HeroClean.astro';
+import HeroImmersive from '../sections/home/HeroImmersive.astro';
+import HeroWindow from '../sections/home/HeroWindow.astro';
+import HeroAnnotated from '../sections/home/HeroAnnotated.astro';
 import Showcase from '../sections/home/Showcase.astro';
 import WhyUs from '../sections/home/WhyUs.astro';
 import SectorsIntro from '../sections/home/SectorsIntro.astro';
@@ -20,8 +23,10 @@ import Across from '../sections/home/Across.astro';
 // Key figures are hidden for now; to bring them back, restore this import and <Metrics /> below.
 // import Metrics from '../sections/home/Metrics.astro';
 import Cta from '../sections/home/Cta.astro';
+import HomeIntro from '../sections/home/HomeIntro.astro';
 import { getCopy } from '../i18n/config';
 import { softwareJsonLd } from '../data/seo';
+import '../styles/rhythm.css';
 
 const locale = 'en';
 const { home } = getCopy(locale);
@@ -34,6 +39,36 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   locale={locale}
   jsonLd={[softwareJsonLd(site, home.seo.description)]}
 >
+  <!-- Test: proportions A (current), B (proposal) or C (compact), styles/rhythm.css; set before paint. -->
+  <script is:inline>
+    try {
+      var r = localStorage.getItem('predicterra:rhythm-v2');
+      document.documentElement.dataset.rhythm = r === 'a' || r === 'b' ? r : 'c';
+    } catch (e) {
+      document.documentElement.dataset.rhythm = 'c';
+    }
+    // Test: the intro (sections/home/HomeIntro.astro), panel hero only, from
+    // the top: on a visit from outside the site and on a reload, not when
+    // arriving from another page of the site (a link or the back button).
+    try {
+      var h = document.documentElement;
+      var intro = localStorage.getItem('predicterra:intro') === 'off' ? 'off' : 'on';
+      var nav = performance.getEntriesByType('navigation')[0];
+      var type = nav ? nav.type : 'navigate';
+      var internal = false;
+      try {
+        internal = !!document.referrer && new URL(document.referrer).origin === location.origin;
+      } catch (e) {}
+      var play = type === 'reload' || (type === 'navigate' && !internal);
+      h.dataset.introPref = intro;
+      if (intro === 'on' && play && h.dataset.hero === 'panel' && !location.hash && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        h.dataset.intro = 'pre';
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+      }
+    } catch (e) {}
+  </script>
+  <HomeIntro />
   <!-- Default hero: title centred, the platform capture peeking up from the bottom. -->
   <HeroApp locale={locale} />
   <!-- Default hero: white panel, title left, text right, the capture underneath. -->
@@ -43,6 +78,10 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   <HeroCutout locale={locale} />
   <HeroPixel locale={locale} />
   <HeroClean locale={locale} />
+  <!-- Test only: three layouts that combine the hero with the platform's interface. -->
+  <HeroImmersive locale={locale} />
+  <HeroWindow locale={locale} />
+  <HeroAnnotated locale={locale} />
   <!-- The platform and, under it, who runs it: one screen once scrolled to. -->
   <Showcase locale={locale} peek logos={home.proof.groups} />
   <!-- Why us: what sets Predicterra apart, in one sentence. -->
@@ -54,5 +93,62 @@ const site = Astro.site ?? new URL('https://www.predicterra.com');
   <Across locale={locale} />
   {/* <Metrics locale={locale} /> */}
   <Cta locale={locale} copy={home.cta} />
+
+  <!-- Test switch, bottom left: proportions. -->
+  <div class="rhy">
+    <div class="rhy__row" role="group" aria-label="Intro (test)">
+      <span class="rhy__label">Intro</span>
+      <button type="button" class="rhy__btn" data-intro-option="on" aria-pressed="false">On</button>
+      <button type="button" class="rhy__btn" data-intro-option="off" aria-pressed="false">Off</button>
+      <button type="button" class="rhy__btn" data-intro-replay>Replay</button>
+    </div>
+    <div class="rhy__row" role="group" aria-label="Home proportions (test)">
+      <span class="rhy__label">Proportions</span>
+      <button type="button" class="rhy__btn" data-rhythm-option="a" aria-pressed="false">Current</button>
+      <button type="button" class="rhy__btn" data-rhythm-option="b" aria-pressed="false">Proposal</button>
+      <button type="button" class="rhy__btn" data-rhythm-option="c" aria-pressed="false">Compact</button>
+    </div>
+  </div>
 </BaseLayout>
 
+<script>
+  const html = document.documentElement;
+  const opts = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-rhythm-option]'));
+  const sync = () => opts.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.rhythmOption === html.dataset.rhythm)));
+  opts.forEach((b) =>
+    b.addEventListener('click', () => {
+      html.dataset.rhythm = b.dataset.rhythmOption;
+      try {
+        localStorage.setItem('predicterra:rhythm-v2', b.dataset.rhythmOption!);
+      } catch {}
+      sync();
+      // Pinned sections and the 3D stages measure their size again.
+      window.dispatchEvent(new Event('resize'));
+    }),
+  );
+  sync();
+
+  // Intro on or off, and replay (reloads from the top).
+  const intros = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-intro-option]'));
+  const syncIntro = () => intros.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.introOption === html.dataset.introPref)));
+  intros.forEach((b) =>
+    b.addEventListener('click', () => {
+      html.dataset.introPref = b.dataset.introOption;
+      try {
+        localStorage.setItem('predicterra:intro', b.dataset.introOption!);
+      } catch {}
+      syncIntro();
+    }),
+  );
+  syncIntro();
+  document.querySelector('[data-intro-replay]')?.addEventListener('click', () => {
+    try {
+      localStorage.setItem('predicterra:intro', 'on');
+    } catch {}
+    history.replaceState(null, '', location.pathname + location.search);
+    window.scrollTo(0, 0);
+    location.reload();
+  });
+
+
+</script>

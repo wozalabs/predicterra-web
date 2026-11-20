@@ -1,0 +1,321 @@
+---
+/**
+ * Home intro (test, html[data-intro], switch bottom left). Panel hero only.
+ * On the dark ground, construction lines run out from where the hero's shape
+ * will be, its outline is traced, then it fills white with the logo on it, as
+ * a small version of the hero panel built round its rise, which is already in
+ * its final place and size. Then it grows into the hero panel itself (the same
+ * six corners, the panel's own clip-path), first across, then up, the header comes in, the title and description
+ * render, and the platform rises.
+ *  pre → lines → trace → fill → widen → morph → (removed)
+ * The state is set before paint (pages/index.astro), on a visit from outside
+ * the site and on a reload, not when arriving from another page of the site;
+ * any scroll, key or resize skips to the end. Remove this file, its use and the switch row once decided.
+ */
+import Logo from '../../components/Logo.astro';
+---
+
+<div class="intro" aria-hidden="true" data-intro-root>
+  <svg class="intro__svg" data-intro-svg>
+    <path class="intro__ext" pathLength="1" data-ext="0" />
+    <path class="intro__ext" pathLength="1" data-ext="1" />
+    <path class="intro__ext" pathLength="1" data-ext="2" />
+    <path class="intro__ext" pathLength="1" data-ext="3" />
+    <path class="intro__ext" pathLength="1" data-ext="4" />
+    <path class="intro__ext" pathLength="1" data-ext="5" />
+    <path class="intro__outline" pathLength="1" data-outline />
+  </svg>
+  <div class="intro__logo" data-intro-logo><Logo /></div>
+  <span class="intro__count" data-intro-count>000</span>
+</div>
+
+<style is:global>
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-header) - 1);
+    display: none;
+    pointer-events: none;
+  }
+
+  html[data-intro] .intro {
+    display: block;
+  }
+
+  .intro__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Construction lines: out from the shape's edges to the screen's. */
+  .intro__ext {
+    fill: none;
+    stroke: rgb(255 255 255 / 0.16);
+    stroke-width: 1;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition:
+      stroke-dashoffset 650ms cubic-bezier(0.65, 0, 0.35, 1),
+      opacity 250ms ease-out;
+  }
+
+  .intro__ext:nth-of-type(2) { transition-delay: 60ms, 0ms; }
+  .intro__ext:nth-of-type(3) { transition-delay: 120ms, 0ms; }
+  .intro__ext:nth-of-type(4) { transition-delay: 90ms, 0ms; }
+  .intro__ext:nth-of-type(5) { transition-delay: 150ms, 0ms; }
+  .intro__ext:nth-of-type(6) { transition-delay: 30ms, 0ms; }
+
+  html:is([data-intro='lines'], [data-intro='trace'], [data-intro='fill'], [data-intro='widen'], [data-intro='morph']) .intro__ext {
+    stroke-dashoffset: 0;
+  }
+
+  /* The shape's outline, traced once round. */
+  .intro__outline {
+    fill: none;
+    stroke: rgb(255 255 255 / 0.85);
+    stroke-width: 1;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition:
+      stroke-dashoffset 700ms cubic-bezier(0.65, 0, 0.35, 1),
+      opacity 250ms ease-out;
+  }
+
+  html:is([data-intro='trace'], [data-intro='fill'], [data-intro='widen'], [data-intro='morph']) .intro__outline {
+    stroke-dashoffset: 0;
+  }
+
+  html:is([data-intro='widen'], [data-intro='morph']) :is(.intro__ext, .intro__outline, .intro__logo, .intro__count) {
+    opacity: 0;
+    transition-delay: 0ms;
+  }
+
+  /* The logo on the white, where the title will sit. */
+  .intro__logo {
+    position: absolute;
+    left: var(--lx, 0);
+    top: var(--ly, 0);
+    color: #1e1e1e;
+    --ink: #1e1e1e;
+    opacity: 0;
+    filter: blur(10px);
+    transition:
+      opacity 500ms cubic-bezier(0.33, 1, 0.68, 1),
+      filter 500ms cubic-bezier(0.33, 1, 0.68, 1);
+  }
+
+  .intro .intro__logo .logo {
+    display: block;
+    height: 1.75rem;
+  }
+
+  html[data-intro='fill'] .intro__logo {
+    opacity: 1;
+    filter: none;
+    transition-delay: 100ms;
+  }
+
+  html:is([data-intro='widen'], [data-intro='morph']) .intro__logo {
+    filter: blur(6px);
+    transition-duration: 220ms;
+  }
+
+  /* Progress, under the rise, where the description will sit. */
+  .intro__count {
+    position: absolute;
+    left: var(--cx, 0);
+    top: var(--cy, 0);
+    color: rgb(255 255 255 / 0.6);
+    font-size: var(--fs-small, 0.875rem);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 250ms ease-out;
+  }
+
+  html:is([data-intro='lines'], [data-intro='trace'], [data-intro='fill']) .intro__count {
+    opacity: 1;
+  }
+
+  /* The hero panel itself: the small shape first, then its own, across
+     first (the full width), then up (to the top of the page). */
+  html[data-intro] .hpn__panel::before {
+    transition:
+      opacity 300ms ease-out,
+      clip-path 650ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  /* Every corner in plain pixels (measured). The rise and the bottom edge
+     never move: across, then up to the top of the page. */
+  html[data-intro='widen'] .hpn__panel::before {
+    clip-path: polygon(
+      0px var(--i-t),
+      var(--f-w) var(--i-t),
+      var(--f-w) var(--f-m),
+      var(--f-n) var(--f-m),
+      var(--f-s) var(--f-b),
+      0px var(--f-b)
+    );
+  }
+
+  html[data-intro='morph'] .hpn__panel::before {
+    transition: clip-path 800ms cubic-bezier(0.76, 0, 0.24, 1);
+    clip-path: polygon(
+      0px 0px,
+      var(--f-w) 0px,
+      var(--f-w) var(--f-m),
+      var(--f-n) var(--f-m),
+      var(--f-s) var(--f-b),
+      0px var(--f-b)
+    );
+  }
+
+  html:is([data-intro='pre'], [data-intro='lines'], [data-intro='trace']) .hpn__panel::before {
+    opacity: 0;
+  }
+
+  html:is([data-intro='pre'], [data-intro='lines'], [data-intro='trace'], [data-intro='fill']) .hpn__panel::before {
+    clip-path: polygon(
+      var(--i-l) var(--i-t),
+      var(--i-r) var(--i-t),
+      var(--i-r) var(--i-m),
+      var(--i-n) var(--i-m),
+      var(--i-s) var(--i-b),
+      var(--i-l) var(--i-b)
+    );
+  }
+
+  /* Held back until the panel is in place: the header, the copy, the platform.
+     Their own entrances run when the state is removed. */
+  html[data-intro] .site-header,
+  html[data-intro] .header-veil {
+    opacity: 0 !important;
+  }
+
+  html[data-intro='morph'] .site-header,
+  html[data-intro='morph'] .header-veil {
+    opacity: 1 !important;
+    transition: opacity 500ms ease-out 350ms !important;
+  }
+
+  html[data-intro] .hpn .hpn__line > span,
+  html[data-intro] .hpn .hpn__text,
+  html[data-intro] .sc .sc__stage {
+    opacity: 0 !important;
+    animation: none !important;
+  }
+</style>
+
+<script>
+  const html = document.documentElement;
+  const root = document.querySelector<HTMLElement>('[data-intro-root]');
+  const panel = document.querySelector<HTMLElement>('.hpn__panel');
+
+  if (html.dataset.intro && root && panel) {
+    const svg = root.querySelector<SVGSVGElement>('[data-intro-svg]')!;
+    const exts = Array.from(root.querySelectorAll<SVGPathElement>('[data-ext]'));
+    const outline = root.querySelector<SVGPathElement>('[data-outline]')!;
+    const logo = root.querySelector<HTMLElement>('[data-intro-logo]')!;
+    const count = root.querySelector<HTMLElement>('[data-intro-count]')!;
+
+    // The panel's own shape, measured: the rise is a grid column from tablets
+    // up (HeroPanel), a short one at the content's right edge on phones.
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const pr = panel.getBoundingClientRect();
+    const riseEl = panel.querySelector<HTMLElement>('.hpn__rise');
+    let fn: number;
+    let fr: number;
+    if (riseEl && riseEl.offsetWidth) {
+      const rr = riseEl.getBoundingClientRect();
+      fn = Math.round(rr.right - pr.left);
+      fr = Math.round(rr.width);
+    } else {
+      const inner = panel.querySelector<HTMLElement>('.hpn__inner');
+      fn = Math.round(pr.width - (inner ? parseFloat(getComputedStyle(inner).paddingRight) : 16));
+      fr = Math.round(parseFloat(getComputedStyle(panel).getPropertyValue('--rise')) * 16) || 40;
+    }
+
+    // The small shape is built round the rise, which is already where and
+    // as big as it ends up: room for the logo to its left, a little to its
+    // right and above it. Only the other edges move afterwards.
+    const b = Math.round(pr.top + pr.height);
+    const m = b - fr;
+    const n = Math.round(pr.left + fn);
+    const s = n - fr;
+    const l = Math.max(Math.round(pr.left) + 8, s - 260);
+    const r = Math.min(Math.round(pr.right) - 8, n + 220);
+    const t = Math.max(Math.round(pr.top) + 8, m - 110);
+
+    // The panel's clip-path, in the panel's own coordinates.
+    const px = (v: number) => `${v}px`;
+    panel.style.setProperty('--i-l', px(l - pr.left));
+    panel.style.setProperty('--i-r', px(r - pr.left));
+    panel.style.setProperty('--i-n', px(fn));
+    panel.style.setProperty('--i-s', px(fn - fr));
+    panel.style.setProperty('--i-t', px(t - pr.top));
+    panel.style.setProperty('--i-m', px(m - pr.top));
+    panel.style.setProperty('--i-b', px(b - pr.top));
+    panel.style.setProperty('--f-w', px(pr.width));
+    panel.style.setProperty('--f-n', px(fn));
+    panel.style.setProperty('--f-s', px(fn - fr));
+    panel.style.setProperty('--f-m', px(pr.height - fr));
+    panel.style.setProperty('--f-b', px(pr.height));
+
+    // Lines and outline, on half pixels so they stay crisp.
+    const h = (v: number) => v + 0.5;
+    svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
+    const ext = [
+      `M${l} ${h(t)}H0`,
+      `M${r} ${h(t)}H${vw}`,
+      `M${h(l)} ${t}V0`,
+      `M${h(r)} ${t}V0`,
+      `M${h(l)} ${b}V${vh}`,
+      `M${r} ${h(m)}H${vw}`,
+    ];
+    exts.forEach((p, i) => p.setAttribute('d', ext[i]));
+    outline.setAttribute('d', `M${h(l)} ${h(t)}H${h(r)}V${h(m)}H${h(n)}L${h(s)} ${h(b)}H${h(l)}Z`);
+
+    const lh = 28; // logo height (1.75rem)
+    logo.style.setProperty('--lx', px(l + 24));
+    logo.style.setProperty('--ly', px(b - 24 - lh));
+    count.style.setProperty('--cx', px(n + 16));
+    count.style.setProperty('--cy', px(m + 48));
+
+    // The timeline.
+    const steps: [string, number][] = [
+      ['lines', 60],
+      ['trace', 380],
+      ['fill', 1050],
+      ['widen', 1850],
+      ['morph', 2500],
+    ];
+    const END = 3300;
+    const timers: number[] = [];
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const k = Math.min(1, (now - t0) / 1750);
+      const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      count.textContent = String(Math.round(e * 100)).padStart(3, '0');
+      if (k < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    const finish = () => {
+      timers.forEach(clearTimeout);
+      cancelAnimationFrame(raf);
+      delete html.dataset.intro;
+      ['wheel', 'touchstart', 'keydown', 'resize'].forEach((ev) => window.removeEventListener(ev, finish));
+    };
+
+    steps.forEach(([state, at]) => timers.push(window.setTimeout(() => (html.dataset.intro = state), at)));
+    timers.push(window.setTimeout(finish, END));
+    ['wheel', 'touchstart', 'keydown', 'resize'].forEach((ev) => window.addEventListener(ev, finish, { passive: true }));
+  } else if (html.dataset.intro) {
+    delete html.dataset.intro;
+  }
+</script>

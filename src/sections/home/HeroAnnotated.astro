@@ -1,0 +1,293 @@
+---
+/**
+ * Hero, annotated layout (test): the title centred over the platform's
+ * interface, shown flat and whole, with four numbered orange markers on what
+ * matters in it (the asset list, the satellite view, the forecast, the risk
+ * panel). The same numbers lead a short legend under the capture, so the
+ * hero explains the product as it shows it. Hovering a legend item lights its
+ * marker. The capture under the hero (Showcase) is skipped in this layout.
+ */
+import { getCopy, withBase, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { hero, showcase } = getCopy(locale).home;
+const { main, ui } = hero;
+const src = withBase(showcase.src);
+const pad = (n: number) => String(n).padStart(3, '0');
+---
+
+<section class="han" aria-labelledby="han-title" data-hero-variant="annotated">
+  <div class="container han__head">
+    <h1 id="han-title" class="han__title">
+      <span class="han__line">{main.titleLine1}</span>
+      <span class="han__line">{main.titleLine2}</span>
+    </h1>
+    <p class="han__text">{main.text}</p>
+  </div>
+
+  <div class="container han__body" data-han>
+    <figure class="han__shot">
+      <img
+        src={`${src}-1600.webp`}
+        srcset={`${src}-960.webp 960w, ${src}-1600.webp 1600w, ${src}-2400.webp 2400w`}
+        sizes="(min-width: 90rem) 86rem, 94vw"
+        width={showcase.w}
+        height={showcase.h}
+        alt={showcase.alt}
+        fetchpriority="high"
+        decoding="async"
+      />
+      {ui.callouts.map((c, i) => (
+        <span class="han__mark" style={`--x:${c.x};--y:${c.y}`} data-mark={i} aria-hidden="true">
+          <span class="han__ring"></span>
+          <span class="han__num">{pad(i + 1)}</span>
+        </span>
+      ))}
+    </figure>
+
+    <ol class="han__legend">
+      {ui.callouts.map((c, i) => (
+        <li class="han__item" data-item={i}>
+          <span class="pg-idx">{pad(i + 1)}</span>
+          <span class="han__name">{c.title}</span>
+          <span class="han__desc">{c.text}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  /* No display here: the hero layout switch (global.css) shows or hides it. */
+  .han {
+    position: relative;
+    padding-top: calc(var(--header-h) + clamp(2.5rem, 1.5rem + 5vh, 5.5rem));
+    padding-bottom: clamp(3rem, 2rem + 3vw, 5rem);
+    background: var(--canvas);
+  }
+
+  .han__head {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+    text-align: center;
+  }
+
+  .han__title {
+    display: grid;
+    font-size: clamp(2.5rem, 1rem + 4vw, 4.75rem);
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: var(--track-display);
+  }
+
+  .han__text {
+    max-width: 48ch;
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.25rem);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  .han__body {
+    display: grid;
+    gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+    margin-top: clamp(2.5rem, 1.5rem + 4vh, 4.5rem);
+  }
+
+  /* The interface, flat and whole, with the notch on its top edge. */
+  .han__shot {
+    --notch: 16px;
+    position: relative;
+    margin: 0;
+    padding-top: var(--notch);
+    background: #0d0d0d;
+    clip-path: polygon(0 var(--notch), calc(42% - var(--notch)) var(--notch), 42% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .han__shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Markers: an orange square with its number, placed on the capture. */
+  .han__mark {
+    position: absolute;
+    left: calc(var(--x) * 100%);
+    top: calc(var(--notch) + var(--y) * (100% - var(--notch)));
+    display: grid;
+    place-items: center;
+    translate: -50% -50%;
+    pointer-events: none;
+  }
+
+  .han__num {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    height: 1.5rem;
+    padding: 0 0.375rem;
+    background: var(--grad-accent);
+    background-size: var(--grad-accent-size);
+    color: #ffffff;
+    font-size: var(--fs-caption);
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.45);
+    transition: scale 200ms var(--ease-out);
+  }
+
+  .han__ring {
+    position: absolute;
+    inset: -6px;
+    border: 1.5px solid var(--accent);
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .han__ring {
+      animation: han-ring 2.4s var(--ease-out) infinite;
+    }
+    .han__mark:nth-of-type(2) .han__ring {
+      animation-delay: 0.6s;
+    }
+    .han__mark:nth-of-type(3) .han__ring {
+      animation-delay: 1.2s;
+    }
+    .han__mark:nth-of-type(4) .han__ring {
+      animation-delay: 1.8s;
+    }
+  }
+
+  @keyframes han-ring {
+    0% {
+      opacity: 0.9;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+  }
+
+  .han__mark[data-on] .han__num {
+    scale: 1.15;
+  }
+
+  /* The legend: one column per marker, same numbers. */
+  .han__legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1.5rem clamp(1.5rem, 1rem + 2vw, 3rem);
+    padding: 0;
+    list-style: none;
+  }
+
+  .han__item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.375rem 0.75rem;
+    align-items: baseline;
+  }
+
+  .han__item .pg-idx {
+    grid-row: span 2;
+    align-self: start;
+  }
+
+  .han__name {
+    font-size: var(--fs-h4, 1.125rem);
+    letter-spacing: var(--track-title);
+  }
+
+  .han__desc {
+    grid-column: 2;
+    color: var(--ink-2);
+    font-size: var(--fs-small);
+  }
+
+  /* Entrance: the copy fades in out of a soft blur, the capture rises, then the markers. */
+  @media (prefers-reduced-motion: no-preference) {
+    .han__line,
+    .han__text {
+      animation: han-text 850ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+    }
+    .han__line:nth-child(1) {
+      animation-delay: 200ms;
+    }
+    .han__line:nth-child(2) {
+      animation-delay: 290ms;
+    }
+    .han__text {
+      animation-delay: 380ms;
+    }
+    .han__shot {
+      animation: han-rise 1200ms cubic-bezier(0.19, 1, 0.22, 1) 420ms backwards;
+    }
+    .han__mark {
+      animation: han-mark 500ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+    }
+    .han__mark:nth-of-type(1) {
+      animation-delay: 1000ms;
+    }
+    .han__mark:nth-of-type(2) {
+      animation-delay: 1100ms;
+    }
+    .han__mark:nth-of-type(3) {
+      animation-delay: 1200ms;
+    }
+    .han__mark:nth-of-type(4) {
+      animation-delay: 1300ms;
+    }
+  }
+
+  @keyframes han-text {
+    from {
+      opacity: 0;
+      filter: blur(10px);
+      color: var(--accent);
+    }
+  }
+
+  @keyframes han-rise {
+    from {
+      opacity: 0;
+      transform: translateY(60px);
+    }
+  }
+
+  @keyframes han-mark {
+    from {
+      opacity: 0;
+      scale: 0.8;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .han__num {
+      min-width: 1.75rem;
+      height: 1.25rem;
+      font-size: 0.6875rem;
+    }
+  }
+</style>
+
+<script>
+  /* Hovering a legend item lights its marker. */
+  document.querySelectorAll<HTMLElement>('[data-han]').forEach((root) => {
+    const marks = Array.from(root.querySelectorAll<HTMLElement>('[data-mark]'));
+    root.querySelectorAll<HTMLElement>('[data-item]').forEach((item) => {
+      const mark = marks[Number(item.dataset.item)];
+      const on = () => mark?.toggleAttribute('data-on', true);
+      const off = () => mark?.removeAttribute('data-on');
+      item.addEventListener('pointerenter', on);
+      item.addEventListener('pointerleave', off);
+    });
+  });
+</script>

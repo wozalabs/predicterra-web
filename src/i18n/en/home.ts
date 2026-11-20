@@ -33,6 +33,20 @@ export default {
   },
 
   hero: {
+    // Test layouts that combine the hero with the platform's interface
+    // (HeroImmersive, HeroWindow, HeroAnnotated). x/y place each callout on
+    // the still capture (fractions of its width and height).
+    ui: {
+      window: 'Asset 16 · Zamora, Castilla y León',
+      risk: { label: 'Wildfire risk', value: 'High', score: '8/10' },
+      wind: { label: 'Peak wind forecast', value: '41.8 km/h', note: 'Next 14 days' },
+      callouts: [
+        { title: 'Every asset in one list', text: 'Lines, towers, substations and plants, filtered by region and type.', x: 0.14, y: 0.56 },
+        { title: 'Each asset seen from above', text: 'Satellite imagery and terrain around the asset at risk.', x: 0.525, y: 0.36 },
+        { title: 'The forecast at that asset', text: 'Wind, rain and heat over the next 14 days, against what is usual.', x: 0.6, y: 0.79 },
+        { title: 'Its risk, hazard by hazard', text: 'Flood, wildfire and economic risk, scored and explained.', x: 0.86, y: 0.79 },
+      ],
+    },
     // App layout (default): title centred, the platform capture peeking below.
     main: {
       label: 'The Cognitive Twin for energy',

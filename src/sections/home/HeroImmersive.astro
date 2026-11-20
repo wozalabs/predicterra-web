@@ -1,0 +1,185 @@
+---
+/**
+ * Hero, immersive layout (test): the platform itself is the hero. The silent
+ * loop of the platform in use runs the full width of the page, whole and at
+ * its own proportions (never cropped), right under the header; the copy sits
+ * on a white card with the brand's notch over its bottom-left corner (under it
+ * on phones). The header sits on the dark ground in light text.
+ * The capture under the hero (Showcase) is skipped in this layout.
+ */
+import Button from '../../components/Button.astro';
+import { getCopy, localizePath, withBase, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { hero, showcase } = getCopy(locale).home;
+const { main } = hero;
+const v = showcase.video;
+---
+
+<section class="him" aria-labelledby="him-title" data-hero-variant="immersive" data-header-dark>
+  <video
+    class="him__video"
+    width={v.w}
+    height={v.h}
+    poster={withBase(v.poster)}
+    muted
+    loop
+    playsinline
+    preload="none"
+    disablepictureinpicture
+    disableRemotePlayback
+    controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+    tabindex="-1"
+    aria-label={v.label}
+    data-hero-video
+  >
+    <source src={withBase(v.small)} type="video/mp4" media="(max-width: 47.99rem)" />
+    <source src={withBase(v.large)} type="video/mp4" />
+  </video>
+  <div class="him__veil" aria-hidden="true"></div>
+
+  <div class="container him__inner">
+    <div class="him__card">
+      <h1 id="him-title" class="him__title">
+        <span class="him__line">{main.titleLine1}</span>
+        <span class="him__line">{main.titleLine2}</span>
+      </h1>
+      <p class="him__text">{main.text}</p>
+      <div class="him__actions">
+        <Button href={localizePath(main.primary.href, locale)} label={main.primary.label} size="lg" />
+        <Button href={localizePath(main.secondary.href, locale)} label={main.secondary.label} size="lg" variant="secondary" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* No display here: the hero layout switch (global.css) shows or hides it. */
+  .him {
+    position: relative;
+    padding-top: var(--header-h);
+    background: #0d0d0d;
+  }
+
+  /* The interface, full width, whole: its height follows its own proportions. */
+  .him__video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1920 / 1076;
+  }
+
+  /* Darker at the bottom left, behind the card, so the interface recedes there. */
+  .him__veil {
+    position: absolute;
+    inset: var(--header-h) 0 0;
+    background: radial-gradient(ellipse 60% 70% at 0% 100%, rgb(13 13 13 / 0.7) 0%, rgb(13 13 13 / 0) 70%);
+    pointer-events: none;
+  }
+
+  /* The card sits over the capture's bottom-left corner. */
+  .him__inner {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-bottom: clamp(1.5rem, 1rem + 2vw, 3rem);
+  }
+
+  /* The copy on a white card with the notch on its top edge, in both themes. */
+  .him__card {
+    --notch: 16px;
+    display: grid;
+    gap: 1.25rem;
+    width: min(40rem, 100%);
+    padding: calc(clamp(1.75rem, 1rem + 2vw, 3rem) + var(--notch)) clamp(1.5rem, 1rem + 2vw, 3rem) clamp(1.75rem, 1rem + 2vw, 3rem);
+    background: #ffffff;
+    color: #1e1e1e;
+    --ink: #1e1e1e;
+    --ink-2: #4d4d4d;
+    clip-path: polygon(0 var(--notch), calc(42% - var(--notch)) var(--notch), 42% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .him__title {
+    display: grid;
+    font-size: clamp(2.25rem, 1.25rem + 3vw, 4rem);
+    font-weight: 400;
+    line-height: 0.98;
+    letter-spacing: var(--track-display);
+  }
+
+  .him__text {
+    max-width: 40ch;
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.45;
+    color: #4d4d4d;
+  }
+
+  .him__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  /* Entrance: the card fades in out of a soft blur, then its lines. */
+  @media (prefers-reduced-motion: no-preference) {
+    .him__card {
+      animation: him-in 800ms cubic-bezier(0.33, 1, 0.68, 1) 150ms backwards;
+    }
+    .him__line,
+    .him__text,
+    .him__actions {
+      animation: him-text 850ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+    }
+    .him__line:nth-child(1) {
+      animation-delay: 300ms;
+    }
+    .him__line:nth-child(2) {
+      animation-delay: 390ms;
+    }
+    .him__text {
+      animation-delay: 480ms;
+    }
+    .him__actions {
+      animation-delay: 560ms;
+    }
+  }
+
+  @keyframes him-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes him-text {
+    from {
+      opacity: 0;
+      filter: blur(10px);
+      color: var(--accent);
+    }
+  }
+
+  /* Phones and narrow tablets: the capture on top, the card under it. */
+  @media (max-width: 63.99rem) {
+    .him__veil {
+      display: none;
+    }
+    .him__inner {
+      position: relative;
+      padding-inline: 0;
+      padding-bottom: 0;
+    }
+    .him__card {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  import { mountHeroVideos } from '../../scripts/hero-video';
+  mountHeroVideos();
+</script>

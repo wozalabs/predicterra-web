@@ -1,0 +1,279 @@
+---
+/**
+ * Hero, window layout (test): the title on the left and the description on
+ * the right, and under them the platform in a dark app window (a thin bar with
+ * the asset it shows, the notch cut into its top edge) rising from the bottom
+ * of the screen, always whole and at its own proportions (never cropped). Two
+ * cards lifted out of the interface float over it: the asset's wildfire risk and its peak wind forecast, so the
+ * hero reads the product before the visitor reads the copy.
+ * The capture under the hero (Showcase) is skipped in this layout.
+ */
+import { getCopy, withBase, type Locale } from '../../i18n/config';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { hero, showcase } = getCopy(locale).home;
+const { main, ui } = hero;
+const v = showcase.video;
+---
+
+<section class="hwn" aria-labelledby="hwn-title" data-hero-variant="window">
+  <div class="container hwn__head">
+    <h1 id="hwn-title" class="hwn__title">
+      <span class="hwn__line">{main.titleLine1}</span>
+      <span class="hwn__line">{main.titleLine2}</span>
+    </h1>
+    <p class="hwn__text">{main.text}</p>
+  </div>
+
+  <div class="container hwn__stage">
+    <figure class="hwn__window">
+      <figcaption class="hwn__bar t-caption">
+        <span class="hwn__dot" aria-hidden="true"></span>
+        {ui.window}
+      </figcaption>
+      <video
+        class="hwn__video"
+        width={v.w}
+        height={v.h}
+        poster={withBase(v.poster)}
+        muted
+        loop
+        playsinline
+        preload="none"
+        disablepictureinpicture
+        disableRemotePlayback
+        controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+        tabindex="-1"
+        aria-label={v.label}
+        data-hero-video
+      >
+        <source src={withBase(v.small)} type="video/mp4" media="(max-width: 47.99rem)" />
+        <source src={withBase(v.large)} type="video/mp4" />
+      </video>
+    </figure>
+
+    <!-- Lifted out of the interface (decorative; the same figures are in the capture). -->
+    <div class="hwn__card hwn__card--risk" aria-hidden="true">
+      <p class="hwn__label t-small">{ui.risk.label}</p>
+      <p class="hwn__value">
+        {ui.risk.value} <span class="hwn__score">{ui.risk.score}</span>
+      </p>
+      <span class="hwn__meter"><span style="--v:0.8"></span></span>
+    </div>
+    <div class="hwn__card hwn__card--wind" aria-hidden="true">
+      <p class="hwn__label t-small">{ui.wind.label}</p>
+      <p class="hwn__value">{ui.wind.value}</p>
+      <p class="hwn__note t-small">{ui.wind.note}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* No display here: the hero layout switch (global.css) shows or hides it. */
+  /* As tall as its content: the window always shows the whole capture, at
+     its own proportions; its lower part comes into view as the page scrolls. */
+  .hwn {
+    position: relative;
+    padding-top: calc(var(--header-h) + clamp(2rem, 1rem + 5vh, 5rem));
+    background: var(--canvas);
+  }
+
+  .hwn__head {
+    display: grid;
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  @media (min-width: 56rem) {
+    .hwn__head {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+      align-items: last baseline;
+      column-gap: clamp(2rem, 1rem + 4vw, 6rem);
+    }
+  }
+
+  .hwn__title {
+    display: grid;
+    font-size: clamp(2.5rem, 1rem + 4vw, 4.75rem);
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: var(--track-display);
+  }
+
+  .hwn__text {
+    max-width: 36ch;
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.25rem);
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+
+  /* The window runs off the bottom of the screen. */
+  .hwn__stage {
+    position: relative;
+    width: 100%;
+    margin-top: clamp(2rem, 1rem + 4vh, 4rem);
+  }
+
+  .hwn__window {
+    --notch: 16px;
+    position: relative;
+    margin: 0;
+    background: #0d0d0d;
+    box-shadow: 0 30px 60px -30px rgb(30 30 30 / 0.45);
+    clip-path: polygon(0 var(--notch), calc(58% - var(--notch)) var(--notch), 58% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  /* On the dark page the window steps up a tone so its edge still reads. */
+  :global(:root[data-theme='dark']) .hwn__window {
+    background: #1c1c1c;
+  }
+
+  .hwn__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    height: calc(2.5rem + var(--notch));
+    padding: var(--notch) 1rem 0;
+    color: rgb(255 255 255 / 0.6);
+  }
+
+  .hwn__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--accent);
+  }
+
+  .hwn__video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1920 / 1076;
+  }
+
+  /* Cards lifted out of the interface, over the window's edges. */
+  .hwn__card {
+    position: absolute;
+    z-index: 1;
+    display: grid;
+    gap: 0.375rem;
+    width: clamp(13rem, 10rem + 6vw, 16rem);
+    padding: 1rem 1.125rem;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow:
+      0 1px 2px rgb(30 30 30 / 0.08),
+      0 24px 48px -16px rgb(30 30 30 / 0.3);
+  }
+
+  /* Floating over the interface, inset from the window's edges. */
+  .hwn__card--risk {
+    top: clamp(4.5rem, 3rem + 6vh, 8rem);
+    right: calc(var(--gutter) + clamp(1rem, 0.5rem + 1.5vw, 2rem));
+  }
+
+  .hwn__card--wind {
+    top: clamp(11rem, 8rem + 14vh, 19rem);
+    left: calc(var(--gutter) + clamp(14rem, 10rem + 8vw, 20rem));
+  }
+
+  .hwn__label,
+  .hwn__note {
+    color: var(--muted);
+  }
+
+  .hwn__value {
+    font-size: 1.75rem;
+    line-height: 1;
+    letter-spacing: var(--track-heading);
+  }
+
+  .hwn__score {
+    font-size: 1rem;
+    color: var(--muted);
+  }
+
+  /* The risk as segments, like the interface's own bars. */
+  .hwn__meter {
+    display: block;
+    height: 0.5rem;
+    margin-top: 0.25rem;
+    background: repeating-linear-gradient(90deg, var(--tick-off) 0 3px, transparent 3px 5px);
+  }
+
+  .hwn__meter span {
+    display: block;
+    width: calc(var(--v) * 100%);
+    height: 100%;
+    background: repeating-linear-gradient(90deg, var(--accent) 0 3px, transparent 3px 5px);
+  }
+
+  /* Entrance: the copy fades in out of a soft blur, the window rises, then the cards. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hwn__line,
+    .hwn__text {
+      animation: hwn-text 850ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+    }
+    .hwn__line:nth-child(1) {
+      animation-delay: 200ms;
+    }
+    .hwn__line:nth-child(2) {
+      animation-delay: 290ms;
+    }
+    .hwn__text {
+      animation-delay: 380ms;
+    }
+    .hwn__window {
+      animation: hwn-rise 1200ms cubic-bezier(0.19, 1, 0.22, 1) 420ms backwards;
+    }
+    .hwn__card {
+      animation: hwn-card 700ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+    }
+    .hwn__card--risk {
+      animation-delay: 1000ms;
+    }
+    .hwn__card--wind {
+      animation-delay: 1120ms;
+    }
+  }
+
+  @keyframes hwn-text {
+    from {
+      opacity: 0;
+      filter: blur(10px);
+      color: var(--accent);
+    }
+  }
+
+  @keyframes hwn-rise {
+    from {
+      opacity: 0;
+      transform: translateY(80px);
+    }
+  }
+
+  @keyframes hwn-card {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.97);
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .hwn__card--risk {
+      top: auto;
+      bottom: -1.5rem;
+      right: calc(var(--gutter) + 0.5rem);
+    }
+    .hwn__card--wind {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { mountHeroVideos } from '../../scripts/hero-video';
+  mountHeroVideos();
+</script>

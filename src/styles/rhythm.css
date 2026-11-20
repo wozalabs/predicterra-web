@@ -1,0 +1,187 @@
+/*
+ * Home proportions (test, html[data-rhythm], switch bottom left):
+ *  a  Current   the home as it is
+ *  b  Proposal  one rhythm instead of one per section: one size for every
+ *               section title, the 3D stops a step below it, the CTA a step
+ *               above it and still under the hero; body copy a step larger;
+ *               one space between sections (--r-y) and one between a title
+ *               and what follows it (--r-gap)
+ *  c  Compact   (the default) the same rhythm, with the content held to 1200px (full-bleed
+ *               grounds still run edge to edge) and every size a step smaller
+ * The rules are shared by b and c; only the values below differ.
+ * Remove this file, its import and the switch once a version is chosen.
+ */
+html[data-rhythm='b'] {
+  --fs-h2: clamp(2.25rem, 1.5rem + 2.2vw, 3.5rem);
+  --r-y: clamp(4.5rem, 3rem + 4.5vw, 8rem);
+  --r-gap: clamp(1.75rem, 1.25rem + 1.5vw, 3rem);
+  --r-hero: clamp(2.5rem, 1rem + 4vw, 5.25rem);
+  --r-hero-text: clamp(1.0625rem, 0.95rem + 0.4vw, 1.25rem);
+  --r-lead: clamp(1.0625rem, 0.95rem + 0.4vw, 1.25rem);
+  --r-statement: clamp(1.375rem, 1.05rem + 0.9vw, 2rem);
+  --r-step: clamp(2rem, 1.4rem + 1.8vw, 3rem);
+  --r-step-text: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --r-row: clamp(1.5rem, 1.1rem + 1.1vw, 2rem);
+  --r-row-text: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --r-cta: clamp(2.75rem, 1.5rem + 3vw, 4.5rem);
+  --r-logo: 1.15;
+}
+
+html[data-rhythm='c'] {
+  /* Content held to 1200px; the header, panels and cards follow. */
+  --max-w: calc(75rem + 2 * var(--gutter));
+  --fs-display: clamp(2.25rem, 1.6rem + 1.8vw, 3.25rem);
+  --fs-h2: clamp(1.75rem, 1.3rem + 1.3vw, 2.5rem);
+  --fs-h3: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem);
+  --fs-lead: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --fs-statement: clamp(1.25rem, 1.05rem + 0.6vw, 1.75rem);
+  --r-y: clamp(4rem, 2.5rem + 4vw, 7rem);
+  --r-gap: clamp(1.5rem, 1rem + 1.2vw, 2.25rem);
+  --r-hero: clamp(2.25rem, 1.2rem + 2.6vw, 3.5rem);
+  --r-hero-text: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
+  --r-lead: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --r-statement: clamp(1.25rem, 1rem + 0.7vw, 1.625rem);
+  --r-step: clamp(1.75rem, 1.3rem + 1.2vw, 2.5rem);
+  --r-step-text: 1rem;
+  --r-row: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem);
+  --r-row-text: 1rem;
+  --r-cta: clamp(2.25rem, 1.4rem + 2.2vw, 3.5rem);
+  --r-logo: 1;
+}
+
+/* Hero: the title and the description on the scale. */
+html:is([data-rhythm='b'], [data-rhythm='c']) .hpn__title {
+  font-size: var(--r-hero);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .hpn__text {
+  font-size: var(--r-hero-text);
+}
+
+/* Trusted by: the same space above as every section. */
+html:is([data-rhythm='b'], [data-rhythm='c']) .sc__after {
+  gap: var(--r-gap);
+  padding-top: var(--r-y);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .sc__logo svg {
+  scale: var(--r-logo);
+}
+
+/* Why us: the same space above, the panel's own padding on the same rhythm. */
+html:is([data-rhythm='b'], [data-rhythm='c']) section.why {
+  padding-top: var(--r-y);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .why__panel {
+  padding-block: var(--r-y);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .why__text {
+  font-size: var(--r-statement);
+  line-height: 1.22;
+}
+
+/* One model for every sector: a section title like the others. */
+html:is([data-rhythm='b'], [data-rhythm='c']) section.si {
+  padding-block: var(--r-y);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .si__inner {
+  gap: var(--r-gap);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .si__title {
+  font-size: var(--fs-h2);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .si__text {
+  font-size: var(--r-lead);
+}
+
+/* 3D stops: titles a step under the section titles, copy a step up and wider. */
+html:is([data-rhythm='b'], [data-rhythm='c']) [data-sectors='trail'] .step {
+  --step-size: var(--r-step);
+  width: min(32rem, 40vw);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) [data-sectors='trail'] .step__text {
+  max-width: 34ch;
+  font-size: var(--r-step-text);
+}
+
+/* Across all sectors: the rows right under the title, no empty band between. */
+html:is([data-rhythm='b'], [data-rhythm='c']) .ac__inner {
+  justify-content: flex-start;
+  gap: var(--r-gap);
+  padding-top: calc(var(--header-h) + var(--r-y) * 0.5);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .ac__inner .ac__list {
+  margin-top: 0;
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .ac .lr__item {
+  padding-block: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .ac .lr__name {
+  font-size: var(--r-row);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .ac .lr__text {
+  font-size: var(--r-row-text);
+}
+
+/* CTA: a closing title above the section titles, below the hero. */
+html:is([data-rhythm='b'], [data-rhythm='c']) .cta__title {
+  font-size: var(--r-cta);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) .cta__card {
+  min-height: clamp(24rem, 46vh, 30rem);
+}
+
+html:is([data-rhythm='b'], [data-rhythm='c']) section.cta {
+  padding-top: var(--r-y);
+}
+
+/* ---------- Switch (test) ---------- */
+.rhy {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: var(--z-menu);
+  display: grid;
+  gap: 0.125rem;
+  padding: 0.25rem;
+  background: var(--surface);
+  box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.35);
+  font-size: 0.75rem;
+}
+
+.rhy__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.rhy__label {
+  padding: 0 0.5rem;
+  color: var(--muted);
+}
+
+.rhy__btn {
+  min-height: 1.75rem;
+  padding: 0 0.625rem;
+  color: var(--ink-2);
+  transition:
+    background-color 150ms ease-out,
+    color 150ms ease-out;
+}
+
+.rhy__btn[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--canvas);
+}

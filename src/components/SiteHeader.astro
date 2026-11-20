@@ -161,7 +161,11 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
     <div class="menu__test" role="group" aria-label={menu.hero.label}>
       <span class="t-small t-muted">{menu.hero.label}</span>
       <div class="seg">
-        <button type="button" class="seg__btn" data-hero-option="app" aria-pressed="true">{menu.hero.app}</button>
+        <button type="button" class="seg__btn" data-hero-option="panel" aria-pressed="true">{menu.hero.panel}</button>
+        <button type="button" class="seg__btn" data-hero-option="immersive" aria-pressed="false">{menu.hero.immersive}</button>
+        <button type="button" class="seg__btn" data-hero-option="window" aria-pressed="false">{menu.hero.window}</button>
+        <button type="button" class="seg__btn" data-hero-option="annotated" aria-pressed="false">{menu.hero.annotated}</button>
+        <button type="button" class="seg__btn" data-hero-option="app" aria-pressed="false">{menu.hero.app}</button>
         <button type="button" class="seg__btn" data-hero-option="clean" aria-pressed="false">{menu.hero.clean}</button>
         <button type="button" class="seg__btn" data-hero-option="centred" aria-pressed="false">{menu.hero.centred}</button>
         <button type="button" class="seg__btn" data-hero-option="split" aria-pressed="false">{menu.hero.split}</button>
@@ -890,7 +894,7 @@ const isCurrent = (href: string) => localizePath(href, locale).replace(/\/+$/, '
       const value = btn.dataset.heroOption!;
       document.documentElement.dataset.hero = value;
       try {
-        localStorage.setItem('predicterra:hero-v3', value);
+        localStorage.setItem('predicterra:hero-v4', value);
       } catch {
         /* storage unavailable: applies to this page view only */
       }
