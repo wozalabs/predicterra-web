@@ -31,10 +31,10 @@ import '../styles/rhythm.css';
 const locale = 'en';
 const { home } = getCopy(locale);
 const site = Astro.site ?? new URL('https://www.predicterra.com');
-// Test switches, bottom left (intro, proportions). Hidden for production: the
-// page then runs on the defaults (Compact, intro on) whatever was stored.
-// Set to true to bring the switches back.
-const showTests = false;
+// Test switches, bottom left (intro, proportions, hero ground). Shown only
+// while developing (npm run dev); the production build hides them and runs on
+// the defaults (Compact, intro on, plain ground) whatever was stored.
+const showTests = import.meta.env.DEV;
 ---
 
 <BaseLayout
@@ -50,6 +50,12 @@ const showTests = false;
       document.documentElement.dataset.rhythm = r === 'a' || r === 'b' ? r : 'c';
     } catch (e) {
       document.documentElement.dataset.rhythm = 'c';
+    }
+    // Test: the hero's dark ground, plain or the sectors film (sections/home/Showcase.astro).
+    try {
+      document.documentElement.dataset.ground = showTests && localStorage.getItem('predicterra:hero-ground') === 'video' ? 'video' : 'plain';
+    } catch (e) {
+      document.documentElement.dataset.ground = 'plain';
     }
     // Test: the intro (sections/home/HomeIntro.astro), panel hero only, from
     // the top: on a visit from outside the site and on a reload, not when
@@ -101,6 +107,11 @@ const showTests = false;
   <!-- Test switches, bottom left: intro and proportions (hidden for production, showTests). -->
   {showTests && (
   <div class="rhy">
+    <div class="rhy__row" role="group" aria-label="Hero ground (test)">
+      <span class="rhy__label">Ground</span>
+      <button type="button" class="rhy__btn" data-ground-option="plain" aria-pressed="false">Plain</button>
+      <button type="button" class="rhy__btn" data-ground-option="video" aria-pressed="false">Sectors film</button>
+    </div>
     <div class="rhy__row" role="group" aria-label="Intro (test)">
       <span class="rhy__label">Intro</span>
       <button type="button" class="rhy__btn" data-intro-option="on" aria-pressed="false">On</button>
@@ -133,6 +144,22 @@ const showTests = false;
     }),
   );
   sync();
+
+  // Hero ground: plain or the sectors film.
+  const grounds = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-ground-option]'));
+  const syncGround = () => grounds.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.groundOption === html.dataset.ground)));
+  grounds.forEach((b) =>
+    b.addEventListener('click', () => {
+      html.dataset.ground = b.dataset.groundOption;
+      try {
+        localStorage.setItem('predicterra:hero-ground', b.dataset.groundOption!);
+      } catch {}
+      syncGround();
+      // The film starts or stops with it (scripts/hero-video).
+      window.dispatchEvent(new Event('hero:change'));
+    }),
+  );
+  syncGround();
 
   // Intro on or off, and replay (reloads from the top).
   const intros = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-intro-option]'));

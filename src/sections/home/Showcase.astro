@@ -13,6 +13,12 @@
  * `peek` (homepage only): with the App hero layout (the default) the capture
  * is pulled up into the bottom of the hero, barely tilted, so it is already in
  * view on load, rising out of a soft fire glow.
+ *
+ * Test (html[data-ground='video'], switch bottom left, panel hero only): the
+ * dark ground under the hero panel and behind the capture plays the earlier
+ * hero film of the sectors and industries, under a dark veil, the capture at
+ * its usual size on top. Remove the ground, its styles and the switch row once
+ * decided.
  */
 import BrandLogo from '../../components/BrandLogo.astro';
 import { getCopy, withBase, type Locale } from '../../i18n/config';
@@ -25,12 +31,34 @@ interface Props {
   logos?: LogoGroup[];
 }
 const { locale = 'en', peek = false, logos } = Astro.props;
-const { showcase: s } = getCopy(locale).home;
+const { showcase: s, hero } = getCopy(locale).home;
 const v = s.video;
+const film = hero.video;
 ---
 
 <section class="sc" aria-label={s.label} data-showcase data-peek={peek ? '' : undefined}>
   {peek && <div class="sc__glow" aria-hidden="true" data-glow />}
+  {
+    peek && (
+      <div class="sc__ground" aria-hidden="true" data-sc-ground>
+        <video
+          class="sc__film"
+          poster={withBase(film.poster)}
+          muted
+          loop
+          playsinline
+          preload="none"
+          disablepictureinpicture
+          disableRemotePlayback
+          tabindex="-1"
+          data-hero-video
+        >
+          <source src={withBase(film.small)} type="video/mp4" media="(max-width: 47.99rem)" />
+          <source src={withBase(film.large)} type="video/mp4" />
+        </video>
+      </div>
+    )
+  }
   <div class="container sc__stage">
     <figure class="sc__frame" data-showcase-frame>
       <video
@@ -119,6 +147,63 @@ const v = s.video;
     box-shadow: 0 0 0 100vmax #0d0d0d;
     clip-path: inset(0 -100vmax);
     padding-bottom: clamp(2rem, 1rem + 3vw, 4rem);
+  }
+
+  /* ---------- Test: the sectors film as the dark ground ----------
+     Full width, from under the hero panel's raised edge down past the bottom
+     of the capture's ground (height set by the script), behind the capture. */
+  .sc__ground {
+    display: none;
+  }
+
+  :global(html[data-hero='panel'][data-ground='video']) .sc[data-peek] .sc__ground {
+    position: absolute;
+    top: -15rem;
+    left: 0;
+    right: 0;
+    display: block;
+    height: calc(var(--ground-h, 100svh) + 15rem + 4rem);
+    overflow: hidden;
+    background: #0d0d0d;
+    /* Runs a little past the capture's ground and fades out into the page,
+       so the next section starts on the canvas with no edge. */
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 14rem), transparent);
+    mask-image: linear-gradient(180deg, #000 calc(100% - 14rem), transparent);
+  }
+
+  .sc__film {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* A dark veil, heavier under the hero's copy and around the capture's foot,
+     so the film reads as ground and never competes with the platform. */
+  .sc__ground::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgb(13 13 13 / 0.35) 0%, rgb(13 13 13 / 0) 30%, rgb(13 13 13 / 0) 70%, rgb(13 13 13 / 0.85) 100%),
+      rgb(13 13 13 / 0.5);
+  }
+
+  :global(html[data-hero='panel'][data-ground='video']) .sc[data-peek] .sc__stage {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html[data-hero='panel'][data-ground='video']) .sc[data-peek] .sc__ground {
+      animation: sc-ground 1200ms cubic-bezier(0.33, 1, 0.68, 1) both;
+    }
+  }
+
+  @keyframes sc-ground {
+    from {
+      opacity: 0;
+    }
   }
 
   /* Layouts whose hero already shows the platform: no second capture, the
@@ -314,6 +399,26 @@ const v = s.video;
     }
   }
 
+
+  /* ---------- Test: the film ground runs down to the capture's ground ---------- */
+  const ground = document.querySelector<HTMLElement>('[data-sc-ground]');
+  const groundStage = ground?.parentElement?.querySelector<HTMLElement>('.sc__stage');
+  const groundHost = ground?.parentElement;
+  if (ground && groundStage && groundHost) {
+    // From the top of the section to the bottom of the capture's ground (layout
+    // boxes, so the stage's entrance transform doesn't count).
+    const fit = () => {
+      let y = 0;
+      for (let el: HTMLElement | null = groundStage; el && el !== groundHost; el = el.offsetParent as HTMLElement | null) y += el.offsetTop;
+      ground.style.setProperty('--ground-h', `${y + groundStage.offsetHeight}px`);
+    };
+    const ro = new ResizeObserver(fit);
+    ro.observe(groundStage);
+    ro.observe(groundHost);
+    window.addEventListener('load', fit, { once: true });
+    fit();
+  }
+  import('../../scripts/hero-video').then((m) => m.mountHeroVideos());
 
   /* ---------- Glow (App hero): fades out as the page scrolls ---------- */
   const glow = document.querySelector<HTMLElement>('[data-glow]');
