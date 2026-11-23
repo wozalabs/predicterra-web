@@ -1,5 +1,5 @@
 ---
-import { LOGO_VIEWBOX, logoAccentPaths, logoInkPaths } from '../data/logo';
+import { LOGO_VIEWBOX, logoAccentPaths, logoCutPaths, logoInkPaths } from '../data/logo';
 
 interface Props {
   class?: string;
@@ -16,6 +16,7 @@ const { class: className, title = 'Predicterra' } = Astro.props;
   xmlns="http://www.w3.org/2000/svg"
 >
   {logoAccentPaths.map((d) => <path d={d} fill="#FF3700" />)}
+  {logoCutPaths.map((d) => <path d={d} fill="#FFFFFF" />)}
   {logoInkPaths.map((d) => <path d={d} fill="currentColor" />)}
 </svg>
 

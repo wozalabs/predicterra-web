@@ -23,12 +23,12 @@ export default {
     h: 1600,
     // The capture shown: a silent loop of the platform in use (public/showcase).
     video: {
-      large: '/showcase/predicterra-show-1920.mp4',
-      small: '/showcase/predicterra-show-960.mp4',
-      poster: '/showcase/predicterra-show-poster.webp',
-      label: 'The Predicterra platform in use: from a satellite view of Spain down to a transmission tower, with its asset list, risk panel and wind forecast.',
+      large: '/showcase/predicterra-web-1920.mp4',
+      small: '/showcase/predicterra-web-960.mp4',
+      poster: '/showcase/predicterra-web-poster.webp',
+      label: 'The Predicterra platform in use: power lines and their risk on the map, a line’s asset panel with its risk scores and wind forecast, then a wind farm and its turbines.',
       w: 1920,
-      h: 1076,
+      h: 1080,
     },
   },
 
