@@ -31,10 +31,12 @@ import '../styles/rhythm.css';
 const locale = 'en';
 const { home } = getCopy(locale);
 const site = Astro.site ?? new URL('https://www.predicterra.com');
-// Test switches, bottom left (the capture and the film, the intro). Shown only
-// while developing (npm run dev); the production build hides them and runs on
-// the defaults (current, intro on) whatever was stored.
-const showTests = import.meta.env.DEV;
+// Test switches, bottom left (the capture and the film, the intro). Always on
+// while developing (npm run dev). On the published site they stay hidden
+// unless the page is opened once with ?options in the address (remembered in
+// that browser; ?options=off hides them again), so coworkers can compare while
+// visitors only ever see the defaults (current, intro on).
+const dev = import.meta.env.DEV;
 ---
 
 <BaseLayout
@@ -44,7 +46,14 @@ const showTests = import.meta.env.DEV;
   jsonLd={[softwareJsonLd(site, home.seo.description)]}
 >
   <!-- Set before paint. -->
-  <script is:inline define:vars={{ showTests }}>
+  <script is:inline define:vars={{ dev }}>
+    var showTests = dev;
+    try {
+      var q = new URLSearchParams(location.search).get('options');
+      if (q !== null) localStorage.setItem('predicterra:options', q === 'off' ? 'off' : 'on');
+      showTests = dev || localStorage.getItem('predicterra:options') === 'on';
+    } catch (e) {}
+    if (showTests) document.documentElement.dataset.tests = '';
     // Test: the capture and the film (sections/home/Showcase.astro).
     try {
       var mix = showTests ? localStorage.getItem('predicterra:sc-mix') : null;
@@ -99,8 +108,8 @@ const showTests = import.meta.env.DEV;
   {/* <Metrics locale={locale} /> */}
   <Cta locale={locale} copy={home.cta} />
 
-  <!-- Test switch, bottom left: the intro (development only, showTests). -->
-  {showTests && (
+  <!-- Test switches, bottom left (shown with html[data-tests], see the script at the top). -->
+  {(
   <div class="rhy">
     <div class="rhy__row" role="group" aria-label="Capture and film (test)">
       <span class="rhy__label">Showcase</span>

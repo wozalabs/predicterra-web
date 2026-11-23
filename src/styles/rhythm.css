@@ -120,6 +120,10 @@ html:root section.cta {
 
 /* ---------- Switch (test) ---------- */
 .rhy {
+  display: none;
+}
+
+html[data-tests] .rhy {
   position: fixed;
   left: 1rem;
   bottom: 1rem;
