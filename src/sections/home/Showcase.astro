@@ -14,11 +14,9 @@
  * is pulled up into the bottom of the hero, barely tilted, so it is already in
  * view on load, rising out of a soft fire glow.
  *
- * Test (html[data-ground='video'], switch bottom left, panel hero only): the
- * dark ground under the hero panel and behind the capture plays the earlier
- * hero film of the sectors and industries, under a dark veil, the capture at
- * its usual size on top. Remove the ground, its styles and the switch row once
- * decided.
+ * Panel hero: the dark ground under the hero panel and behind the capture
+ * plays the film of the sectors and industries, under a dark veil, the
+ * capture at its usual size on top; it fades out into the page below.
  */
 import BrandLogo from '../../components/BrandLogo.astro';
 import { getCopy, withBase, type Locale } from '../../i18n/config';
@@ -140,23 +138,21 @@ const film = hero.video;
     }
   }
 
-  /* Panel hero: the capture sits on a plain dark ground, full width, in both
-     themes, down to its bottom edge. */
+  /* Panel hero: the capture sits on the film's ground (below), full width,
+     down to its bottom edge. */
   :global(html[data-hero='panel']) .sc[data-peek] .sc__stage {
-    background: #0d0d0d;
-    box-shadow: 0 0 0 100vmax #0d0d0d;
     clip-path: inset(0 -100vmax);
     padding-bottom: clamp(2rem, 1rem + 3vw, 4rem);
   }
 
-  /* ---------- Test: the sectors film as the dark ground ----------
+  /* ---------- The sectors film as the dark ground (panel hero) ----------
      Full width, from under the hero panel's raised edge down past the bottom
      of the capture's ground (height set by the script), behind the capture. */
   .sc__ground {
     display: none;
   }
 
-  :global(html[data-hero='panel'][data-ground='video']) .sc[data-peek] .sc__ground {
+  :global(html[data-hero='panel']) .sc[data-peek] .sc__ground {
     position: absolute;
     top: -15rem;
     left: 0;
@@ -189,13 +185,8 @@ const film = hero.video;
       rgb(13 13 13 / 0.5);
   }
 
-  :global(html[data-hero='panel'][data-ground='video']) .sc[data-peek] .sc__stage {
-    background: transparent;
-    box-shadow: none;
-  }
-
   @media (prefers-reduced-motion: no-preference) {
-    :global(html[data-hero='panel'][data-ground='video']) .sc[data-peek] .sc__ground {
+    :global(html[data-hero='panel']) .sc[data-peek] .sc__ground {
       animation: sc-ground 1200ms cubic-bezier(0.33, 1, 0.68, 1) both;
     }
   }
@@ -400,7 +391,7 @@ const film = hero.video;
   }
 
 
-  /* ---------- Test: the film ground runs down to the capture's ground ---------- */
+  /* ---------- The film ground runs down to the capture's ground ---------- */
   const ground = document.querySelector<HTMLElement>('[data-sc-ground]');
   const groundStage = ground?.parentElement?.querySelector<HTMLElement>('.sc__stage');
   const groundHost = ground?.parentElement;
