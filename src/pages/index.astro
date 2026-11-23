@@ -31,8 +31,9 @@ import '../styles/rhythm.css';
 const locale = 'en';
 const { home } = getCopy(locale);
 const site = Astro.site ?? new URL('https://www.predicterra.com');
-// Test switch, bottom left (the intro). Shown only while developing
-// (npm run dev); the production build hides it and the intro always runs.
+// Test switches, bottom left (the capture and the film, the intro). Shown only
+// while developing (npm run dev); the production build hides them and runs on
+// the defaults (current, intro on) whatever was stored.
 const showTests = import.meta.env.DEV;
 ---
 
@@ -44,6 +45,13 @@ const showTests = import.meta.env.DEV;
 >
   <!-- Set before paint. -->
   <script is:inline define:vars={{ showTests }}>
+    // Test: the capture and the film (sections/home/Showcase.astro).
+    try {
+      var mix = showTests ? localStorage.getItem('predicterra:sc-mix') : null;
+      document.documentElement.dataset.scMix = mix === 'alternate' || mix === 'framed' ? mix : 'current';
+    } catch (e) {
+      document.documentElement.dataset.scMix = 'current';
+    }
     // Test: the intro (sections/home/HomeIntro.astro), panel hero only, from
     // the top: on a visit from outside the site and on a reload, not when
     // arriving from another page of the site (a link or the back button).
@@ -94,6 +102,12 @@ const showTests = import.meta.env.DEV;
   <!-- Test switch, bottom left: the intro (development only, showTests). -->
   {showTests && (
   <div class="rhy">
+    <div class="rhy__row" role="group" aria-label="Capture and film (test)">
+      <span class="rhy__label">Showcase</span>
+      <button type="button" class="rhy__btn" data-mix-option="current" aria-pressed="false">Current</button>
+      <button type="button" class="rhy__btn" data-mix-option="alternate" aria-pressed="false">Alternate</button>
+      <button type="button" class="rhy__btn" data-mix-option="framed" aria-pressed="false">App lower</button>
+    </div>
     <div class="rhy__row" role="group" aria-label="Intro (test)">
       <span class="rhy__label">Intro</span>
       <button type="button" class="rhy__btn" data-intro-option="on" aria-pressed="false">On</button>
@@ -106,6 +120,23 @@ const showTests = import.meta.env.DEV;
 
 <script>
   const html = document.documentElement;
+  // The capture and the film: current, alternate or app lower.
+  const mixes = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-mix-option]'));
+  const syncMix = () => mixes.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mixOption === html.dataset.scMix)));
+  mixes.forEach((b) =>
+    b.addEventListener('click', () => {
+      html.dataset.scMix = b.dataset.mixOption;
+      try {
+        localStorage.setItem('predicterra:sc-mix', b.dataset.mixOption!);
+      } catch {}
+      syncMix();
+      window.dispatchEvent(new Event('showcase:mix'));
+      // The ground film starts or stops with it (scripts/hero-video).
+      window.dispatchEvent(new Event('hero:change'));
+    }),
+  );
+  syncMix();
+
   // Intro on or off, and replay (reloads from the top).
   const intros = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-intro-option]'));
   const syncIntro = () => intros.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.introOption === html.dataset.introPref)));

@@ -17,6 +17,15 @@
  * Panel hero: the dark ground under the hero panel and behind the capture
  * plays the film of the sectors and industries, under a dark veil, the
  * capture at its usual size on top; it fades out into the page below.
+ *
+ * Test (html[data-sc-mix], switch bottom left, development only):
+ *  current    the above
+ *  alternate  the sectors film plays inside the capture's 16:9 frame, taking
+ *             turns with the platform (a crossfade between them), on a plain
+ *             dark ground
+ *  framed     the capture at its size but lower, just under the fold, so the
+ *             first screen shows the film (under a lighter veil) and the
+ *             capture follows as the page scrolls
  */
 import BrandLogo from '../../components/BrandLogo.astro';
 import { getCopy, withBase, type Locale } from '../../i18n/config';
@@ -79,6 +88,26 @@ const film = hero.video;
         <source src={withBase(v.small)} type="video/mp4" media="(max-width: 47.99rem)" />
         <source src={withBase(v.large)} type="video/mp4" />
       </video>
+      {
+        peek && (
+          <video
+            class="sc__alt"
+            poster={withBase(film.poster)}
+            muted
+            loop
+            playsinline
+            preload="none"
+            disablepictureinpicture
+            disableRemotePlayback
+            tabindex="-1"
+            aria-hidden="true"
+            data-sc-alt
+          >
+            <source src={withBase(film.small)} type="video/mp4" media="(max-width: 47.99rem)" />
+            <source src={withBase(film.large)} type="video/mp4" />
+          </video>
+        )
+      }
     </figure>
   </div>
   {
@@ -195,6 +224,51 @@ const film = hero.video;
     from {
       opacity: 0;
     }
+  }
+
+  /* ---------- Test: alternate (the film inside the frame, taking turns) ---------- */
+  .sc__alt {
+    display: none;
+  }
+
+  :global(html[data-sc-mix='alternate']) .sc__alt {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 900ms cubic-bezier(0.33, 1, 0.68, 1);
+    pointer-events: none;
+  }
+
+  :global(html[data-sc-mix='alternate']) .sc__frame[data-alt-on] .sc__alt {
+    opacity: 1;
+  }
+
+  /* The film is in the frame, so the ground goes back to plain dark. */
+  :global(html[data-hero='panel'][data-sc-mix='alternate']) .sc[data-peek] .sc__ground {
+    display: none;
+  }
+
+  :global(html[data-hero='panel'][data-sc-mix='alternate']) .sc[data-peek] .sc__stage {
+    background: #0d0d0d;
+    box-shadow: 0 0 0 100vmax #0d0d0d;
+  }
+
+  /* ---------- Test: framed (the capture lower, the film first) ----------
+     The capture starts where the first screen ends, its top edge just in view
+     as a cue to scroll; its own size is unchanged. */
+  :global(html[data-hero='panel'][data-sc-mix='framed']) .sc[data-peek] .sc__stage {
+    padding-top: calc(var(--hero-peek) - 3rem);
+    padding-bottom: clamp(4rem, 2rem + 6vw, 9rem);
+  }
+
+  :global(html[data-hero='panel'][data-sc-mix='framed']) .sc[data-peek] .sc__ground::after {
+    background:
+      linear-gradient(180deg, rgb(13 13 13 / 0.5) 0%, rgb(13 13 13 / 0) 30%, rgb(13 13 13 / 0) 70%, rgb(13 13 13 / 0.75) 100%),
+      rgb(13 13 13 / 0.18);
   }
 
   /* Layouts whose hero already shows the platform: no second capture, the
@@ -390,6 +464,45 @@ const film = hero.video;
     }
   }
 
+
+  /* ---------- Test: alternate, the platform and the film taking turns ---------- */
+  {
+    const html = document.documentElement;
+    const altFrame = document.querySelector<HTMLElement>('[data-showcase-frame]');
+    const app = altFrame?.querySelector<HTMLVideoElement>('[data-showcase-video]');
+    const film = altFrame?.querySelector<HTMLVideoElement>('[data-sc-alt]');
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const APP_MS = 7000;
+    const FILM_MS = 5000;
+    const FADE_MS = 900;
+    let timer = 0;
+    const show = (onFilm: boolean) => {
+      if (!altFrame || !app || !film) return;
+      altFrame.toggleAttribute('data-alt-on', onFilm);
+      if (onFilm) {
+        if (film.preload === 'none') film.preload = 'auto';
+        film.play().catch(() => {});
+        // The platform holds its place while the film plays, then carries on.
+        window.setTimeout(() => altFrame.hasAttribute('data-alt-on') && app.pause(), FADE_MS);
+      } else {
+        app.play().catch(() => {});
+        window.setTimeout(() => !altFrame.hasAttribute('data-alt-on') && film.pause(), FADE_MS);
+      }
+      timer = window.setTimeout(() => show(!onFilm), onFilm ? FILM_MS : APP_MS);
+    };
+    const stop = () => {
+      window.clearTimeout(timer);
+      altFrame?.removeAttribute('data-alt-on');
+      film?.pause();
+    };
+    const start = () => {
+      stop();
+      if (html.dataset.scMix !== 'alternate' || still) return;
+      timer = window.setTimeout(() => show(true), APP_MS);
+    };
+    window.addEventListener('showcase:mix', start);
+    start();
+  }
 
   /* ---------- The film ground runs down to the capture's ground ---------- */
   const ground = document.querySelector<HTMLElement>('[data-sc-ground]');
