@@ -10,6 +10,15 @@
 import type { FlowWorld, FlowAnchor } from './world-flow';
 import { onThemeChange } from '../theme';
 
+/** Any world the scroll can drive (world-flow.ts, world-twin.ts). */
+type World = Omit<FlowWorld, 'project'> & { project(id: string): { x: number; y: number } };
+type Load = (canvas: HTMLCanvasElement, opts: { reducedMotion: boolean; lowPower: boolean }) => Promise<World>;
+
+const loadFlow: Load = async (canvas, opts) => {
+  const { createFlowWorld } = await import('./world-flow');
+  return createFlowWorld(canvas, opts) as unknown as World;
+};
+
 /** Extra viewport fraction to hold on the last stop before the cover starts (matches CSS). */
 const LAST_HOLD = 0.5;
 /** How far (in hops) the camera drifts past the last stop. */
@@ -17,7 +26,13 @@ const GLIDE = 0.6;
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
-export function mountFlowScene(root: HTMLElement) {
+/**
+ * `load` builds the world (the data flow by default); `cardAnchor` is the
+ * anchor the last stop's card sits beside.
+ */
+export function mountFlowScene(root: HTMLElement, options: { load?: Load; cardAnchor?: string } = {}) {
+  const load = options.load ?? loadFlow;
+  const cardAnchor = options.cardAnchor ?? 'out0';
   const stage = root.querySelector<HTMLElement>('[data-stage]')!;
   const host = root.querySelector<HTMLElement>('[data-canvas-host]')!;
   const steps = Array.from(root.querySelectorAll<HTMLElement>('[data-step]'));
@@ -29,7 +44,7 @@ export function mountFlowScene(root: HTMLElement) {
   const stopCount = steps.length;
   const lastStop = stopCount - 1;
 
-  let world: FlowWorld | null = null;
+  let world: World | null = null;
   let loading = false;
   let visible = false;
   let raf = 0;
@@ -79,11 +94,11 @@ export function mountFlowScene(root: HTMLElement) {
   function positionOverlays() {
     if (!world) return;
     for (const t of tags) {
-      const { x, y } = world.project(t.dataset.anchor as FlowAnchor);
+      const { x, y } = world.project(t.dataset.anchor as FlowAnchor | string);
       t.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
     }
     if (card && !narrow.matches) {
-      const { x, y } = world.project('out0');
+      const { x, y } = world.project(cardAnchor);
       const cw = card.offsetWidth;
       const ch = card.offsetHeight;
       const gap = Math.max(60, width * 0.06);
@@ -131,9 +146,8 @@ export function mountFlowScene(root: HTMLElement) {
       const canvas = document.createElement('canvas');
       if (!canvas.getContext('webgl2')) throw new Error('WebGL2 unavailable');
       const lowPower = narrow.matches || (navigator.hardwareConcurrency ?? 8) <= 4;
-      const { createFlowWorld } = await import('./world-flow');
       host.appendChild(canvas);
-      world = createFlowWorld(canvas, { reducedMotion: reduceMotion.matches, lowPower });
+      world = await load(canvas, { reducedMotion: reduceMotion.matches, lowPower });
       world.resize(width, height);
       world.setFocus(focus);
       world.snap();

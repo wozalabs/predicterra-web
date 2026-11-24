@@ -1,0 +1,428 @@
+---
+/**
+ * Platform, "The Cognitive Twin of the energy system", as the home's pinned
+ * 3D scroll (scripts/sector-scene/flow-controller.ts + world-twin.ts): one
+ * stretch of grid that gains a level at each stop.
+ *  0  the title and the line under it
+ *  1  descriptive twin: the grid as a map, each asset named
+ *  2  physical twin: the assets rise and a simulated hazard spreads, in grey
+ *  3  Cognitive Twin: the colour arrives, the tower at risk in orange, the
+ *     link to the substation it feeds, and the decision beside it
+ * The copy works like the home's sector stops (icon square, rule and title in
+ * a row, then the twin's chip and what it asks and does). The first two
+ * squares are grey and the Cognitive Twin's orange, so the hierarchy reads in
+ * the copy as it does in the scene.
+ */
+import Icon from '../../components/Icon.astro';
+import { getCopy, type Locale } from '../../i18n/config';
+import type { IconName } from '../../data/icons';
+
+interface Props {
+  locale?: Locale;
+}
+const { locale = 'en' } = Astro.props;
+const { platform: c } = getCopy(locale);
+const t = c.twin;
+const icons: IconName[] = ['location_on', 'air', 'hub'];
+const twins = t.columns.map((name, i) => ({
+  name,
+  tag: t.tags[i],
+  icon: icons[i],
+  rows: t.rows.map((r) => ({ label: r.label, text: r.cells[i] })),
+}));
+const last = twins.length - 1;
+---
+
+<section class="tf" aria-labelledby="twin-title" data-twin-flow style={`--stops:${twins.length + 1}`}>
+  <div class="tf__stage theme-scrub" data-stage>
+    <div class="tf__canvas" data-canvas-host aria-hidden="true"></div>
+
+    <div class="tf__copy container">
+      <!-- Stop 0: the corridor, the title. -->
+      <div class="tf-step tf-step--intro" data-step="0" data-active>
+        <h2 id="twin-title" class="tf-step__intro-title" data-render>{t.title}</h2>
+        <p class="tf-step__text">{t.text}</p>
+      </div>
+
+      {
+        twins.map((w, i) => (
+          <article class:list={['tf-step', i === last && 'tf-step--hi']} data-step={i + 1} aria-labelledby={`tf-${i + 1}-title`}>
+            <div class="tf-step__head">
+              <Icon name={w.icon} boxed size="var(--step-size)" class={i === last ? undefined : 'tf-step__icon--muted'} />
+              <span class="tf-step__divider" aria-hidden="true" />
+              <h3 id={`tf-${i + 1}-title`} class="tf-step__title">
+                {w.name}
+              </h3>
+            </div>
+            <span class:list={['tf-step__tag', i === last && 'tf-step__tag--hi']}>{w.tag}</span>
+            <dl class="tf-step__rows">
+              {w.rows.map((r) => (
+                <div>
+                  <dt class="t-small">{r.label}</dt>
+                  <dd>{r.text}</dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+        ))
+      }
+    </div>
+
+    <!-- Labels on the scene, following their 3D anchors (decorative). -->
+    <div class="tf__tags" aria-hidden="true">
+      {t.scene.ids.map((id, k) => (
+        <span class="tf-tag" data-anchor={`t${k}`} data-stops="1">
+          {id}
+        </span>
+      ))}
+      <span class="tf-tag" data-anchor="sub" data-stops="1">
+        {t.scene.substation}
+      </span>
+      <span class="tf-tag tf-tag--hazard" data-anchor="hazard" data-stops="2">
+        {t.scene.hazard}
+      </span>
+    </div>
+
+    <!-- The last stop: the decision, in the clear space above the scene. -->
+    <div class="tf__card" data-card>
+      <p class="tf-card__label t-small">
+        <span class="pg-dot" aria-hidden="true" />
+        {t.scene.card.label}
+      </p>
+      <p class="tf-card__value">{t.scene.card.value}</p>
+      <p class="tf-card__why t-small">{t.scene.card.why}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---------- Pinning (as the home's 3D trace and the data flow) ---------- */
+  .tf {
+    position: relative;
+    z-index: var(--z-stage);
+    height: calc((var(--stops) + 1.5) * 100svh);
+  }
+
+  .tf__stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: clip;
+    background: var(--canvas);
+    transform-origin: 50% 0;
+  }
+
+  .tf__canvas {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(circle, var(--scene-dot) 1px, transparent 1.6px);
+    background-size: 22px 22px;
+  }
+
+  .tf__canvas :global(canvas) {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+
+  .tf__canvas[data-ready] :global(canvas) {
+    opacity: 1;
+  }
+
+  /* Readability veil behind the copy column. */
+  .tf__stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgb(var(--canvas-rgb) / 0.94) 0%, rgb(var(--canvas-rgb) / 0.78) 26%, rgb(var(--canvas-rgb) / 0) 46%);
+  }
+
+  /* ---------- Copy layers ---------- */
+  .tf__copy {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .tf-step {
+    --step-size: clamp(2.25rem, 1.5rem + 2.2vw, 3.5rem);
+    position: absolute;
+    left: var(--gutter);
+    top: 50%;
+    width: min(30rem, 38vw);
+    display: grid;
+    justify-items: start;
+    gap: 1.25rem;
+    opacity: 0;
+    transform: translateY(calc(-50% + 12px));
+    transition:
+      opacity 360ms var(--ease-out),
+      transform 480ms var(--ease-out);
+  }
+
+  .tf-step[data-active] {
+    opacity: 1;
+    transform: translateY(-50%);
+    transition:
+      opacity 420ms var(--ease-out) 80ms,
+      transform 560ms var(--ease-out) 80ms;
+  }
+
+  .tf-step__intro-title {
+    max-width: 16ch;
+    font-size: var(--fs-h2);
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: var(--track-heading);
+  }
+
+  .tf-step__head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  /* The earlier twins: a grey square, no fire. */
+  .tf-step__head :global(.tf-step__icon--muted) {
+    background: var(--chip-bg);
+    color: var(--ink-2);
+    animation: none;
+    box-shadow: none;
+  }
+
+  .tf-step__divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--line-strong);
+  }
+
+  .tf-step__title {
+    font-size: var(--step-size);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: var(--track-heading);
+  }
+
+  /* The earlier twins' names a step quieter. */
+  .tf-step:not(.tf-step--hi) .tf-step__title {
+    color: var(--ink-2);
+  }
+
+  .tf-step__text {
+    max-width: 34ch;
+    color: var(--ink-2);
+  }
+
+  .tf-step__tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+    padding: 0 0.5rem;
+    background: var(--chip-bg);
+    color: var(--ink-2);
+    font-size: var(--fs-caption);
+    white-space: nowrap;
+  }
+
+  .tf-step__tag--hi {
+    background: var(--grad-accent);
+    background-size: var(--grad-accent-size);
+    color: #ffffff;
+  }
+
+  .tf-step__rows {
+    display: grid;
+    gap: 0.875rem;
+    max-width: 36ch;
+  }
+
+  .tf-step__rows div {
+    display: grid;
+    gap: 0.125rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .tf-step__rows dt {
+    color: var(--muted);
+  }
+
+  .tf-step__rows dd {
+    color: var(--ink-2);
+  }
+
+  .tf-step--hi .tf-step__rows dd {
+    color: var(--ink);
+  }
+
+  /* ---------- Labels on the scene ---------- */
+  .tf__tags {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .tf-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0.25rem 0.5rem;
+    background: var(--surface);
+    color: var(--ink-2);
+    box-shadow:
+      0 1px 2px rgb(30 30 30 / 0.06),
+      0 8px 24px -10px rgb(30 30 30 / 0.25);
+    font-size: var(--fs-caption);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    translate: -50% calc(-100% - 8px);
+    opacity: 0;
+    scale: 0.96;
+    transition:
+      opacity 240ms ease,
+      scale 320ms var(--ease-out);
+    will-change: transform;
+  }
+
+  .tf-tag[data-on] {
+    opacity: 1;
+    scale: 1;
+    transition:
+      opacity 420ms ease 120ms,
+      scale 520ms var(--ease-out) 120ms;
+  }
+
+  .tf-tag--hazard {
+    padding: 0.375rem 0.625rem;
+    font-size: var(--fs-small);
+  }
+
+  .tf:not([data-ready]) .tf-tag {
+    display: none;
+  }
+
+  /* ---------- The decision ---------- */
+  .tf__card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    display: grid;
+    justify-items: start;
+    gap: 0.625rem;
+    width: min(22rem, 30vw);
+    padding: 1.25rem 1.375rem 1.375rem;
+    background: #ffffff;
+    color: #1e1e1e;
+    --ink: #1e1e1e;
+    --ink-2: #4d4d4d;
+    --muted: #767676;
+    box-shadow:
+      0 1px 2px rgb(30 30 30 / 0.06),
+      0 24px 48px -16px rgb(30 30 30 / 0.3);
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    /* Fixed in the stage's top right, over the empty ground, never on the
+       assets (the controller's anchored position is not used here). */
+    top: calc(var(--header-h) + clamp(1.5rem, 1rem + 2vw, 3rem));
+    left: auto;
+    right: var(--gutter);
+    transform: none !important;
+    translate: 0 8px;
+    transition:
+      opacity 220ms ease,
+      translate 260ms var(--ease-out),
+      visibility 0s linear 260ms;
+  }
+
+  .tf__card[data-open] {
+    opacity: 1;
+    visibility: visible;
+    translate: 0 0;
+    transition:
+      opacity 460ms cubic-bezier(0.22, 1, 0.36, 1) 260ms,
+      translate 620ms cubic-bezier(0.22, 1, 0.36, 1) 260ms,
+      visibility 0s;
+  }
+
+  .tf-card__label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+  }
+
+  .tf-card__value {
+    font-size: var(--fs-h4);
+    line-height: 1.25;
+    letter-spacing: var(--track-title);
+  }
+
+  .tf-card__why {
+    color: var(--ink-2);
+    line-height: 1.45;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tf__card,
+    .tf__card[data-open],
+    .tf-tag,
+    .tf-tag[data-on] {
+      translate: none;
+      scale: none;
+    }
+    .tf-tag {
+      translate: -50% calc(-100% - 8px);
+    }
+  }
+
+  /* ---------- Small screens: the copy on top, the scene under it ---------- */
+  @media (max-width: 47.99rem) {
+    .tf__stage::before {
+      background: linear-gradient(180deg, rgb(var(--canvas-rgb) / 0.95) 0%, rgb(var(--canvas-rgb) / 0.85) 40%, rgb(var(--canvas-rgb) / 0) 56%);
+    }
+    .tf-step {
+      top: calc(var(--header-h) + 1.5rem);
+      right: var(--gutter);
+      width: auto;
+      gap: 0.75rem;
+      transform: translateY(12px);
+    }
+    .tf-step[data-active] {
+      transform: none;
+    }
+    .tf-step__rows {
+      gap: 0.5rem;
+      font-size: var(--fs-small);
+    }
+    .tf__card {
+      left: var(--gutter);
+      right: var(--gutter);
+      top: auto;
+      bottom: var(--gutter);
+      width: auto;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  import { mountFlowScene } from '../../scripts/sector-scene/flow-controller';
+
+  const root = document.querySelector<HTMLElement>('[data-twin-flow]');
+  if (root)
+    mountFlowScene(root, {
+      cardAnchor: 'risk',
+      load: async (canvas, opts) => {
+        const { createTwinWorld } = await import('../../scripts/sector-scene/world-twin');
+        return createTwinWorld(canvas, opts);
+      },
+    });
+</script>

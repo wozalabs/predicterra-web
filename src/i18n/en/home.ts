@@ -64,10 +64,14 @@ export default {
     eyebrow: 'Asset foresight for energy',
     titleLine1: 'Foresight infrastructure',
     titleLine2: 'for the energy transition',
+    // The film under the hero and behind the platform capture (Showcase.astro).
     video: {
-      poster: '/video/hero-poster.webp',
-      large: '/video/hero-1080.mp4',
-      small: '/video/hero-720.mp4',
+      poster: '/video/hero-bg-poster.webp',
+      large: '/video/hero-bg-1920.mp4',
+      small: '/video/hero-bg-960.mp4',
+      // Large and retina screens: the 4K source at its own resolution and
+      // bitrate (only cropped of its side bars, sound removed).
+      xl: '/video/hero-bg-3840.mp4',
     },
     // Grid over the video. c/r = column/row on desktop (8×3), cm/rm on mobile (4×3).
     cells: [

@@ -41,6 +41,8 @@ const { locale = 'en', peek = false, logos } = Astro.props;
 const { showcase: s, hero } = getCopy(locale).home;
 const v = s.video;
 const film = hero.video;
+/** The 4K film on wide screens, and on retina laptops from 1200px wide. */
+const XL = '(min-width: 100rem), (min-width: 75rem) and (min-resolution: 2dppx)';
 ---
 
 <section class="sc" aria-label={s.label} data-showcase data-peek={peek ? '' : undefined}>
@@ -61,6 +63,7 @@ const film = hero.video;
           data-hero-video
         >
           <source src={withBase(film.small)} type="video/mp4" media="(max-width: 47.99rem)" />
+          <source src={withBase(film.xl)} type="video/mp4" media={XL} />
           <source src={withBase(film.large)} type="video/mp4" />
         </video>
       </div>
@@ -104,6 +107,7 @@ const film = hero.video;
             data-sc-alt
           >
             <source src={withBase(film.small)} type="video/mp4" media="(max-width: 47.99rem)" />
+            <source src={withBase(film.xl)} type="video/mp4" media={XL} />
             <source src={withBase(film.large)} type="video/mp4" />
           </video>
         )

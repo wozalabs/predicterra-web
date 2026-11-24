@@ -7,7 +7,7 @@
  */
 import PageLayout from '../layouts/PageLayout.astro';
 import PageHero from '../sections/pages/PageHero.astro';
-import TwinNest from '../sections/pages/TwinNest.astro';
+import TwinFlow from '../sections/pages/TwinFlow.astro';
 import Rows from '../sections/pages/Rows.astro';
 import SectionHead from '../sections/pages/SectionHead.astro';
 import Stats from '../sections/pages/Stats.astro';
@@ -32,23 +32,19 @@ const pad = (n: number) => String(n).padStart(3, '0');
   <!-- The title on the left, the description and the action on the right. -->
   <PageHero locale={locale} {...c.hero} />
 
-  <!-- Three kinds of twin as layers, each standing on the one that can do more. -->
-  <TwinNest
-    id="twin-title"
-    title={c.twin.title}
-    text={c.twin.text}
-    columns={c.twin.columns}
-    rows={c.twin.rows}
-    tags={c.twin.tags}
-    closing={c.twin.closing}
-  />
+  <!-- Three kinds of twin as a pinned 3D scroll: one stretch of grid that
+       becomes a map, then a simulation, then the Cognitive Twin. -->
+  <TwinFlow locale={locale} />
 
+  <!-- The four layers slide over the pinned twins, notched top edge first. -->
+  <div class="pf-cover">
   <Rows id="arch-title" title={c.architecture.title} text={c.architecture.text} items={c.architecture.layers} marker="num">
     <p class="pf-note" data-reveal>
       <span class="pg-dot" aria-hidden="true"></span>
       {c.architecture.closing}
     </p>
   </Rows>
+  </div>
 
   <!-- The ontology in action: the story on one side, the object and its relationships on the other. -->
   <section class="pf-ont pg-sec" aria-labelledby="ont-title">

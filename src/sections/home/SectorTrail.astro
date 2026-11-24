@@ -53,7 +53,8 @@ const stops = steps.length;
       }
     </div>
 
-    <!-- Markers: square dots projected from the 3D anchors. -->
+    <!-- Markers: white squares projected from the 3D anchors, each with the
+         icon of its hazard, so they read as something to open. -->
     <div class="sectors__markers" data-markers>
       {
         scene.sectors.map((s, i) => (
@@ -66,7 +67,9 @@ const stops = steps.length;
               aria-label={`${scene.openAlert} ${s.alert.asset}`}
             >
               <span class="marker__ring" aria-hidden="true" />
-              <span class="marker__dot" aria-hidden="true" />
+              <span class="marker__dot" aria-hidden="true">
+                <Icon name={s.alert.hazardIcon as IconName} class="marker__icon" />
+              </span>
             </button>
           </div>
         ))
@@ -262,15 +265,24 @@ const stops = steps.length;
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* White, so it stands out on the orange asset it marks. */
+  /* White, so it stands out on the orange asset it marks; the hazard's icon in
+     orange inside it. */
   .marker__dot {
-    width: 14px;
-    height: 14px;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
     background: #ffffff;
+    color: var(--accent);
     box-shadow:
       0 0 0 1px rgb(30 30 30 / 0.12),
       0 2px 10px rgb(30 30 30 / 0.35);
     transition: transform 200ms var(--ease-out);
+  }
+
+  .marker__dot :global(.marker__icon) {
+    width: 18px;
+    height: 18px;
   }
 
   .marker__btn:active .marker__dot {
@@ -283,8 +295,8 @@ const stops = steps.length;
 
   .marker__ring {
     position: absolute;
-    width: 14px;
-    height: 14px;
+    width: 28px;
+    height: 28px;
     border: 1.5px solid #ffffff;
     opacity: 0;
   }
@@ -304,7 +316,7 @@ const stops = steps.length;
     }
     70%,
     100% {
-      transform: scale(3.2);
+      transform: scale(2.2);
       opacity: 0;
     }
   }

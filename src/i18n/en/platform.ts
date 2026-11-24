@@ -23,9 +23,21 @@ export default {
     // What each twin can do, on one scale (the meters on the page).
     scale: ['Describe', 'Simulate', 'Reason', 'Anticipate'],
     levels: [25, 50, 100],
-    // Nested panels (sections/pages/TwinNest.astro): each twin sits inside the
-    // one that can do more; the chip names what it adds.
+    // The chip names what each twin adds (sections/pages/TwinFlow.astro).
     tags: ['Describes', 'Simulates', 'Reasons and anticipates'],
+    // The 3D scroll (sections/pages/TwinFlow.astro): one stretch of grid,
+    // labelled as the descriptive twin knows it, the hazard the physical twin
+    // simulates and the decision the Cognitive Twin makes (illustrative).
+    scene: {
+      ids: ['T-101', 'T-102', 'T-103', 'T-104', 'T-105'],
+      substation: 'SE-14',
+      hazard: 'Gusts of 92 km/h, simulated',
+      card: {
+        label: 'Decision',
+        value: 'Clear the vegetation at T-103 and pre-position a crew.',
+        why: 'Gusts of 92 km/h tonight bring dry vegetation within 1.2 m of the conductor on a line that feeds substation SE-14.',
+      },
+    },
     rows: [
       {
         label: 'Asks',

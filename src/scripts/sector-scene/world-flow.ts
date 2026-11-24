@@ -512,7 +512,7 @@ export function createFlowWorld(canvas: HTMLCanvasElement, opts: { reducedMotion
 }
 
 /** Parallel lines along a plan polyline; the middle one carries the orange pulses. */
-function addBundle(
+export function addBundle(
   scene: Scene,
   path: P[],
   lineMat: LineBasicMaterial,
@@ -569,7 +569,7 @@ function offsetPolyline(pts: P[], d: number): P[] {
   return out;
 }
 
-function mulberry32(seed: number) {
+export function mulberry32(seed: number) {
   return () => {
     seed |= 0;
     seed = (seed + 0x6d2b79f5) | 0;
